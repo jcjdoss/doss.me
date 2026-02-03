@@ -182,6 +182,31 @@ mark, .highlight {
 }
 
 /* ============================================
+   HAND-DRAWN MARKER LABELS — Basecamp style
+   ============================================ */
+.marker-label {
+  display: inline-block;
+  font-family: 'Comic Sans MS', 'Chalkboard', 'Comic Neue', cursive;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  background: var(--pop);
+  padding: 6px 14px;
+  margin-bottom: var(--space-md);
+  transform: rotate(-1deg);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+}
+
+.marker-label-alt {
+  transform: rotate(0.5deg);
+}
+
+.marker-label-tilt {
+  transform: rotate(-2deg);
+}
+
+/* ============================================
    SECTIONS — Visual rhythm, varying weights
    ============================================ */
 section {
