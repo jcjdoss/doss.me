@@ -16,9 +16,9 @@
   --text-muted: #999999;
   --border: #e8e6e1;
   
-  /* Analog accent - highlighter yellow */
-  --highlight: #fff176;
-  --highlight-soft: #fff9c4;
+  /* Analog accent - bold highlighter (Basecamp lime-yellow) */
+  --highlight: #d4f566;
+  --highlight-soft: #e8faaa;
   
   /* Ink blue for links */
   --ink: #2c5282;
@@ -158,27 +158,22 @@ header h1 {
   height: 2px;
 }
 
-/* === Highlighter Effect === */
+/* === Highlighter Effect — Bold stripe like Basecamp === */
 .highlight,
 mark {
-  background: linear-gradient(
-    180deg,
-    transparent 50%,
-    var(--highlight) 50%
-  );
-  padding: 0 4px;
-  margin: 0 -4px;
+  background: var(--highlight);
+  padding: 2px 6px;
+  margin: 0 -2px;
+  border-radius: 2px;
 }
 
-/* Subtle highlighter - less intense */
-.highlight-soft {
-  background: linear-gradient(
-    180deg,
-    transparent 60%,
-    var(--highlight-soft) 60%
-  );
-  padding: 0 2px;
-  margin: 0 -2px;
+/* Full-width highlighter bar (for headers/callouts) */
+.highlight-bar {
+  display: inline-block;
+  background: var(--highlight);
+  padding: 4px 12px;
+  margin: 0 -4px;
+  font-weight: 700;
 }
 
 /* === Pen Underline Effect === */
