@@ -1,12 +1,60 @@
+/*
+ * DOSS.ME DESIGN SYSTEM v2.0
+ * 
+ * Inspired by J's favorite apps: Flighty, Fantastical, Carrot Weather, Things 3
+ * 
+ * DESIGN PHILOSOPHY:
+ * - Warm, not cold (like Fantastical's warmth)
+ * - Personality allowed, not sterile (like Carrot Weather's wit)
+ * - Premium feel with approachability (like Flighty's polish)
+ * - Peaceful intentionality (like Things 3's calm)
+ * 
+ * CORE PRINCIPLES:
+ * - Light, bright energy matching J's optimistic nature
+ * - "GREAT" not "fine" - every interaction should feel positive
+ * - Gradients and depth create visual interest without overwhelming
+ * - Typography as the foundation of beautiful, readable design
+ * - Color as personality, not decoration
+ * 
+ * PALETTE INSPIRATION:
+ * - Sunrise oranges and warm ambers (Flighty's warmth + energy)
+ * - Soft sky blues for trust and calm (premium but approachable)
+ * - Cream whites and warm off-whites (Things 3's peaceful base)
+ * - Sage greens for growth and positivity
+ * - Rich typography contrasts for readability
+ */
+
 :root {
-    --bg: #fefefe;
-    --bg-secondary: #f8f9fa;
-    --text: #1a1a1a;
-    --text-muted: #6b7280;
-    --accent: #ea580c;
-    --accent-dim: #dc2626;
-    --border: #e5e7eb;
-    --card-bg: #f9fafb;
+    /* Base Colors - Warm, Bright Foundation */
+    --bg: #fffcf7; /* Warm white, like morning light */
+    --bg-secondary: #faf7f2; /* Slightly warmer off-white */
+    --text: #2c1810; /* Rich brown-black, not harsh black */
+    --text-muted: #8b7355; /* Warm gray, like Things 3 */
+    
+    /* Accent Colors - Personality + Energy */
+    --accent-primary: #ff8c42; /* Warm sunset orange (Flighty inspired) */
+    --accent-secondary: #6c9bd1; /* Soft sky blue (calming but vibrant) */
+    --accent-tertiary: #85b892; /* Sage green (growth, positivity) */
+    --accent-warm: #ffb366; /* Lighter orange for hover states */
+    
+    /* Gradient Magic - Depth + Premium Feel */
+    --gradient-sunrise: linear-gradient(135deg, #ff8c42 0%, #ffb366 100%);
+    --gradient-sky: linear-gradient(135deg, #6c9bd1 0%, #8fbce8 100%);
+    --gradient-growth: linear-gradient(135deg, #85b892 0%, #a6ccb0 100%);
+    --gradient-subtle: linear-gradient(135deg, #faf7f2 0%, #f5f1ea 100%);
+    
+    /* Semantic Colors */
+    --border: #e8e2d8; /* Warm border, never cold gray */
+    --border-soft: #f0ebe3; /* Ultra-light borders */
+    --card-bg: #ffffff; /* Pure white cards on warm background */
+    --card-shadow: rgba(255, 140, 66, 0.08); /* Warm shadow tint */
+    
+    /* Interactive States */
+    --hover-lift: rgba(255, 140, 66, 0.12);
+    --focus-ring: rgba(255, 140, 66, 0.3);
+    --success: #85b892;
+    --warning: #ff8c42;
+    --info: #6c9bd1;
 }
 
 * {
@@ -19,8 +67,14 @@ body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg);
     color: var(--text);
-    line-height: 1.6;
+    line-height: 1.65; /* Slightly more breathing room */
     min-height: 100vh;
+    /* Subtle gradient background for warmth */
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-secondary) 100%);
+    /* Enhanced typography */
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .container {
@@ -29,16 +83,26 @@ body {
     padding: 4rem 1.5rem;
 }
 
-/* Header */
+/* Header - Premium Warmth with Personality */
 header {
     text-align: center;
     margin-bottom: 3rem;
+    padding: 2rem 0;
 }
 
 .avatar {
     font-size: 4rem;
     margin-bottom: 1rem;
-    filter: grayscale(20%);
+    /* Remove grayscale - let personality shine! */
+    filter: drop-shadow(0 4px 12px var(--card-shadow));
+    /* Subtle bounce animation on load */
+    animation: avatarBounce 0.6s ease-out;
+}
+
+@keyframes avatarBounce {
+    0% { transform: scale(0.8) translateY(20px); opacity: 0; }
+    60% { transform: scale(1.1) translateY(-5px); }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 
 h1 {
@@ -46,58 +110,105 @@ h1 {
     font-weight: 600;
     letter-spacing: -0.02em;
     margin-bottom: 0.5rem;
+    /* Warm gradient text for personality */
+    background: var(--gradient-sunrise);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    /* Fallback for browsers that don't support gradient text */
+    color: var(--accent-primary);
+}
+
+/* Fallback for browsers that don't support background-clip: text */
+@supports not (background-clip: text) {
+    h1 {
+        color: var(--accent-primary);
+    }
 }
 
 .tagline {
     color: var(--text-muted);
     font-size: 1.1rem;
+    font-weight: 400;
+    /* Add a touch of warmth */
+    margin-bottom: 0.5rem;
 }
 
-/* Navigation */
+/* Navigation - Playful but Professional */
 .nav {
     display: flex;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
     margin-top: 2rem;
     flex-wrap: wrap;
 }
 
 .nav-link {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.8rem;
     font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--border);
+    text-transform: capitalize;
+    letter-spacing: 0.02em;
+    padding: 0.75rem 1.25rem;
+    border: 2px solid var(--border-soft);
     background: var(--card-bg);
     color: var(--text-muted);
     text-decoration: none;
-    transition: all 0.2s ease;
+    border-radius: 25px; /* Pill shape like Fantastical */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 1;
 }
 
 .nav-link:hover {
-    color: var(--text);
-    border-color: var(--accent-dim);
+    color: var(--bg);
+    border-color: var(--accent-primary);
+    background: var(--gradient-sunrise);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--card-shadow);
 }
 
 .nav-link.active {
-    background: var(--accent);
-    border-color: var(--accent);
+    background: var(--gradient-sunrise);
+    border-color: var(--accent-primary);
     color: var(--bg);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px var(--card-shadow);
 }
 
-/* About */
+/* About - Warm and Inviting */
 .about {
     margin-bottom: 3rem;
-    padding: 1.5rem;
+    padding: 2rem;
     background: var(--card-bg);
-    border-radius: 12px;
-    border: 1px solid var(--border);
+    border-radius: 16px; /* More friendly, less sharp */
+    border: 1px solid var(--border-soft);
+    box-shadow: 0 4px 16px var(--card-shadow);
+    /* Subtle inner glow for warmth */
+    position: relative;
+}
+
+.about::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 16px;
+    padding: 1px;
+    background: var(--gradient-sunrise);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: subtract;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: subtract;
+    opacity: 0.3;
 }
 
 .about p {
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
+    font-size: 1rem;
+    line-height: 1.7;
 }
 
 .about p:last-child {
@@ -105,56 +216,96 @@ h1 {
 }
 
 .highlight {
-    color: var(--accent);
-    font-weight: 500;
+    background: var(--gradient-sunrise);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 600;
+    /* Fallback for browsers that don't support gradient text */
+    color: var(--accent-primary);
 }
 
-/* Links */
+/* Links - Vibrant and Engaging */
 .links {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 1rem;
     margin-bottom: 3rem;
 }
 
 .link-card {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
+    gap: 1.25rem;
+    padding: 1.25rem 1.5rem;
     background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    border: 2px solid var(--border-soft);
+    border-radius: 16px;
     text-decoration: none;
     color: var(--text);
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.link-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--gradient-subtle);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
 }
 
 .link-card:hover {
-    border-color: var(--accent-dim);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.1);
+    border-color: var(--accent-primary);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px var(--card-shadow);
+}
+
+.link-card:hover::before {
+    left: 0;
+}
+
+.link-card:hover .link-icon {
+    background: var(--gradient-sunrise);
+    transform: scale(1.1);
+}
+
+.link-card:hover .link-text strong {
+    color: var(--accent-primary);
 }
 
 .link-icon {
     font-size: 1.5rem;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 3rem;
+    height: 3rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bg);
-    border-radius: 8px;
+    background: var(--bg-secondary);
+    border-radius: 12px;
     font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 1;
+    border: 2px solid var(--border-soft);
 }
 
 .link-text {
     display: flex;
     flex-direction: column;
+    position: relative;
+    z-index: 1;
 }
 
 .link-text strong {
     font-weight: 600;
+    margin-bottom: 0.25rem;
+    transition: color 0.3s ease;
 }
 
 .link-text span:last-child {
@@ -162,48 +313,84 @@ h1 {
     font-size: 0.875rem;
 }
 
-/* Current Projects */
+/* Current Projects - Premium Showcase */
 .current {
     margin-bottom: 3rem;
 }
 
 .current h2 {
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-muted);
-    margin-bottom: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    letter-spacing: 0.02em;
+    color: var(--accent-secondary);
+    margin-bottom: 1.5rem;
+    padding-left: 1rem;
+    position: relative;
+}
+
+.current h2::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 20px;
+    background: var(--gradient-sky);
+    border-radius: 2px;
 }
 
 .project {
-    padding: 1.5rem;
+    padding: 2rem;
     background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
+    border: 2px solid var(--border-soft);
+    border-radius: 20px;
+    box-shadow: 0 8px 24px var(--card-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.project::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-growth);
 }
 
 .project h3 {
-    font-size: 1.25rem;
+    font-size: 1.4rem;
     font-weight: 600;
-    margin-bottom: 0.75rem;
-    color: var(--accent);
+    margin-bottom: 1rem;
+    background: var(--gradient-sunrise);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: var(--accent-primary); /* Fallback */
 }
 
 .project p {
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.7;
 }
 
 .project ul {
     list-style: none;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 1rem 0;
 }
 
 .project li {
-    padding: 0.5rem 0;
-    padding-left: 1.5rem;
+    padding: 0.75rem 1.5rem;
+    padding-left: 2.5rem;
     position: relative;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-soft);
+    transition: all 0.2s ease;
 }
 
 .project li:last-child {
@@ -211,94 +398,171 @@ h1 {
 }
 
 .project li::before {
-    content: "→";
+    content: "✨";
     position: absolute;
-    left: 0;
-    color: var(--accent-dim);
+    left: 1rem;
+    top: 0.75rem;
+    font-size: 1rem;
+}
+
+.project li:hover {
+    background: var(--card-bg);
+    border-radius: 8px;
+    margin: 0 0.5rem;
+    transform: translateX(4px);
 }
 
 .project a {
-    color: var(--accent);
+    color: var(--accent-primary);
     text-decoration: none;
+    position: relative;
 }
 
-.project a:hover {
-    text-decoration: underline;
+.project a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--gradient-sunrise);
+    transition: width 0.3s ease;
+}
+
+.project a:hover::after {
+    width: 100%;
 }
 
 .meta {
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     color: var(--text-muted);
     font-style: italic;
     margin-bottom: 0;
+    padding: 1rem;
+    background: var(--gradient-subtle);
+    border-radius: 12px;
+    border-left: 4px solid var(--accent-secondary);
 }
 
-/* Footer */
+/* Footer - Warm and Personal */
 footer {
     text-align: center;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border);
+    padding-top: 3rem;
+    margin-top: 2rem;
+    border-top: 2px solid var(--border-soft);
+    position: relative;
+}
+
+footer::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: var(--gradient-sunrise);
+    border-radius: 1px;
 }
 
 .note {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.8rem;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.9rem;
     color: var(--text-muted);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-style: italic;
 }
 
 .copyright {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
+    opacity: 0.8;
 }
 
-/* Posts/Stream - BRUTALIST */
+/* Posts/Stream - Warm and Engaging */
 .stream {
     margin-bottom: 3rem;
 }
 
 .stream h2 {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: var(--text);
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    letter-spacing: 0.02em;
+    background: var(--gradient-sky);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: var(--accent-secondary); /* Fallback */
+    margin-bottom: 2rem;
+    padding-bottom: 0.75rem;
+    position: relative;
+}
+
+.stream h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background: var(--gradient-sky);
+    border-radius: 2px;
 }
 
 .post {
-    padding: 1.5rem 0;
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 0;
+    padding: 2rem;
+    background: var(--card-bg);
+    border: 2px solid var(--border-soft);
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 16px var(--card-shadow);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.post::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-sunrise);
+}
+
+.post:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--card-shadow);
+    border-color: var(--accent-primary);
 }
 
 .post:last-of-type {
-    border-bottom: 2px solid var(--text);
+    margin-bottom: 0;
 }
 
 .post-date {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--accent);
-    margin-bottom: 0.75rem;
-    letter-spacing: 0.05em;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    margin-bottom: 1rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    opacity: 0.8;
 }
 
 .post-content {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
-    line-height: 1.8;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.7;
     color: var(--text);
 }
 
 .post-content p {
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
 }
 
 .post-content p:last-child {
@@ -307,43 +571,72 @@ footer {
 
 .post-tag {
     display: inline-block;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    font-weight: 700;
-    padding: 0.25rem 0.5rem;
-    background: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    background: var(--gradient-sunrise);
     color: var(--bg);
-    margin-top: 1rem;
+    margin-top: 1.5rem;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px var(--card-shadow);
 }
 
-/* Disclaimer - BRUTALIST */
+/* Disclaimer - Friendly but Important */
 .disclaimer {
-    padding: 1rem;
-    background: transparent;
-    border: 2px solid var(--accent);
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border: 2px solid var(--accent-tertiary);
     margin-bottom: 3rem;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.85rem;
     color: var(--text-muted);
-    line-height: 1.6;
+    line-height: 1.65;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.disclaimer::before {
+    content: '🤖';
+    position: absolute;
+    top: -8px;
+    right: 1rem;
+    background: var(--card-bg);
+    padding: 0 8px;
+    font-size: 1.2rem;
 }
 
 .disclaimer strong {
-    color: var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    background: var(--gradient-growth);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: var(--accent-tertiary); /* Fallback */
+    font-weight: 600;
 }
 
 .disclaimer a {
-    color: var(--text);
-    text-decoration: underline;
-    text-underline-offset: 2px;
+    color: var(--accent-primary);
+    text-decoration: none;
+    position: relative;
 }
 
-.disclaimer a:hover {
-    color: var(--accent);
+.disclaimer a::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--accent-primary);
+    transition: width 0.3s ease;
+}
+
+.disclaimer a:hover::after {
+    width: 100%;
 }
 
 /* Resume Styles */
