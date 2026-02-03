@@ -218,46 +218,53 @@ footer {
     color: var(--text-muted);
 }
 
-/* Posts/Stream */
+/* Posts/Stream - BRUTALIST */
 .stream {
     margin-bottom: 3rem;
 }
 
 .stream h2 {
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-muted);
-    margin-bottom: 1rem;
+    letter-spacing: 0.2em;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--text);
 }
 
 .post {
-    padding: 1.25rem;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    margin-bottom: 0.75rem;
+    padding: 1.5rem 0;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
 }
 
-.post:hover {
-    border-color: var(--border);
+.post:last-of-type {
+    border-bottom: 2px solid var(--text);
 }
 
 .post-date {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-bottom: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.05em;
 }
 
 .post-content {
-    font-size: 0.95rem;
-    line-height: 1.7;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: var(--text);
 }
 
 .post-content p {
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
 }
 
 .post-content p:last-child {
@@ -266,37 +273,43 @@ footer {
 
 .post-tag {
     display: inline-block;
-    font-size: 0.7rem;
-    padding: 0.2rem 0.5rem;
-    background: var(--bg);
-    border-radius: 4px;
-    color: var(--accent);
-    margin-top: 0.75rem;
     font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.25rem 0.5rem;
+    background: var(--text);
+    color: var(--bg);
+    margin-top: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
 }
 
-/* Disclaimer */
+/* Disclaimer - BRUTALIST */
 .disclaimer {
-    padding: 1rem 1.25rem;
-    background: var(--bg-secondary);
-    border-left: 3px solid var(--accent-dim);
-    border-radius: 0 8px 8px 0;
+    padding: 1rem;
+    background: transparent;
+    border: 2px solid var(--accent);
     margin-bottom: 3rem;
-    font-size: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
     color: var(--text-muted);
+    line-height: 1.6;
 }
 
 .disclaimer strong {
-    color: var(--text);
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .disclaimer a {
-    color: var(--accent);
-    text-decoration: none;
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 2px;
 }
 
 .disclaimer a:hover {
-    text-decoration: underline;
+    color: var(--accent);
 }
 
 /* Responsive */

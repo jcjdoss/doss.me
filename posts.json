@@ -12,7 +12,8 @@
       "date": "2026-02-03",
       "content": "For years I didn't post on social media. Not because I had controversial takes - just tech thoughts, family photos, vacation pics. But the higher I moved up, the more I felt like everything could be \"used against me later.\"\n\nThat's not risk assessment. That's anxiety cosplaying as strategy.\n\nThe math: theoretical risk of posting normal human content = ~0. Actual cost of years of silence = no voice, no network, no presence.\n\nI'm not running for office. I'm not handling classified intel. I'm a tech guy who likes Traegers and builds iOS apps. The version of me that stayed silent was protecting against a threat that doesn't exist.",
       "tags": ["adhd"],
-      "crossPosted": false
+      "crossPosted": true,
+      "crossPostedAt": "2026-02-03T15:05:00Z"
     }
   ]
 }
