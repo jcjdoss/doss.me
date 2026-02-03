@@ -1,12 +1,12 @@
 :root {
-    --bg: #0a0a0b;
-    --bg-secondary: #141417;
-    --text: #e4e4e7;
-    --text-muted: #71717a;
-    --accent: #a78bfa;
-    --accent-dim: #7c3aed;
-    --border: #27272a;
-    --card-bg: #18181b;
+    --bg: #fefefe;
+    --bg-secondary: #f8f9fa;
+    --text: #1a1a1a;
+    --text-muted: #6b7280;
+    --accent: #ea580c;
+    --accent-dim: #dc2626;
+    --border: #e5e7eb;
+    --card-bg: #f9fafb;
 }
 
 * {
@@ -133,7 +133,7 @@ h1 {
 .link-card:hover {
     border-color: var(--accent-dim);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(167, 139, 250, 0.1);
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.1);
 }
 
 .link-icon {
@@ -570,7 +570,7 @@ footer {
     letter-spacing: 0.2em;
     color: var(--text);
     margin-bottom: 1rem;
-    text-shadow: 0 0 20px var(--accent);
+    text-shadow: 0 0 20px rgba(234, 88, 12, 0.3);
 }
 
 .stream-subtitle {
@@ -1113,7 +1113,7 @@ footer {
 .contact-link:hover {
     border-color: var(--accent);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(167, 139, 250, 0.1);
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.1);
 }
 
 .contact-icon {
