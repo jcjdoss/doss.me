@@ -206,6 +206,44 @@ mark, .highlight {
   transform: rotate(-2deg);
 }
 
+/* Hand-drawn badge/stamp style — like Basecamp "YES!" */
+.badge {
+  display: inline-block;
+  font-family: 'Comic Sans MS', 'Chalkboard', 'Comic Neue', cursive;
+  font-size: 1.1em;
+  font-weight: 700;
+  background: var(--pop);
+  padding: 4px 12px;
+  border-radius: 4px;
+  transform: rotate(-1deg);
+  margin-left: 8px;
+}
+
+/* Green checkmark list */
+.check-list {
+  list-style: none;
+}
+
+.check-list li {
+  padding: 8px 0;
+  padding-left: 32px;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+}
+
+.check-list li:last-child {
+  border-bottom: none;
+}
+
+.check-list li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #22c55e;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
 /* ============================================
    SECTIONS — Visual rhythm, varying weights
    ============================================ */
