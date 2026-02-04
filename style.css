@@ -1,28 +1,26 @@
 /* ============================================
-   DOSS.ME — Alive, Emotional, Dynamic
+   DOSS.ME — Digital + Cheeky Analog
    
-   Basecamp energy: bold contrasts, visual rhythm,
-   hand-touched personality, confident typography
+   White, wide, rounded, movement
+   Unapologetically digital with hand-drawn accents
    ============================================ */
 
 :root {
-  /* Warm foundation */
-  --bg: #faf9f7;
-  --white: #ffffff;
-  
-  /* High contrast text */
+  /* Clean digital palette */
+  --bg: #ffffff;
+  --bg-subtle: #f8f9fa;
   --black: #111111;
-  --dark: #1a1a1a;
-  --text: #444444;
-  --text-light: #777777;
-  --border: #e5e5e5;
+  --text: #374151;
+  --text-light: #6b7280;
+  --border: #e5e7eb;
   
-  /* Bold accent - Basecamp lime */
+  /* Pop accent - lime for analog touches */
   --pop: #c8f547;
-  --pop-soft: #e4faaa;
+  --pop-soft: #e8faaa;
   
-  /* Ink for links */
-  --ink: #1a5fb4;
+  /* Digital blue */
+  --blue: #2563eb;
+  --blue-light: #dbeafe;
   
   /* Typography */
   --font-display: 'Georgia', serif;
@@ -34,7 +32,11 @@
   --space-md: 24px;
   --space-lg: 48px;
   --space-xl: 72px;
-  --space-2xl: 120px;
+  
+  /* Rounded corners - soft, not hard */
+  --radius: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
 }
 
 /* === Reset === */
@@ -46,7 +48,7 @@
 
 /* === Base === */
 html {
-  font-size: 18px;
+  font-size: 17px;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -57,145 +59,102 @@ body {
   line-height: 1.6;
 }
 
-/* === Links === */
+/* === Links with movement === */
 a {
-  color: var(--ink);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  color: var(--blue);
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 a:hover {
   color: var(--black);
 }
 
-/* === Container === */
+/* === Container - WIDER === */
 .container {
-  max-width: 720px;
+  max-width: 900px;
   margin: 0 auto;
   padding: var(--space-xl) var(--space-md);
 }
 
 /* ============================================
-   HEADER — Bold, confident, memorable
+   HEADER — Clean, digital, confident
    ============================================ */
 header {
   text-align: center;
-  padding: var(--space-2xl) var(--space-md) var(--space-xl);
+  padding: var(--space-xl) var(--space-md);
   margin-bottom: var(--space-lg);
 }
 
 header h1 {
   font-family: var(--font-display);
-  font-size: 4rem;
+  font-size: 3.5rem;
   font-weight: 700;
   font-style: italic;
   letter-spacing: -0.03em;
   color: var(--black);
   margin-bottom: var(--space-xs);
-  line-height: 1;
+  transition: transform 0.3s ease;
+}
+
+header h1:hover {
+  transform: scale(1.02);
 }
 
 .tagline {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: var(--text-light);
   margin-bottom: var(--space-lg);
 }
 
-/* === Navigation === */
+/* === Navigation with movement === */
 .nav {
   display: flex;
   justify-content: center;
   gap: var(--space-md);
+  flex-wrap: wrap;
 }
 
 .nav-link {
-  color: var(--text);
-  text-decoration: none;
+  color: var(--text-light);
   font-size: 0.95rem;
   font-weight: 500;
-  padding: var(--space-xs) 0;
-  position: relative;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  transition: all 0.2s ease;
 }
 
 .nav-link:hover {
   color: var(--black);
+  background: var(--bg-subtle);
 }
 
 .nav-link.active {
   color: var(--black);
+  background: var(--pop);
   font-weight: 600;
 }
 
-.nav-link.active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--pop);
-}
-
 /* ============================================
-   ABOUT — The hook, prominent placement
-   ============================================ */
-.about {
-  font-size: 1.35rem;
-  line-height: 1.55;
-  color: var(--dark);
-  margin-bottom: var(--space-xl);
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.about p {
-  margin-bottom: var(--space-md);
-}
-
-.about p:last-child {
-  margin-bottom: 0;
-}
-
-/* ============================================
-   HIGHLIGHTER — Bold pop like Basecamp
-   ============================================ */
-mark, .highlight {
-  background: var(--pop);
-  padding: 2px 8px;
-  margin: 0 -4px;
-  border-radius: 3px;
-  color: var(--black);
-}
-
-/* Full-width highlight bar */
-.highlight-bar {
-  display: inline-block;
-  background: var(--pop);
-  padding: 6px 16px;
-  font-weight: 700;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-radius: 3px;
-  margin-bottom: var(--space-md);
-}
-
-/* ============================================
-   HAND-DRAWN MARKER LABELS — Basecamp style
+   MARKER LABELS — Cheeky analog on digital
    ============================================ */
 .marker-label {
   display: inline-block;
-  font-family: 'Comic Sans MS', 'Chalkboard', 'Comic Neue', cursive;
-  font-size: 0.95rem;
+  font-family: 'Comic Sans MS', 'Chalkboard', cursive;
+  font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.02em;
   background: var(--pop);
   padding: 6px 14px;
   margin-bottom: var(--space-md);
+  border-radius: var(--radius);
   transform: rotate(-1deg);
-  box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.marker-label:hover {
+  transform: rotate(0deg) scale(1.05);
 }
 
 .marker-label-alt {
@@ -206,46 +165,33 @@ mark, .highlight {
   transform: rotate(-2deg);
 }
 
-/* Hand-drawn badge/stamp style — like Basecamp "YES!" */
-.badge {
-  display: inline-block;
-  font-family: 'Comic Sans MS', 'Chalkboard', 'Comic Neue', cursive;
-  font-size: 1.1em;
-  font-weight: 700;
+/* === Highlighter === */
+mark, .highlight {
   background: var(--pop);
-  padding: 4px 12px;
+  padding: 2px 6px;
   border-radius: 4px;
-  transform: rotate(-1deg);
-  margin-left: 8px;
-}
-
-/* Green checkmark list */
-.check-list {
-  list-style: none;
-}
-
-.check-list li {
-  padding: 8px 0;
-  padding-left: 32px;
-  position: relative;
-  border-bottom: 1px solid var(--border);
-}
-
-.check-list li:last-child {
-  border-bottom: none;
-}
-
-.check-list li::before {
-  content: '✓';
-  position: absolute;
-  left: 0;
-  color: #22c55e;
-  font-size: 1.2rem;
-  font-weight: 700;
+  color: var(--black);
 }
 
 /* ============================================
-   SECTIONS — Visual rhythm, varying weights
+   ABOUT — Wide, airy
+   ============================================ */
+.about {
+  font-size: 1.25rem;
+  line-height: 1.7;
+  color: var(--text);
+  margin-bottom: var(--space-xl);
+  max-width: 750px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.about p {
+  margin-bottom: var(--space-md);
+}
+
+/* ============================================
+   SECTIONS
    ============================================ */
 section {
   margin-bottom: var(--space-xl);
@@ -253,7 +199,7 @@ section {
 
 section h2 {
   font-family: var(--font-display);
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   font-style: italic;
   color: var(--black);
@@ -261,14 +207,19 @@ section h2 {
 }
 
 /* ============================================
-   STREAM / POSTS — Content with personality
+   POSTS — Rounded cards with movement
    ============================================ */
 .post {
-  background: var(--white);
+  background: var(--bg-subtle);
   padding: var(--space-lg);
   margin-bottom: var(--space-md);
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  border-radius: var(--radius-lg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.post:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
 }
 
 .post-date {
@@ -282,7 +233,7 @@ section h2 {
 .post-content {
   font-size: 1.05rem;
   line-height: 1.7;
-  color: var(--dark);
+  color: var(--text);
 }
 
 .post-content p {
@@ -294,69 +245,90 @@ section h2 {
 }
 
 /* ============================================
-   LINKS — Clean, interactive
+   LINK CARDS — Rounded, interactive
    ============================================ */
 .links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
   margin-bottom: var(--space-xl);
+}
+
+.links h2 {
+  grid-column: 1 / -1;
+}
+
+.links .marker-label {
+  grid-column: 1 / -1;
 }
 
 .link-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-md) var(--space-lg);
-  background: var(--white);
-  margin-bottom: var(--space-sm);
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  text-align: center;
+  padding: var(--space-lg) var(--space-md);
+  background: var(--bg-subtle);
+  border-radius: var(--radius-lg);
   text-decoration: none;
   color: inherit;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.25s ease;
 }
 
 .link-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+  background: var(--bg);
 }
 
 .link-icon {
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--black);
   background: var(--bg);
-  border-radius: 4px;
+  border-radius: var(--radius);
+  margin-bottom: var(--space-sm);
+  transition: background 0.2s ease;
+}
+
+.link-card:hover .link-icon {
+  background: var(--pop);
 }
 
 .link-text strong {
   display: block;
   font-weight: 600;
   color: var(--black);
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
 .link-text span {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--text-light);
 }
 
 /* ============================================
-   CURRENT FOCUS — Highlighted section
+   CURRENT FOCUS — Pop section with movement
    ============================================ */
 .current {
   background: var(--pop);
   padding: var(--space-lg);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   margin-bottom: var(--space-xl);
+  transition: transform 0.2s ease;
+}
+
+.current:hover {
+  transform: scale(1.01);
 }
 
 .current h2 {
   color: var(--black);
-  margin-bottom: var(--space-sm);
 }
 
 .project h3 {
@@ -369,38 +341,42 @@ section h2 {
 }
 
 .project > p {
-  color: var(--dark);
+  color: var(--black);
+  opacity: 0.85;
   margin-bottom: var(--space-md);
-  font-size: 1.05rem;
 }
 
-.project ul {
+/* Green checkmarks */
+.check-list {
   list-style: none;
   margin: var(--space-md) 0;
 }
 
-.project li {
+.check-list li {
   padding: var(--space-xs) 0;
-  padding-left: var(--space-md);
+  padding-left: 28px;
   position: relative;
-  color: var(--dark);
+  color: var(--black);
+  opacity: 0.9;
 }
 
-.project li::before {
-  content: '→';
+.check-list li::before {
+  content: '✓';
   position: absolute;
   left: 0;
-  color: var(--black);
+  color: #16a34a;
+  font-weight: 700;
+  font-size: 1.1rem;
 }
 
-.project li strong {
+.check-list li strong {
   font-weight: 600;
 }
 
 .project .meta {
   font-size: 0.9rem;
-  color: var(--dark);
-  opacity: 0.7;
+  color: var(--black);
+  opacity: 0.6;
   font-style: italic;
   padding-top: var(--space-md);
   border-top: 2px solid rgba(0,0,0,0.1);
@@ -411,11 +387,10 @@ section h2 {
    RESUME SECTIONS
    ============================================ */
 .resume-section {
-  background: var(--white);
+  background: var(--bg-subtle);
   padding: var(--space-lg);
   margin-bottom: var(--space-md);
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border-radius: var(--radius-lg);
 }
 
 .contact-info {
@@ -463,15 +438,18 @@ section h2 {
 
 .job-header h3 {
   font-family: var(--font-display);
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 700;
   font-style: italic;
   color: var(--black);
 }
 
 .duration {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-light);
+  background: var(--pop-soft);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
 }
 
 .company {
@@ -485,15 +463,15 @@ section h2 {
 
 .achievements li {
   padding: 4px 0;
-  padding-left: var(--space-md);
+  padding-left: 20px;
   position: relative;
   font-size: 0.95rem;
 }
 
 .achievements li::before {
-  content: '–';
+  content: '→';
   position: absolute;
-  left: 4px;
+  left: 0;
   color: var(--text-light);
 }
 
@@ -506,7 +484,7 @@ section h2 {
 .skill-category {
   padding: var(--space-md);
   background: var(--bg);
-  border-radius: 4px;
+  border-radius: var(--radius);
 }
 
 .skill-category h4 {
@@ -544,11 +522,10 @@ section h2 {
 }
 
 .about-section {
-  background: var(--white);
+  background: var(--bg-subtle);
   padding: var(--space-lg);
   margin-bottom: var(--space-md);
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border-radius: var(--radius-lg);
 }
 
 .disclosure-content,
@@ -579,7 +556,7 @@ section h2 {
 .authenticity-content li,
 .tech-stack li {
   padding: var(--space-xs) 0;
-  padding-left: var(--space-md);
+  padding-left: 24px;
   position: relative;
 }
 
@@ -609,7 +586,12 @@ section h2 {
 .step {
   padding: var(--space-md);
   background: var(--bg);
-  border-radius: 4px;
+  border-radius: var(--radius);
+  transition: transform 0.2s ease;
+}
+
+.step:hover {
+  transform: scale(1.02);
 }
 
 .step-number {
@@ -636,25 +618,31 @@ section h2 {
 .tech-stack {
   background: var(--bg);
   padding: var(--space-md);
-  border-radius: 4px;
+  border-radius: var(--radius);
   margin: var(--space-md) 0;
 }
 
 .contact-section {
   background: var(--pop);
   padding: var(--space-lg);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   margin-bottom: var(--space-lg);
+  transition: transform 0.2s ease;
+}
+
+.contact-section:hover {
+  transform: scale(1.01);
 }
 
 .contact-section h2 {
   font-size: 1.4rem;
-  margin-bottom: var(--space-sm);
   color: var(--black);
+  margin-bottom: var(--space-sm);
 }
 
 .contact-section > p {
-  color: var(--dark);
+  color: var(--black);
+  opacity: 0.8;
   margin-bottom: var(--space-md);
 }
 
@@ -667,6 +655,14 @@ section h2 {
 .contact-link {
   color: var(--black);
   font-weight: 600;
+  padding: var(--space-xs) var(--space-sm);
+  background: rgba(255,255,255,0.5);
+  border-radius: var(--radius);
+  transition: background 0.2s ease;
+}
+
+.contact-link:hover {
+  background: rgba(255,255,255,0.8);
 }
 
 /* ============================================
@@ -712,15 +708,21 @@ footer .note {
 /* ============================================
    RESPONSIVE
    ============================================ */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+  .links {
+    grid-template-columns: 1fr;
+  }
+  
   header h1 {
-    font-size: 2.75rem;
+    font-size: 2.5rem;
   }
   
   .about {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
   }
-  
+}
+
+@media (max-width: 600px) {
   .process-flow,
   .skills-grid {
     grid-template-columns: 1fr;
@@ -728,7 +730,7 @@ footer .note {
   
   .job-header {
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
   }
 }
 
@@ -736,4 +738,9 @@ footer .note {
 ::selection {
   background: var(--pop);
   color: var(--black);
+}
+
+/* === Smooth scrolling === */
+html {
+  scroll-behavior: smooth;
 }
