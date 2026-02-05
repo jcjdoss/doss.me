@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../style.css?v=20260205">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
 </head>
 <body>
@@ -27,13 +27,15 @@
         </header>
 
         <div class="lab-intro">
+            <span class="marker-label marker-label-tilt">WHERE THE MAGIC HAPPENS</span>
             <h1>Lab</h1>
             <p>Technical experiments, architectural diagrams, and open source work. Where ideas become systems.</p>
         </div>
 
-        <section class="project-section">
+        <section class="project-section card-lift">
+            <span class="marker-label">THE MAIN PROJECT</span>
             <h2>AI Agent System</h2>
-            <p>A multi-agent system that actually helps me get stuff done. Reminders, accountability, memory - the things I'd forget without them.</p>
+            <p>A multi-agent system that <mark>actually helps me get stuff done</mark>. Reminders, accountability, memory - the things I'd forget without them.</p>
             
             <div class="architecture-placeholder">
                 <h3>System Architecture</h3>
@@ -69,19 +71,19 @@ Activator → Helps with task switching
 
             <div class="features-grid">
                 <div class="feature-card">
-                    <h4>Push-Based Interaction</h4>
+                    <h4>✓ Push-Based Interaction</h4>
                     <p>Agents reach out to me. I don't have to remember to check things.</p>
                 </div>
                 <div class="feature-card">
-                    <h4>Context Preservation</h4>
+                    <h4>✓ Context Preservation</h4>
                     <p>Persistent memory across sessions. Decisions and insights don't get lost.</p>
                 </div>
                 <div class="feature-card">
-                    <h4>Brutalist UX</h4>
+                    <h4>✓ Brutalist UX</h4>
                     <p>Minimal interface, maximum signal. Less noise, more useful.</p>
                 </div>
                 <div class="feature-card">
-                    <h4>Open Architecture</h4>
+                    <h4>✓ Open Architecture</h4>
                     <p>Built on open tools. Extensible. No vendor lock-in.</p>
                 </div>
             </div>
@@ -113,7 +115,8 @@ Activator → Helps with task switching
             </div>
         </section>
 
-        <section class="project-section">
+        <section class="project-section card-lift">
+            <span class="marker-label marker-label-alt">OPEN SOURCE</span>
             <h2>Open Source Contributions</h2>
             
             <div class="repo-list">
@@ -136,13 +139,14 @@ export const timeAwareness = {
             </div>
         </section>
 
-        <section class="project-section">
+        <section class="project-section card-lift">
+            <span class="marker-label marker-label-right">EXPERIMENTS</span>
             <h2>Research & Experiments</h2>
             
             <div class="experiment-list">
                 <div class="experiment">
                     <h3>Low-Noise Interfaces</h3>
-                    <p>How minimal design helps focus. Less chrome, more signal. Brutalist design principles for productivity tools.</p>
+                    <p>How minimal design helps focus. Less chrome, more signal. <mark>Brutalist design principles</mark> for productivity tools.</p>
                 </div>
                 
                 <div class="experiment">
@@ -158,12 +162,13 @@ export const timeAwareness = {
         </section>
 
         <div class="lab-footer">
+            <span class="marker-label marker-label-tilt">LET'S BUILD TOGETHER</span>
             <h2>Collaboration</h2>
             <p>Interested in AI agent tooling? Building similar systems? Let's connect:</p>
-            <ul>
-                <li>GitHub: <a href="https://github.com/jdoss" target="_blank">@jdoss</a></li>
-                <li>X: <a href="https://x.com/whatmefocus" target="_blank">@whatmefocus</a></li>
-                <li>OpenClaw Discord: <a href="https://discord.com/invite/clawd" target="_blank">discord.com/invite/clawd</a></li>
+            <ul class="check-list">
+                <li>GitHub: <a href="https://github.com/jdoss" target="_blank"><strong>@jdoss</strong></a></li>
+                <li>X: <a href="https://x.com/whatmefocus" target="_blank"><strong>@whatmefocus</strong></a></li>
+                <li>OpenClaw Discord: <a href="https://discord.com/invite/clawd" target="_blank"><strong>discord.com/invite/clawd</strong></a></li>
             </ul>
         </div>
 
