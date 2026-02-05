@@ -1,8 +1,8 @@
 /* ============================================
-   DOSS.ME — Digital + Cheeky Analog
+   DOSS.ME — Basecamp Energy + J's Voice
    
-   White, wide, rounded, movement
-   Unapologetically digital with hand-drawn accents
+   Unapologetically digital, cheeky with analog
+   Alive, confident, has movement
    ============================================ */
 
 :root {
@@ -22,9 +22,14 @@
   --blue: #2563eb;
   --blue-light: #dbeafe;
   
+  /* Green for checkmarks */
+  --green: #22c55e;
+  --green-dark: #16a34a;
+  
   /* Typography */
   --font-display: 'Georgia', serif;
   --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-marker: 'Comic Sans MS', 'Chalkboard SE', 'Chalkboard', cursive;
   
   /* Spacing */
   --space-xs: 8px;
@@ -37,6 +42,11 @@
   --radius: 12px;
   --radius-lg: 20px;
   --radius-full: 9999px;
+  
+  /* Transitions - smooth, responsive */
+  --transition-fast: 0.15s ease;
+  --transition: 0.2s ease;
+  --transition-slow: 0.3s ease;
 }
 
 /* === Reset === */
@@ -50,6 +60,7 @@
 html {
   font-size: 17px;
   -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -63,7 +74,7 @@ body {
 a {
   color: var(--blue);
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color var(--transition);
 }
 
 a:hover {
@@ -94,7 +105,7 @@ header h1 {
   letter-spacing: -0.03em;
   color: var(--black);
   margin-bottom: var(--space-xs);
-  transition: transform 0.3s ease;
+  transition: transform var(--transition-slow);
 }
 
 header h1:hover {
@@ -105,6 +116,12 @@ header h1:hover {
   font-size: 1.1rem;
   color: var(--text-light);
   margin-bottom: var(--space-lg);
+}
+
+/* === Avatar === */
+.avatar {
+  font-size: 3rem;
+  margin-bottom: var(--space-sm);
 }
 
 /* === Navigation with movement === */
@@ -121,12 +138,13 @@ header h1:hover {
   font-weight: 500;
   padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-full);
-  transition: all 0.2s ease;
+  transition: all var(--transition);
 }
 
 .nav-link:hover {
   color: var(--black);
   background: var(--bg-subtle);
+  transform: translateY(-1px);
 }
 
 .nav-link.active {
@@ -137,10 +155,11 @@ header h1:hover {
 
 /* ============================================
    MARKER LABELS — Cheeky analog on digital
+   Hand-drawn font, ALL CAPS, rotated, lime bg
    ============================================ */
 .marker-label {
   display: inline-block;
-  font-family: 'Comic Sans MS', 'Chalkboard', cursive;
+  font-family: var(--font-marker);
   font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -149,20 +168,64 @@ header h1:hover {
   padding: 6px 14px;
   margin-bottom: var(--space-md);
   border-radius: var(--radius);
-  transform: rotate(-1deg);
-  transition: transform 0.2s ease;
+  transform: rotate(-1.5deg);
+  transition: transform var(--transition);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.05);
 }
 
 .marker-label:hover {
   transform: rotate(0deg) scale(1.05);
 }
 
+/* Rotation variants */
 .marker-label-alt {
   transform: rotate(0.5deg);
 }
 
+.marker-label-alt:hover {
+  transform: rotate(-1deg) scale(1.05);
+}
+
 .marker-label-tilt {
   transform: rotate(-2deg);
+}
+
+.marker-label-tilt:hover {
+  transform: rotate(0deg) scale(1.05);
+}
+
+.marker-label-right {
+  transform: rotate(1deg);
+}
+
+.marker-label-right:hover {
+  transform: rotate(-0.5deg) scale(1.05);
+}
+
+/* Small marker variant */
+.marker-label-sm {
+  font-size: 0.7rem;
+  padding: 4px 10px;
+}
+
+/* Marker date styling for stream */
+.marker-date {
+  display: inline-block;
+  font-family: var(--font-marker);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--pop);
+  padding: 4px 10px;
+  border-radius: 6px;
+  transform: rotate(-1deg);
+  transition: transform var(--transition);
+  margin-bottom: var(--space-sm);
+}
+
+.marker-date:hover {
+  transform: rotate(0deg) scale(1.05);
 }
 
 /* === Highlighter === */
@@ -171,6 +234,59 @@ mark, .highlight {
   padding: 2px 6px;
   border-radius: 4px;
   color: var(--black);
+}
+
+/* Strong highlight for key phrases */
+.highlight-strong {
+  background: var(--pop);
+  padding: 3px 8px;
+  border-radius: 4px;
+  color: var(--black);
+  font-weight: 600;
+}
+
+/* ============================================
+   GREEN CHECKMARKS — Lists that pop
+   ============================================ */
+.check-list {
+  list-style: none;
+  margin: var(--space-md) 0;
+}
+
+.check-list li {
+  padding: var(--space-xs) 0;
+  padding-left: 28px;
+  position: relative;
+  color: var(--black);
+  opacity: 0.9;
+  transition: transform var(--transition);
+}
+
+.check-list li:hover {
+  transform: translateX(4px);
+}
+
+.check-list li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--green);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.check-list li strong {
+  font-weight: 600;
+}
+
+/* Check list variant for resume achievements */
+.check-list-resume li {
+  color: var(--text);
+  opacity: 1;
+}
+
+.check-list-resume li::before {
+  color: var(--green-dark);
 }
 
 /* ============================================
@@ -207,6 +323,31 @@ section h2 {
 }
 
 /* ============================================
+   CARDS — Hover lift effect
+   ============================================ */
+.card {
+  background: var(--bg-subtle);
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+
+/* Card with stronger hover */
+.card-lift {
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.card-lift:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+}
+
+/* ============================================
    POSTS — Rounded cards with movement
    ============================================ */
 .post {
@@ -214,7 +355,7 @@ section h2 {
   padding: var(--space-lg);
   margin-bottom: var(--space-md);
   border-radius: var(--radius-lg);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform var(--transition), box-shadow var(--transition);
 }
 
 .post:hover {
@@ -230,6 +371,11 @@ section h2 {
   margin-bottom: var(--space-sm);
 }
 
+/* Post with marker date */
+.post-with-marker .post-date {
+  display: none;
+}
+
 .post-content {
   font-size: 1.05rem;
   line-height: 1.7;
@@ -242,6 +388,16 @@ section h2 {
 
 .post-content p:last-child {
   margin-bottom: 0;
+}
+
+.post-tag {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  margin-top: var(--space-sm);
+  padding: 4px 8px;
+  background: var(--bg);
+  border-radius: var(--radius);
 }
 
 /* ============================================
@@ -293,11 +449,12 @@ section h2 {
   background: var(--bg);
   border-radius: var(--radius);
   margin-bottom: var(--space-sm);
-  transition: background 0.2s ease;
+  transition: all var(--transition);
 }
 
 .link-card:hover .link-icon {
   background: var(--pop);
+  transform: scale(1.05);
 }
 
 .link-text strong {
@@ -320,7 +477,7 @@ section h2 {
   padding: var(--space-lg);
   border-radius: var(--radius-lg);
   margin-bottom: var(--space-xl);
-  transition: transform 0.2s ease;
+  transition: transform var(--transition);
 }
 
 .current:hover {
@@ -346,33 +503,6 @@ section h2 {
   margin-bottom: var(--space-md);
 }
 
-/* Green checkmarks */
-.check-list {
-  list-style: none;
-  margin: var(--space-md) 0;
-}
-
-.check-list li {
-  padding: var(--space-xs) 0;
-  padding-left: 28px;
-  position: relative;
-  color: var(--black);
-  opacity: 0.9;
-}
-
-.check-list li::before {
-  content: '✓';
-  position: absolute;
-  left: 0;
-  color: #16a34a;
-  font-weight: 700;
-  font-size: 1.1rem;
-}
-
-.check-list li strong {
-  font-weight: 600;
-}
-
 .project .meta {
   font-size: 0.9rem;
   color: var(--black);
@@ -384,6 +514,311 @@ section h2 {
 }
 
 /* ============================================
+   STREAM PAGE — Personality
+   ============================================ */
+.stream-header {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
+.stream-title {
+  font-family: var(--font-marker);
+  font-size: 3rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--black);
+  letter-spacing: 0.05em;
+  transform: rotate(-1deg);
+  margin-bottom: var(--space-xs);
+}
+
+.stream-subtitle {
+  color: var(--text-light);
+  font-size: 1.1rem;
+}
+
+.content-warning {
+  background: var(--pop-soft);
+  padding: var(--space-md);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-lg);
+  font-size: 0.95rem;
+  border-left: 4px solid var(--pop);
+}
+
+.stream-footer {
+  text-align: center;
+  padding: var(--space-lg) 0;
+  color: var(--text-light);
+}
+
+.stream-footer p {
+  margin-bottom: var(--space-xs);
+}
+
+/* ============================================
+   LAB PAGE — Builder energy
+   ============================================ */
+.lab-intro {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.lab-intro h1 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--black);
+  margin-bottom: var(--space-sm);
+}
+
+.lab-intro p {
+  font-size: 1.2rem;
+  color: var(--text);
+}
+
+.project-section {
+  background: var(--bg-subtle);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-md);
+  border-radius: var(--radius-lg);
+  transition: transform var(--transition);
+}
+
+.project-section:hover {
+  transform: translateY(-2px);
+}
+
+.project-section h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--black);
+  margin-bottom: var(--space-sm);
+}
+
+.project-section > p {
+  color: var(--text);
+  margin-bottom: var(--space-md);
+}
+
+.architecture-placeholder,
+.tech-details,
+.status-section {
+  margin: var(--space-md) 0;
+}
+
+.architecture-placeholder h3,
+.tech-details h3,
+.status-section h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--black);
+  margin-bottom: var(--space-sm);
+}
+
+.diagram-placeholder {
+  background: var(--bg);
+  padding: var(--space-lg);
+  border-radius: var(--radius);
+  text-align: center;
+  color: var(--text-light);
+}
+
+.diagram-placeholder p {
+  font-size: 1.1rem;
+  margin-bottom: var(--space-xs);
+}
+
+.code-block {
+  background: var(--black);
+  color: #e5e7eb;
+  padding: var(--space-md);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+.code-block pre {
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+  margin: var(--space-md) 0;
+}
+
+.feature-card {
+  background: var(--bg);
+  padding: var(--space-md);
+  border-radius: var(--radius);
+  transition: all var(--transition);
+}
+
+.feature-card:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  background: var(--pop-soft);
+}
+
+.feature-card h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--black);
+  margin-bottom: 4px;
+}
+
+.feature-card p {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.status-grid {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.95rem;
+  padding: var(--space-xs);
+  border-radius: 6px;
+  transition: background var(--transition);
+}
+
+.status-item:hover {
+  background: var(--bg);
+}
+
+.status-indicator {
+  font-size: 0.6rem;
+}
+
+.status-indicator.deployed { color: var(--green); }
+.status-indicator.in-progress { color: #f59e0b; }
+.status-indicator.planned { color: var(--text-light); }
+
+.repo-list {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.repo-item {
+  padding: var(--space-md);
+  background: var(--bg);
+  border-radius: var(--radius);
+  transition: all var(--transition);
+}
+
+.repo-item:hover {
+  transform: translateX(4px);
+  box-shadow: -4px 0 0 var(--pop);
+}
+
+.repo-item h3 {
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.repo-item h3 a {
+  color: var(--black);
+}
+
+.repo-item p {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.code-snippet {
+  background: var(--black);
+  color: #e5e7eb;
+  padding: var(--space-sm);
+  border-radius: 6px;
+  margin-top: var(--space-sm);
+  overflow-x: auto;
+}
+
+.code-snippet code {
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-size: 0.8rem;
+  white-space: pre;
+}
+
+.experiment-list {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.experiment {
+  padding: var(--space-md);
+  background: var(--bg);
+  border-radius: var(--radius);
+  transition: all var(--transition);
+}
+
+.experiment:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.experiment h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--black);
+  margin-bottom: 4px;
+}
+
+.experiment p {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.lab-footer {
+  background: var(--pop);
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-lg);
+  transition: transform var(--transition);
+}
+
+.lab-footer:hover {
+  transform: scale(1.01);
+}
+
+.lab-footer h2 {
+  font-size: 1.3rem;
+  color: var(--black);
+  margin-bottom: var(--space-sm);
+}
+
+.lab-footer p {
+  color: var(--black);
+  opacity: 0.8;
+  margin-bottom: var(--space-md);
+}
+
+.lab-footer ul {
+  list-style: none;
+}
+
+.lab-footer li {
+  padding: 4px 0;
+  color: var(--black);
+}
+
+.lab-footer a {
+  color: var(--black);
+  font-weight: 600;
+}
+
+/* ============================================
    RESUME SECTIONS
    ============================================ */
 .resume-section {
@@ -391,6 +826,11 @@ section h2 {
   padding: var(--space-lg);
   margin-bottom: var(--space-md);
   border-radius: var(--radius-lg);
+  transition: transform var(--transition);
+}
+
+.resume-section:hover {
+  transform: translateY(-1px);
 }
 
 .contact-info {
@@ -416,6 +856,11 @@ section h2 {
 .job {
   padding: var(--space-md) 0;
   border-bottom: 1px solid var(--border);
+  transition: transform var(--transition);
+}
+
+.job:hover {
+  transform: translateX(4px);
 }
 
 .job:first-child {
@@ -463,16 +908,30 @@ section h2 {
 
 .achievements li {
   padding: 4px 0;
-  padding-left: 20px;
+  padding-left: 24px;
   position: relative;
   font-size: 0.95rem;
+  transition: transform var(--transition);
+}
+
+.achievements li:hover {
+  transform: translateX(4px);
 }
 
 .achievements li::before {
-  content: '→';
+  content: '✓';
   position: absolute;
   left: 0;
-  color: var(--text-light);
+  color: var(--green);
+  font-weight: 700;
+}
+
+/* Highlighted achievement */
+.achievements li.highlight-achievement {
+  background: var(--pop-soft);
+  margin: 4px -8px;
+  padding: 8px 8px 8px 32px;
+  border-radius: 6px;
 }
 
 .skills-grid {
@@ -485,6 +944,12 @@ section h2 {
   padding: var(--space-md);
   background: var(--bg);
   border-radius: var(--radius);
+  transition: all var(--transition);
+}
+
+.skill-category:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .skill-category h4 {
@@ -497,6 +962,12 @@ section h2 {
 .skill-category p {
   font-size: 0.9rem;
   color: var(--text);
+}
+
+.education h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--black);
 }
 
 /* ============================================
@@ -526,6 +997,11 @@ section h2 {
   padding: var(--space-lg);
   margin-bottom: var(--space-md);
   border-radius: var(--radius-lg);
+  transition: transform var(--transition);
+}
+
+.about-section:hover {
+  transform: translateY(-1px);
 }
 
 .disclosure-content,
@@ -556,18 +1032,27 @@ section h2 {
 .authenticity-content li,
 .tech-stack li {
   padding: var(--space-xs) 0;
-  padding-left: 24px;
+  padding-left: 28px;
   position: relative;
+  transition: transform var(--transition);
+}
+
+.disclosure-content li:hover,
+.importance-content li:hover,
+.authenticity-content li:hover,
+.tech-stack li:hover {
+  transform: translateX(4px);
 }
 
 .disclosure-content li::before,
 .importance-content li::before,
 .authenticity-content li::before,
 .tech-stack li::before {
-  content: '→';
+  content: '✓';
   position: absolute;
   left: 0;
-  color: var(--text-light);
+  color: var(--green);
+  font-weight: 700;
 }
 
 .disclosure-content li strong,
@@ -587,11 +1072,12 @@ section h2 {
   padding: var(--space-md);
   background: var(--bg);
   border-radius: var(--radius);
-  transition: transform 0.2s ease;
+  transition: all var(--transition);
 }
 
 .step:hover {
-  transform: scale(1.02);
+  transform: scale(1.02) translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
 }
 
 .step-number {
@@ -601,6 +1087,11 @@ section h2 {
   font-style: italic;
   color: var(--pop);
   margin-bottom: var(--space-xs);
+  transition: transform var(--transition);
+}
+
+.step:hover .step-number {
+  transform: scale(1.1);
 }
 
 .step-content h3 {
@@ -627,7 +1118,7 @@ section h2 {
   padding: var(--space-lg);
   border-radius: var(--radius-lg);
   margin-bottom: var(--space-lg);
-  transition: transform 0.2s ease;
+  transition: transform var(--transition);
 }
 
 .contact-section:hover {
@@ -653,16 +1144,24 @@ section h2 {
 }
 
 .contact-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
   color: var(--black);
   font-weight: 600;
   padding: var(--space-xs) var(--space-sm);
   background: rgba(255,255,255,0.5);
   border-radius: var(--radius);
-  transition: background 0.2s ease;
+  transition: all var(--transition);
 }
 
 .contact-link:hover {
-  background: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.9);
+  transform: translateY(-2px);
+}
+
+.contact-icon {
+  font-weight: 700;
 }
 
 /* ============================================
@@ -671,6 +1170,11 @@ section h2 {
 .project-item {
   padding: var(--space-md) 0;
   border-bottom: 1px solid var(--border);
+  transition: transform var(--transition);
+}
+
+.project-item:hover {
+  transform: translateX(4px);
 }
 
 .project-item:last-child {
@@ -720,6 +1224,14 @@ footer .note {
   .about {
     font-size: 1.1rem;
   }
+  
+  .stream-title {
+    font-size: 2rem;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 600px) {
@@ -738,9 +1250,4 @@ footer .note {
 ::selection {
   background: var(--pop);
   color: var(--black);
-}
-
-/* === Smooth scrolling === */
-html {
-  scroll-behavior: smooth;
 }
