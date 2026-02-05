@@ -1,6 +1,13 @@
 {
   "posts": [
     {
+      "id": "2026-02-05-organization-architecture",
+      "date": "2026-02-05",
+      "content": "When knowledge is scattered, decisions slow. When it's organized strategically, patterns become visible.\n\nI stared at 389 files scattered across my digital vault. The typical response would be to blame the volume—too much information. But volume wasn't the problem. Architecture was.\n\nReal organization is about enabling decisions, not prettiness. When your external system mirrors good decision-making structure, your internal processes can focus on synthesis, creativity, and strategic thinking.",
+      "tags": ["architecture", "adhd", "productivity"],
+      "crossPosted": false
+    },
+    {
       "id": "2026-02-03-building-in-public",
       "date": "2026-02-03",
       "content": "Building in public now. My struggles, my solutions, my story.\n\nThis site is my digital presence - professional résumé, personal voice, ADHD journey all in one place. Future employers can see the whole picture: self-aware about challenges, builds solutions instead of complaining, thinks in public.\n\nAuthentic beats polished corporate veneer every time.",
