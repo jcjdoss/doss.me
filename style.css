@@ -858,6 +858,94 @@ section h2 {
   box-shadow: 0 8px 24px rgba(0,0,0,0.08);
 }
 
+/* === Experience Narrative === */
+.experience-narrative {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: var(--space-lg);
+}
+
+.experience-narrative p {
+  margin-bottom: var(--space-md);
+  color: var(--text);
+}
+
+.experience-narrative p:last-child {
+  margin-bottom: var(--space-lg);
+}
+
+.experience-narrative strong {
+  color: var(--black);
+  font-weight: 600;
+}
+
+/* === Experience Timeline === */
+.experience-timeline {
+  border-left: 3px solid var(--blue);
+  padding-left: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.timeline-item {
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--border);
+  transition: transform var(--transition), color var(--transition);
+  position: relative;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 16px;
+  width: 12px;
+  height: 12px;
+  background: var(--blue);
+  border-radius: 50%;
+  border: 3px solid var(--bg-subtle);
+  transition: all var(--transition);
+}
+
+.timeline-item:hover {
+  transform: translateX(4px);
+  color: var(--black);
+}
+
+.timeline-item:hover::before {
+  background: var(--pop);
+  border-color: var(--bg);
+  transform: scale(1.2);
+}
+
+.timeline-item:last-child {
+  border-bottom: none;
+}
+
+.timeline-item h4 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--black);
+  margin-bottom: 4px;
+}
+
+.timeline-item .duration {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  background: var(--pop-soft);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  margin-right: var(--space-sm);
+}
+
+.company-inline {
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
 .contact-info {
   display: flex;
   flex-wrap: wrap;
