@@ -328,6 +328,49 @@ mark:hover, .highlight:hover {
   margin-bottom: var(--space-md);
 }
 
+/* About section with photo layout */
+.about-content {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+.about-text {
+  /* Text flows naturally */
+}
+
+.about-image {
+  position: sticky;
+  top: var(--space-md);
+}
+
+.profile-photo {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.profile-photo:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile: stack photo below text */
+@media (max-width: 768px) {
+  .about-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .about-image {
+    position: static;
+    order: -1; /* Photo first on mobile */
+    max-width: 250px;
+    margin: 0 auto var(--space-md);
+  }
+}
+
 /* ============================================
    SECTIONS
    ============================================ */
