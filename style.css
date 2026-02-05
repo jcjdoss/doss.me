@@ -170,14 +170,14 @@ header h1:hover {
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  background: var(--pop);
-  color: #2d2d2d;
+  background: #2a2a2a;
+  color: var(--pop);
   padding: 0.3em 0.5em 0.4em 0.5em;
   margin-bottom: var(--space-md);
   border-radius: 0.2em;
   transform: rotate(-1.5deg);
   transition: transform var(--transition-fast);
-  box-shadow: 2px 4px 6px rgba(0,0,0,0.08);
+  box-shadow: 2px 4px 6px rgba(0,0,0,0.12);
 }
 
 .marker-label:hover {
