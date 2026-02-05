@@ -43,10 +43,10 @@
   --radius-lg: 20px;
   --radius-full: 9999px;
   
-  /* Transitions - smooth, responsive */
-  --transition-fast: 0.15s ease;
+  /* Transitions - smooth, responsive, snappy like Basecamp */
+  --transition-fast: 0.1s ease;
   --transition: 0.2s ease;
-  --transition-slow: 0.3s ease;
+  --transition-slow: 0.2s ease;
 }
 
 /* === Reset === */
@@ -74,11 +74,15 @@ body {
 a {
   color: var(--blue);
   text-decoration: none;
-  transition: color var(--transition);
+  transition: color var(--transition-fast), text-decoration var(--transition-fast);
+  position: relative;
 }
 
 a:hover {
   color: var(--black);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
 }
 
 /* === Container - WIDER === */
@@ -156,25 +160,28 @@ header h1:hover {
 /* ============================================
    MARKER LABELS — Cheeky analog on digital
    Hand-drawn font, ALL CAPS, rotated, lime bg
+   Exact Basecamp specs: Sharpie font, 0.04em spacing,
+   -2° rotation, proportional padding, soft corners
    ============================================ */
 .marker-label {
   display: inline-block;
   font-family: var(--font-marker);
   font-size: 0.85rem;
-  font-weight: 700;
+  font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   background: var(--pop);
-  padding: 6px 14px;
+  padding: 0.3em 0.5em 0.4em 0.5em;
   margin-bottom: var(--space-md);
-  border-radius: var(--radius);
+  border-radius: 0.2em;
   transform: rotate(-1.5deg);
-  transition: transform var(--transition);
-  box-shadow: 2px 2px 0 rgba(0,0,0,0.05);
+  transition: transform var(--transition-fast);
+  box-shadow: 2px 4px 6px rgba(0,0,0,0.08);
 }
 
 .marker-label:hover {
-  transform: rotate(0deg) scale(1.05);
+  transform: rotate(0deg) scale(1.08);
+  transition: transform var(--transition-fast);
 }
 
 /* Rotation variants */
@@ -183,7 +190,8 @@ header h1:hover {
 }
 
 .marker-label-alt:hover {
-  transform: rotate(-1deg) scale(1.05);
+  transform: rotate(-1deg) scale(1.08);
+  transition: transform var(--transition-fast);
 }
 
 .marker-label-tilt {
@@ -191,7 +199,8 @@ header h1:hover {
 }
 
 .marker-label-tilt:hover {
-  transform: rotate(0deg) scale(1.05);
+  transform: rotate(0deg) scale(1.08);
+  transition: transform var(--transition-fast);
 }
 
 .marker-label-right {
@@ -199,13 +208,14 @@ header h1:hover {
 }
 
 .marker-label-right:hover {
-  transform: rotate(-0.5deg) scale(1.05);
+  transform: rotate(-0.5deg) scale(1.08);
+  transition: transform var(--transition-fast);
 }
 
 /* Small marker variant */
 .marker-label-sm {
   font-size: 0.7rem;
-  padding: 4px 10px;
+  padding: 0.25em 0.4em 0.3em 0.4em;
 }
 
 /* Marker date styling for stream */
@@ -213,36 +223,47 @@ header h1:hover {
   display: inline-block;
   font-family: var(--font-marker);
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   background: var(--pop);
-  padding: 4px 10px;
-  border-radius: 6px;
+  padding: 0.3em 0.5em 0.4em 0.5em;
+  border-radius: 0.2em;
   transform: rotate(-1deg);
-  transition: transform var(--transition);
+  transition: transform var(--transition-fast);
   margin-bottom: var(--space-sm);
 }
 
 .marker-date:hover {
-  transform: rotate(0deg) scale(1.05);
+  transform: rotate(0deg) scale(1.08);
+  transition: transform var(--transition-fast);
 }
 
 /* === Highlighter === */
 mark, .highlight {
   background: var(--pop);
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 6px 12px;
+  border-radius: 0.2em;
   color: var(--black);
+  transition: transform var(--transition-fast);
+}
+
+mark:hover, .highlight:hover {
+  transform: scale(1.02);
 }
 
 /* Strong highlight for key phrases */
 .highlight-strong {
   background: var(--pop);
-  padding: 3px 8px;
-  border-radius: 4px;
+  padding: 8px 16px;
+  border-radius: 0.2em;
   color: var(--black);
   font-weight: 600;
+  transition: transform var(--transition-fast);
+}
+
+.highlight-strong:hover {
+  transform: scale(1.02);
 }
 
 /* ============================================
@@ -323,7 +344,7 @@ section h2 {
 }
 
 /* ============================================
-   CARDS — Hover lift effect
+   CARDS — Hover lift effect with scale
    ============================================ */
 .card {
   background: var(--bg-subtle);
@@ -333,8 +354,8 @@ section h2 {
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
 }
 
 /* Card with stronger hover */
@@ -343,8 +364,8 @@ section h2 {
 }
 
 .card-lift:hover {
-  transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.15);
 }
 
 /* ============================================
@@ -359,8 +380,8 @@ section h2 {
 }
 
 .post:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
 }
 
 .post-date {
@@ -587,7 +608,7 @@ section h2 {
 }
 
 .project-section:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
 }
 
 .project-section h2 {
@@ -661,8 +682,8 @@ section h2 {
 }
 
 .feature-card:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.1);
   background: var(--pop-soft);
 }
 
