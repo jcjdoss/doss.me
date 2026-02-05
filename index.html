@@ -25,6 +25,7 @@
         <section class="current">
             <span class="marker-label marker-label-tilt">WHAT I'M BUILDING NOW</span>
             <h2>Current Focus</h2>
+            <p class="quote-subtitle" id="headerQuote">My focus is like Schrödinger's cat—both working and not working simultaneously.</p>
             <div class="project">
                 <h3>AI Agent System</h3>
                 <p>I built a multi-agent system that actually <mark>reaches out to me</mark> instead of making me remember to check in. Sounds simple—changes everything in practice.</p>
@@ -34,6 +35,7 @@
         </section>
 
         <section class="about">
+            <blockquote class="pull-quote">I have hyperfocus. Unfortunately, it's hyperfocused on not doing the thing.</blockquote>
             <p>15+ years helping organizations move from <mark>chaos to clarity</mark>—through systems design, honest AI adoption, and teams that thrive with autonomy. I think in systems because of how my brain works, not despite it. ADHD perspective solves problems homogeneous teams miss.</p>
             <p>This site is where I share how I think. Public building on doss.me, <mark>@whatmefocus</mark>, and my thinking notebook. Transparent about what actually works in AI, infrastructure, and team dynamics—not the hype.</p>
         </section>
@@ -96,8 +98,53 @@
 
         <footer>
             <p class="note">This site is a work in progress.</p>
+            <p class="random-quote" id="footerQuote"></p>
             <p class="copyright">© 2026 J Doss</p>
         </footer>
     </div>
+
+    <script>
+        // Focus quote rotation and rotation
+        const quotes = [
+            "My focus is like Schrödinger's cat—both working and not working simultaneously.",
+            "Focus defined: spending 90 minutes on Slack while the deadline approaches.",
+            "I have three browser tabs open. I'm 62% confident they're all relevant.",
+            "They say to work with your ADHD, not against it. I'm still negotiating the terms.",
+            "Built this while deep in hyperfocus. Built that while avoiding the first thing entirely. Balance.",
+            "If I'm not building, debugging, or reading Hacker News at 2 AM, is it even focus?",
+            "Started with one project. Now there are five. This is called progress.",
+            "I lose focus the moment something's finished. The messy middle is where I live.",
+            "Some people set timers. I set up a new development environment instead.",
+            "Attention span: scattered. Attention to detail on whatever I'm actually focused on: unsettling.",
+            "I scheduled time to finish this. Then got distracted by a better implementation. Story of my code.",
+            "Three open PRs, two abandoned branches, one clear vision. The math doesn't add up, but neither does the code."
+        ];
+
+        // Rotate header quote based on day
+        function getHeaderQuote() {
+            const today = new Date();
+            const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+            return quotes[dayOfYear % quotes.length];
+        }
+
+        // Random footer quote
+        function getRandomQuote() {
+            return quotes[Math.floor(Math.random() * quotes.length)];
+        }
+
+        // Set quotes on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const headerEl = document.getElementById('headerQuote');
+            const footerEl = document.getElementById('footerQuote');
+            
+            if (headerEl) {
+                headerEl.textContent = getHeaderQuote();
+            }
+            
+            if (footerEl) {
+                footerEl.textContent = getRandomQuote();
+            }
+        });
+    </script>
 </body>
 </html>
