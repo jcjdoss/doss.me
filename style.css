@@ -369,7 +369,7 @@ section h2 {
 }
 
 /* ============================================
-   POSTS — Rounded cards with movement
+   POSTS — Rounded cards with movement + scale
    ============================================ */
 .post {
   background: var(--bg-subtle);
@@ -380,8 +380,8 @@ section h2 {
 }
 
 .post:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.15);
 }
 
 .post-date {
@@ -449,12 +449,12 @@ section h2 {
   border-radius: var(--radius-lg);
   text-decoration: none;
   color: inherit;
-  transition: all 0.25s ease;
+  transition: all var(--transition);
 }
 
 .link-card:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.15);
   background: var(--bg);
 }
 
@@ -491,18 +491,19 @@ section h2 {
 }
 
 /* ============================================
-   CURRENT FOCUS — Pop section with movement
+   CURRENT FOCUS — Pop section with movement + scale
    ============================================ */
 .current {
   background: var(--pop);
   padding: var(--space-lg);
   border-radius: var(--radius-lg);
   margin-bottom: var(--space-xl);
-  transition: transform var(--transition);
+  transition: transform var(--transition), box-shadow var(--transition);
 }
 
 .current:hover {
-  transform: scale(1.01);
+  transform: scale(1.02);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
 }
 
 .current h2 {
@@ -604,11 +605,12 @@ section h2 {
   padding: var(--space-lg);
   margin-bottom: var(--space-md);
   border-radius: var(--radius-lg);
-  transition: transform var(--transition);
+  transition: transform var(--transition), box-shadow var(--transition);
 }
 
 .project-section:hover {
-  transform: translateY(-4px);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.1);
 }
 
 .project-section h2 {
@@ -682,8 +684,8 @@ section h2 {
 }
 
 .feature-card:hover {
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+  transform: translateY(-4px) scale(1.04);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.12);
   background: var(--pop-soft);
 }
 
@@ -739,8 +741,8 @@ section h2 {
 }
 
 .repo-item:hover {
-  transform: translateX(4px);
-  box-shadow: -4px 0 0 var(--pop);
+  transform: translateX(4px) scale(1.02);
+  box-shadow: -4px 0 0 var(--pop), 0 8px 24px rgba(0,0,0,0.08);
 }
 
 .repo-item h3 {
@@ -785,8 +787,8 @@ section h2 {
 }
 
 .experiment:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.1);
 }
 
 .experiment h3 {
@@ -806,11 +808,12 @@ section h2 {
   padding: var(--space-lg);
   border-radius: var(--radius-lg);
   margin-bottom: var(--space-lg);
-  transition: transform var(--transition);
+  transition: transform var(--transition), box-shadow var(--transition);
 }
 
 .lab-footer:hover {
-  transform: scale(1.01);
+  transform: scale(1.02);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
 }
 
 .lab-footer h2 {
@@ -847,11 +850,12 @@ section h2 {
   padding: var(--space-lg);
   margin-bottom: var(--space-md);
   border-radius: var(--radius-lg);
-  transition: transform var(--transition);
+  transition: transform var(--transition), box-shadow var(--transition);
 }
 
 .resume-section:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
 }
 
 .contact-info {
@@ -969,8 +973,8 @@ section h2 {
 }
 
 .skill-category:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
 }
 
 .skill-category h4 {
@@ -1018,11 +1022,12 @@ section h2 {
   padding: var(--space-lg);
   margin-bottom: var(--space-md);
   border-radius: var(--radius-lg);
-  transition: transform var(--transition);
+  transition: transform var(--transition), box-shadow var(--transition);
 }
 
 .about-section:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
 }
 
 .disclosure-content,
@@ -1097,8 +1102,8 @@ section h2 {
 }
 
 .step:hover {
-  transform: scale(1.02) translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  transform: scale(1.03) translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.1);
 }
 
 .step-number {
@@ -1132,6 +1137,12 @@ section h2 {
   padding: var(--space-md);
   border-radius: var(--radius);
   margin: var(--space-md) 0;
+  transition: all var(--transition);
+}
+
+.tech-stack:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  transform: scale(1.01);
 }
 
 .contact-section {
@@ -1139,11 +1150,12 @@ section h2 {
   padding: var(--space-lg);
   border-radius: var(--radius-lg);
   margin-bottom: var(--space-lg);
-  transition: transform var(--transition);
+  transition: transform var(--transition), box-shadow var(--transition);
 }
 
 .contact-section:hover {
-  transform: scale(1.01);
+  transform: scale(1.02);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
 }
 
 .contact-section h2 {
@@ -1178,7 +1190,8 @@ section h2 {
 
 .contact-link:hover {
   background: rgba(255,255,255,0.9);
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
 .contact-icon {
