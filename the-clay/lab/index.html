@@ -13,7 +13,6 @@
 <body>
 
   <div class="scroll-progress"></div>
-
   <svg class="noise-overlay" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
     <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter>
     <rect width="100%" height="100%" filter="url(#noise)"/>
@@ -23,24 +22,21 @@
     <div class="nav-inner">
       <a href="/the-clay/" class="nav-logo">doss<span class="nav-logo-dot">.</span>me</a>
       <div class="nav-links">
-        <a href="/the-clay/" class="nav-link" data-page="home">Home</a>
-        <a href="/the-clay/stream/" class="nav-link" data-page="stream">Stream</a>
-        <a href="/the-clay/resume/" class="nav-link" data-page="resume">Resume</a>
-        <a href="/the-clay/lab/" class="nav-link active" data-page="lab">Lab</a>
-        <a href="/the-clay/about/" class="nav-link" data-page="about">About</a>
+        <a href="/the-clay/" class="nav-link">Home</a>
+        <a href="/the-clay/stream/" class="nav-link">Stream</a>
+        <a href="/the-clay/resume/" class="nav-link">Resume</a>
+        <a href="/the-clay/lab/" class="nav-link active">Lab</a>
+        <a href="/the-clay/about/" class="nav-link">About</a>
       </div>
       <div class="nav-actions">
-        <button class="theme-toggle" aria-label="Toggle dark mode">
+        <button class="theme-toggle" aria-label="Toggle theme">
           <svg class="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
           <svg class="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
-        <button class="nav-mobile-toggle" aria-label="Menu">
-          <span></span><span></span><span></span>
-        </button>
+        <button class="nav-mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
       </div>
     </div>
   </nav>
-
   <div class="nav-mobile-menu">
     <a href="/the-clay/" class="nav-mobile-link">Home</a>
     <a href="/the-clay/stream/" class="nav-mobile-link">Stream</a>
@@ -53,41 +49,47 @@
     <div class="container">
 
       <header class="page-header">
+        <div class="page-header-shape"></div>
         <h1>Lab</h1>
         <p class="page-header-description">
           Projects, tools, and experiments. Some ship. Some teach me things. All of them started because I couldn't stop thinking about them.
         </p>
       </header>
 
-      <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-2xl);">
+      <div class="project-grid stagger-children">
 
-        <!-- Project 1: doss.me -->
-        <div class="project-card card-tilt animate-on-scroll">
+        <!-- Project 1: doss.me — Featured, spans full width -->
+        <div class="project-card project-card-featured card-tilt animate-on-scroll">
           <div class="card-accent card-accent-amber"></div>
-          <div class="project-card-header">
-            <div>
-              <div class="card-label" style="display: flex; align-items: center; gap: var(--space-sm);">
-                <span class="status-dot status-dot-active"></span>
-                Active
+          <div class="project-card-visual">
+            <div class="project-card-visual-text">the-clay/</div>
+          </div>
+          <div>
+            <div class="project-card-header">
+              <div>
+                <div class="card-label" style="display: flex; align-items: center; gap: var(--space-sm);">
+                  <span class="status-dot status-dot-active"></span>
+                  Active
+                </div>
+                <div class="project-card-title">doss.me</div>
               </div>
-              <div class="project-card-title">doss.me</div>
+              <span class="tag tag-amber">Meta</span>
             </div>
-            <span class="tag tag-amber">Meta</span>
-          </div>
-          <div class="project-card-description">
-            <p>This website. A personal site that's equal parts portfolio and personality, built with Claude from a detailed creative brief. The competition version lives in <code class="text-mono">/the-clay/</code> because the metaphor was too good to pass up.</p>
-            <p style="margin-top: var(--space-md);">The whole thing is an experiment in AI-directed design: I provide the vision, the voice, the taste. Claude provides the execution. The result is what you're looking at right now.</p>
-          </div>
-          <div class="project-card-tech">
-            <span class="skill-tag">HTML/CSS/JS</span>
-            <span class="skill-tag">Claude</span>
-            <span class="skill-tag">GitHub Pages</span>
-            <span class="skill-tag">No Build Tools</span>
+            <div class="project-card-description">
+              <p>This website. A personal site that's equal parts portfolio and personality, built with Claude from a detailed creative brief. The competition version lives in <code class="text-mono">/the-clay/</code> because the metaphor was too good to pass up.</p>
+              <p style="margin-top: var(--space-md);">The whole thing is an experiment in AI-directed design: I provide the vision, the voice, the taste. Claude provides the execution.</p>
+            </div>
+            <div class="project-card-tech">
+              <span class="skill-tag">HTML/CSS/JS</span>
+              <span class="skill-tag">Claude</span>
+              <span class="skill-tag">GitHub Pages</span>
+              <span class="skill-tag">No Build Tools</span>
+            </div>
           </div>
         </div>
 
         <!-- Project 2: AI Agent System -->
-        <div class="project-card card-tilt animate-on-scroll" style="transition-delay: 100ms;">
+        <div class="project-card card-tilt animate-on-scroll">
           <div class="card-accent card-accent-coral"></div>
           <div class="project-card-header">
             <div>
@@ -100,8 +102,8 @@
             <span class="tag tag-coral">AI</span>
           </div>
           <div class="project-card-description">
-            <p>A multi-agent system for task management and writing assistance. Multiple specialized agents that coordinate to handle complex workflows — research, drafting, editing, organizing.</p>
-            <p style="margin-top: var(--space-md);">Currently in the "works beautifully for 11 minutes then does something unexpected" phase. Which is honestly the most interesting phase of any project.</p>
+            <p>A multi-agent system for task management and writing assistance. Multiple specialized agents that coordinate to handle complex workflows.</p>
+            <p style="margin-top: var(--space-md);">Currently in the "works beautifully for 11 minutes then does something unexpected" phase. The most interesting phase of any project.</p>
           </div>
           <div class="project-card-tech">
             <span class="skill-tag">Claude API</span>
@@ -112,7 +114,7 @@
         </div>
 
         <!-- Project 3: iOS Apps -->
-        <div class="project-card card-tilt animate-on-scroll" style="transition-delay: 200ms;">
+        <div class="project-card card-tilt animate-on-scroll">
           <div class="card-accent card-accent-blue"></div>
           <div class="project-card-header">
             <div>
@@ -126,7 +128,7 @@
           </div>
           <div class="project-card-description">
             <p>Building iOS apps because the best way to understand a platform is to ship something on it. Details coming as things take shape.</p>
-            <p style="margin-top: var(--space-md);">The ADHD brain loves learning new frameworks. The ADHD brain is less enthusiastic about App Store review guidelines. We're working through it.</p>
+            <p style="margin-top: var(--space-md);">The ADHD brain loves learning new frameworks. Less enthusiastic about App Store review guidelines. We're working through it.</p>
           </div>
           <div class="project-card-tech">
             <span class="skill-tag">Swift</span>
@@ -137,7 +139,7 @@
         </div>
 
         <!-- Project 4: Smart Grilling -->
-        <div class="project-card card-tilt animate-on-scroll" style="transition-delay: 300ms;">
+        <div class="project-card card-tilt animate-on-scroll">
           <div class="card-accent card-accent-green"></div>
           <div class="project-card-header">
             <div>
@@ -151,7 +153,7 @@
           </div>
           <div class="project-card-description">
             <p>Traeger + sous vide + temperature monitoring + automation. Because if you can automate it, you should. Especially when brisket is on the line.</p>
-            <p style="margin-top: var(--space-md);">The intersection of IoT and BBQ is an underserved market. I'm not fixing that problem at scale. I'm fixing it in my backyard.</p>
+            <p style="margin-top: var(--space-md);">The intersection of IoT and BBQ is an underserved market. I'm not fixing that at scale. I'm fixing it in my backyard.</p>
           </div>
           <div class="project-card-tech">
             <span class="skill-tag">Traeger</span>

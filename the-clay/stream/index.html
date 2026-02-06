@@ -49,97 +49,107 @@
     <div class="container">
 
       <header class="page-header">
+        <div class="page-header-shape"></div>
         <h1>Stream</h1>
         <p class="page-header-description">
           No polish. No editorial calendar. Just what's on my mind.
         </p>
       </header>
 
-      <!-- Entry 1 — Meta (amber) -->
-      <article class="stream-entry animate-on-scroll" data-tag="meta">
-        <div class="stream-meta">
-          <span class="stream-date">Feb 6, 2026</span>
-          <span class="tag tag-amber">Meta</span>
-        </div>
-        <h2 class="stream-title">The Claude Experiment</h2>
-        <div class="stream-body">
-          <p>You're looking at it. I gave Claude a brief and said "build me a website." Not because I can't. Because I wanted to see what happens when you treat AI as clay, not a crutch.</p>
-          <p style="margin-top: var(--space-md);">The brief was detailed. The voice direction was specific. The design references were intentional. This isn't "AI wrote my website." This is "I directed an AI to build what I envisioned." There's a difference.</p>
-        </div>
-      </article>
+      <div class="stream-grid stagger-children">
 
-      <!-- Entry 2 — Work (blue) -->
-      <article class="stream-entry animate-on-scroll" data-tag="work">
-        <div class="stream-meta">
-          <span class="stream-date">Feb 4, 2026</span>
-          <span class="tag tag-blue">Work</span>
-        </div>
-        <h2 class="stream-title">Webex Calling Migration: Week 3</h2>
-        <div class="stream-body">
-          <p>Migrating 400+ users off legacy telephony while keeping the lights on is the IT equivalent of changing a tire at 60mph. We're at 72% and only two "but my fax machine" tickets this week.</p>
-          <p style="margin-top: var(--space-md);">The secret nobody talks about in government IT: the technology is the easy part. The change management is where you earn your paycheck.</p>
-        </div>
-      </article>
+        <!-- Entry 1 — Meta -->
+        <article class="stream-card animate-on-scroll" data-tag="meta">
+          <div class="stream-card-accent"></div>
+          <div class="stream-meta">
+            <span class="stream-date">Feb 6, 2026</span>
+            <span class="tag tag-amber">Meta</span>
+          </div>
+          <h2 class="stream-title">The Claude Experiment</h2>
+          <div class="stream-body">
+            <p>You're looking at it. I gave Claude a brief and said "build me a website." Not because I can't. Because I wanted to see what happens when you treat AI as clay, not a crutch.</p>
+            <p style="margin-top: var(--space-md);">The brief was detailed. The voice direction was specific. The design references were intentional. This isn't "AI wrote my website." This is "I directed an AI to build what I envisioned." There's a difference.</p>
+          </div>
+        </article>
 
-      <!-- Entry 3 — Life (purple), SHORT form -->
-      <article class="stream-entry stream-entry-short animate-on-scroll" data-tag="life">
-        <div class="stream-meta">
-          <span class="stream-date">Feb 2, 2026</span>
-          <span class="tag tag-purple">Life</span>
-        </div>
-        <div class="stream-body">
-          Current browser tab count: 47. Each one represents a thought I was absolutely going to get back to.
-        </div>
-      </article>
+        <!-- Entry 2 — Work -->
+        <article class="stream-card animate-on-scroll" data-tag="work">
+          <div class="stream-card-accent"></div>
+          <div class="stream-meta">
+            <span class="stream-date">Feb 4, 2026</span>
+            <span class="tag tag-blue">Work</span>
+          </div>
+          <h2 class="stream-title">Webex Calling Migration: Week 3</h2>
+          <div class="stream-body">
+            <p>Migrating 400+ users off legacy telephony while keeping the lights on is the IT equivalent of changing a tire at 60mph. We're at 72% and only two "but my fax machine" tickets this week.</p>
+            <p style="margin-top: var(--space-md);">The secret nobody talks about in government IT: the technology is the easy part. The change management is where you earn your paycheck.</p>
+          </div>
+        </article>
 
-      <!-- Entry 4 — Work (blue) -->
-      <article class="stream-entry animate-on-scroll" data-tag="work">
-        <div class="stream-meta">
-          <span class="stream-date">Jan 28, 2026</span>
-          <span class="tag tag-blue">Work</span>
-        </div>
-        <h2 class="stream-title">Why Government IT Doesn't Have to Suck</h2>
-        <div class="stream-body">
-          <p>Hot take that shouldn't be hot: government employees deserve the same quality tech experience as private sector workers. ServiceNow intake optimization isn't sexy. But 1,000 county employees not wanting to throw their laptops out the window? That's the dream.</p>
-        </div>
-      </article>
+        <!-- Entry 3 — Life, SHORT -->
+        <article class="stream-card stream-card-short animate-on-scroll" data-tag="life">
+          <div class="stream-meta">
+            <span class="stream-date">Feb 2, 2026</span>
+            <span class="tag tag-purple">Life</span>
+          </div>
+          <div class="stream-body">
+            Current browser tab count: 47. Each one represents a thought I was absolutely going to get back to.
+          </div>
+        </article>
 
-      <!-- Entry 5 — Life (purple) -->
-      <article class="stream-entry animate-on-scroll" data-tag="life">
-        <div class="stream-meta">
-          <span class="stream-date">Jan 24, 2026</span>
-          <span class="tag tag-purple">Life</span>
-        </div>
-        <h2 class="stream-title">Traeger + Sous Vide = Cheat Codes</h2>
-        <div class="stream-body">
-          <p>Started the brisket at 5am. Sous vide got it to 165&deg;, then the Traeger finishes the bark. It's not traditional. Purists will hate it. But it's perfect every single time, and I'm done apologizing for consistency.</p>
-          <p style="margin-top: var(--space-md);">There's a metaphor in here about technology and tradition that I'm choosing not to make. Sometimes a brisket is just a brisket.</p>
-        </div>
-      </article>
+        <!-- Entry 4 — Work -->
+        <article class="stream-card animate-on-scroll" data-tag="work">
+          <div class="stream-card-accent"></div>
+          <div class="stream-meta">
+            <span class="stream-date">Jan 28, 2026</span>
+            <span class="tag tag-blue">Work</span>
+          </div>
+          <h2 class="stream-title">Why Government IT Doesn't Have to Suck</h2>
+          <div class="stream-body">
+            <p>Hot take that shouldn't be hot: government employees deserve the same quality tech experience as private sector workers. ServiceNow intake optimization isn't sexy. But 1,000 county employees not wanting to throw their laptops out the window? That's the dream.</p>
+          </div>
+        </article>
 
-      <!-- Entry 6 — Tech (coral) -->
-      <article class="stream-entry animate-on-scroll" data-tag="tech">
-        <div class="stream-meta">
-          <span class="stream-date">Jan 20, 2026</span>
-          <span class="tag tag-coral">Tech</span>
-        </div>
-        <h2 class="stream-title">The Agent System is Working. Kind Of.</h2>
-        <div class="stream-body">
-          <p>My multi-agent system just successfully managed a task pipeline without me babysitting it. For about 11 minutes. Then it decided to reorganize my notes into a taxonomy that made sense to no one, including the AI.</p>
-          <p style="margin-top: var(--space-md);">But those 11 minutes? Genuinely impressive. The gap between "sometimes works beautifully" and "production ready" is where all the interesting engineering lives.</p>
-        </div>
-      </article>
+        <!-- Entry 5 — Life -->
+        <article class="stream-card animate-on-scroll" data-tag="life">
+          <div class="stream-card-accent"></div>
+          <div class="stream-meta">
+            <span class="stream-date">Jan 24, 2026</span>
+            <span class="tag tag-purple">Life</span>
+          </div>
+          <h2 class="stream-title">Traeger + Sous Vide = Cheat Codes</h2>
+          <div class="stream-body">
+            <p>Started the brisket at 5am. Sous vide got it to 165&deg;, then the Traeger finishes the bark. It's not traditional. Purists will hate it. But it's perfect every single time, and I'm done apologizing for consistency.</p>
+            <p style="margin-top: var(--space-md);">There's a metaphor in here about technology and tradition that I'm choosing not to make. Sometimes a brisket is just a brisket.</p>
+          </div>
+        </article>
 
-      <!-- Entry 7 — Life (purple), SHORT form -->
-      <article class="stream-entry stream-entry-short animate-on-scroll" data-tag="life">
-        <div class="stream-meta">
-          <span class="stream-date">Jan 15, 2026</span>
-          <span class="tag tag-purple">Life</span>
-        </div>
-        <div class="stream-body">
-          Someone asked how I was doing today. I said "GREAT." They did a visible double-take. That's the whole point. Life is too short for lukewarm responses.
-        </div>
-      </article>
+        <!-- Entry 6 — Tech -->
+        <article class="stream-card animate-on-scroll" data-tag="tech">
+          <div class="stream-card-accent"></div>
+          <div class="stream-meta">
+            <span class="stream-date">Jan 20, 2026</span>
+            <span class="tag tag-coral">Tech</span>
+          </div>
+          <h2 class="stream-title">The Agent System is Working. Kind Of.</h2>
+          <div class="stream-body">
+            <p>My multi-agent system just successfully managed a task pipeline without me babysitting it. For about 11 minutes. Then it decided to reorganize my notes into a taxonomy that made sense to no one, including the AI.</p>
+            <p style="margin-top: var(--space-md);">But those 11 minutes? Genuinely impressive. The gap between "sometimes works beautifully" and "production ready" is where all the interesting engineering lives.</p>
+          </div>
+        </article>
+
+        <!-- Entry 7 — Life, SHORT -->
+        <article class="stream-card stream-card-short animate-on-scroll" data-tag="life">
+          <div class="stream-meta">
+            <span class="stream-date">Jan 15, 2026</span>
+            <span class="tag tag-purple">Life</span>
+          </div>
+          <div class="stream-body">
+            Someone asked how I was doing today. I said "GREAT." They did a visible double-take. That's the whole point. Life is too short for lukewarm responses.
+          </div>
+        </article>
+
+      </div>
 
     </div>
   </main>

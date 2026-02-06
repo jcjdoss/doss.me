@@ -55,54 +55,111 @@
   <main class="page-content">
     <div class="container">
 
-      <!-- Hero: Quote, not introduction -->
-      <section class="hero">
-        <div class="hero-glow"></div>
-        <div class="hero-quote-container">
+      <!-- Hero: Spatial Composition -->
+      <section class="hero-spatial">
+        <!-- Gradient orbs -->
+        <div class="hero-orb hero-orb-1"></div>
+        <div class="hero-orb hero-orb-2"></div>
+
+        <!-- Left: Quote + Attribution -->
+        <div class="hero-content">
           <p class="hero-quote" data-hero-quote>I'm the artist, AI is the clay.</p>
+          <div class="hero-attribution">
+            <span class="hero-dash">&mdash;</span>
+            <span class="hero-name">J Doss</span>
+            <span class="hero-detail">IT Manager &middot; Sierra Nevada, CA</span>
+          </div>
         </div>
-        <div class="hero-attribution">
-          <span class="hero-dash">&mdash;</span>
-          <span class="hero-name">J Doss</span>
-          <span class="hero-detail">IT Manager &middot; Sierra Nevada, CA &middot; 51</span>
+
+        <!-- Right: Floating Card Stack -->
+        <div class="hero-cards">
+          <!-- Card 1: Bold amber identity card -->
+          <div class="hero-card hero-card-1">
+            <div class="hero-card-label">// who</div>
+            <div class="hero-card-name">J Doss</div>
+            <div class="hero-card-role">IT Division Manager &middot; Madera County</div>
+          </div>
+
+          <!-- Card 2: Stat card -->
+          <div class="hero-card hero-card-2">
+            <div class="hero-card-stat" data-count="33">33</div>
+            <div class="hero-card-stat-label">Team members led</div>
+          </div>
+
+          <!-- Card 3: Philosophy card -->
+          <div class="hero-card hero-card-3">
+            <div class="hero-card-quote">"Everyone has a resume. Not everyone has personality."</div>
+          </div>
         </div>
+
         <div class="hero-scroll-hint">
           <span>Scroll</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
         </div>
       </section>
 
-      <!-- Typographic Nav — not cards, just text with conviction -->
+      <!-- Bento Grid Navigation -->
       <section class="section animate-on-scroll">
-        <nav class="type-nav">
-          <a href="/the-clay/stream/" class="type-nav-link">
-            <span class="type-nav-number">01</span>
-            Read what I'm thinking
-            <span class="type-nav-arrow">&rarr;</span>
+        <div class="bento stagger-children">
+
+          <!-- Stream: Bold amber, wide -->
+          <a href="/the-clay/stream/" class="bento-item bento-wide bento-amber animate-on-scroll">
+            <span class="bento-number">01</span>
+            <div>
+              <div class="bento-title">Stream</div>
+              <div class="bento-desc">Unfiltered thoughts on tech, work, life.</div>
+            </div>
+            <div class="bento-arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+            </div>
           </a>
-          <a href="/the-clay/resume/" class="type-nav-link">
-            <span class="type-nav-number">02</span>
-            See where I've been
-            <span class="type-nav-arrow">&rarr;</span>
+
+          <!-- Resume: Blue -->
+          <a href="/the-clay/resume/" class="bento-item bento-blue animate-on-scroll">
+            <span class="bento-number">02</span>
+            <div>
+              <div class="bento-title">Resume</div>
+              <div class="bento-desc">The non-linear path.</div>
+            </div>
+            <div class="bento-arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+            </div>
           </a>
-          <a href="/the-clay/lab/" class="type-nav-link">
-            <span class="type-nav-number">03</span>
-            Watch what I'm building
-            <span class="type-nav-arrow">&rarr;</span>
+
+          <!-- Lab: Coral -->
+          <a href="/the-clay/lab/" class="bento-item bento-coral animate-on-scroll">
+            <span class="bento-number">03</span>
+            <div>
+              <div class="bento-title">Lab</div>
+              <div class="bento-desc">What I'm building.</div>
+            </div>
+            <div class="bento-arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+            </div>
           </a>
-          <a href="/the-clay/about/" class="type-nav-link">
-            <span class="type-nav-number">04</span>
-            Learn who I actually am
-            <span class="type-nav-arrow">&rarr;</span>
+
+          <!-- About: Dark surface, wide -->
+          <a href="/the-clay/about/" class="bento-item bento-wide bento-dark animate-on-scroll">
+            <span class="bento-number">04</span>
+            <div>
+              <div class="bento-title">About</div>
+              <div class="bento-desc">Kansas to California. Atari to AI. The full story.</div>
+            </div>
+            <div class="bento-arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+            </div>
           </a>
-        </nav>
+
+        </div>
       </section>
 
     </div>
 
-    <!-- Broken Grid Pullquote — breaks the container, tilts, demands attention -->
-    <div class="pullquote-break animate-on-scroll">
-      <div class="pullquote-break-inner">
+    <!-- Full-Bleed Color Block Pullquote -->
+    <div class="color-block color-block-amber animate-on-scroll">
+      <div class="color-block-shape" style="width: 400px; height: 400px; top: -100px; right: -100px; background: rgba(255,255,255,0.06);"></div>
+      <div class="color-block-shape" style="width: 200px; height: 200px; bottom: -60px; left: 10%; background: rgba(255,255,255,0.04);"></div>
+      <div class="color-block-inner">
         <blockquote>People who are scared of AI won't get me anyway. The ones who understand? They'll see this site and know exactly what it means.</blockquote>
         <cite>Built with Claude. Directed by J. The folder is called the-clay. Obviously.</cite>
       </div>
@@ -110,10 +167,11 @@
 
     <div class="container">
 
-      <!-- Latest from Stream — just one, impactful -->
+      <!-- Latest from Stream -->
       <section class="section animate-on-scroll">
         <div class="divider-label">Latest from the stream</div>
-        <article class="stream-entry" data-tag="meta" style="margin-top: var(--space-xl);">
+        <div class="stream-card animate-on-scroll" data-tag="meta" style="margin-top: var(--space-xl);">
+          <div class="stream-card-accent"></div>
           <div class="stream-meta">
             <span class="stream-date">Feb 6, 2026</span>
             <span class="tag tag-amber">Meta</span>
@@ -122,7 +180,7 @@
           <div class="stream-body">
             <p>You're looking at it. I gave Claude a brief and said "build me a website." Not because I can't. Because I wanted to see what happens when you treat AI as clay, not a crutch. The results are what they are. Judge accordingly.</p>
           </div>
-        </article>
+        </div>
         <a href="/the-clay/stream/" class="btn btn-ghost mt-xl">
           More thoughts
           <svg class="btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>

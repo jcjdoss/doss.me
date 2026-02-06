@@ -1,6 +1,6 @@
 /* ============================================================
-   doss.me — the-clay edition v2
-   Dark-first. Quote hero. Premium interactions.
+   doss.me — the-clay edition v3
+   SPATIAL. LAYERED. BOLD. PRODUCT-FEEL.
    ============================================================ */
 
 (function () {
@@ -11,7 +11,6 @@
   function getPreferredTheme() {
     const stored = localStorage.getItem(THEME_KEY);
     if (stored) return stored;
-    // Default to dark. Light is the escape hatch.
     return 'dark';
   }
   function setTheme(theme) {
@@ -23,7 +22,7 @@
     localStorage.setItem(THEME_KEY, theme);
   }
 
-  // Apply theme immediately (before DOM ready)
+  // Apply immediately
   const initialTheme = getPreferredTheme();
   if (initialTheme === 'light') {
     document.documentElement.setAttribute('data-theme', 'light');
@@ -91,7 +90,7 @@
     });
   }
 
-  // ---- Scroll Animations ----
+  // ---- Scroll Animations with stagger ----
   function initScrollAnimations() {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -100,7 +99,7 @@
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
     document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
   }
 
@@ -196,7 +195,7 @@
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.5 });
+    }, { threshold: 0.3 });
     counters.forEach(c => observer.observe(c));
   }
 
@@ -204,7 +203,7 @@
     const target = parseInt(el.getAttribute('data-count'), 10);
     const suffix = el.getAttribute('data-suffix') || '';
     const prefix = el.getAttribute('data-prefix') || '';
-    const dur = 1800;
+    const dur = target > 100 ? 2000 : 1400;
     const start = performance.now();
     function tick(now) {
       const p = Math.min((now - start) / dur, 1);
@@ -222,10 +221,10 @@
       if ((link.getAttribute('href') || '').startsWith('#')) return;
       link.addEventListener('click', (e) => {
         const href = link.getAttribute('href');
-        if (!href) return;
+        if (!href || href === window.location.pathname) return;
         e.preventDefault();
         document.body.classList.add('page-exit');
-        setTimeout(() => { window.location.href = href; }, 280);
+        setTimeout(() => { window.location.href = href; }, 250);
       });
     });
   }
@@ -239,11 +238,11 @@
       "I'm the artist, AI is the clay.",
       "GREAT. Not fine. Never fine.",
       "47 open tabs is not chaos. It's cartography.",
-      "Nuance over hot takes.",
-      "The people who get it, get it.",
-      "Everyone has a resume. Not everyone has personality.",
-      "I see the world in grey. That's where the interesting stuff lives.",
-      "Positive by choice, not by naivety."
+      "Systems thinking is my native language.",
+      "If you can automate it, you should.",
+      "Building in public means you see the messy parts.",
+      "The vision is mine. The execution is a collaboration.",
+      "Cynicism is easy. Optimism takes effort. I choose the effort."
     ];
 
     let current = 0;
@@ -257,13 +256,11 @@
         el.textContent = quotes[current];
         el.style.opacity = '1';
         el.style.transform = 'translateY(0)';
-      }, 400);
+      }, 350);
     }
 
-    // Auto-cycle
     interval = setInterval(cycle, 5500);
 
-    // Click to advance
     el.addEventListener('click', () => {
       clearInterval(interval);
       cycle();
@@ -287,23 +284,25 @@
     });
 
     // Logo 5-click
-    let clicks = 0;
+    let clicks = 0, clickTimer;
     const logo = document.querySelector('.nav-logo');
     if (logo) {
       logo.addEventListener('click', (e) => {
         clicks++;
+        clearTimeout(clickTimer);
         if (clicks >= 5) {
           e.preventDefault();
           clicks = 0;
           showToast();
         }
+        clickTimer = setTimeout(() => { clicks = 0; }, 1500);
       });
     }
   }
 
   function showRetroOverlay() {
     const d = document.createElement('div');
-    d.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#000;color:#0f0;font-family:"Courier New",monospace;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:1.1rem;cursor:pointer;animation:fadeIn .5s ease-out;';
+    d.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#000;color:#0f0;font-family:"JetBrains Mono","Courier New",monospace;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:1.1rem;cursor:pointer;animation:fadeIn .5s ease-out;';
     d.innerHTML = '<pre style="color:#0f0;text-align:center;line-height:1.6">\n  ╔═══════════════════════════════════╗\n  ║   KONAMI CODE ACCEPTED           ║\n  ║                                  ║\n  ║   > 80s kid detected             ║\n  ║   > Loading Atari 2600...        ║\n  ║   > Just kidding.                ║\n  ║   > But you knew the code.       ║\n  ║   > That makes us friends.       ║\n  ║                                  ║\n  ║   [CLICK TO RETURN]              ║\n  ╚═══════════════════════════════════╝\n</pre>';
     d.addEventListener('click', () => d.remove());
     document.body.appendChild(d);
