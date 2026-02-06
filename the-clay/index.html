@@ -10,46 +10,39 @@
   <meta property="og:type" content="website">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Scroll progress -->
   <div class="scroll-progress"></div>
 
-  <!-- Noise texture overlay -->
   <svg class="noise-overlay" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
     <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter>
     <rect width="100%" height="100%" filter="url(#noise)"/>
   </svg>
 
-  <!-- Navigation -->
+  <!-- Nav -->
   <nav class="nav" role="navigation">
     <div class="nav-inner">
-      <a href="/the-clay/" class="nav-logo">
-        doss<span class="nav-logo-dot">.</span>me
-      </a>
+      <a href="/the-clay/" class="nav-logo">doss<span class="nav-logo-dot">.</span>me</a>
       <div class="nav-links">
-        <a href="/the-clay/" class="nav-link active" data-page="home">Home</a>
-        <a href="/the-clay/stream/" class="nav-link" data-page="stream">Stream</a>
-        <a href="/the-clay/resume/" class="nav-link" data-page="resume">Resume</a>
-        <a href="/the-clay/lab/" class="nav-link" data-page="lab">Lab</a>
-        <a href="/the-clay/about/" class="nav-link" data-page="about">About</a>
+        <a href="/the-clay/" class="nav-link active">Home</a>
+        <a href="/the-clay/stream/" class="nav-link">Stream</a>
+        <a href="/the-clay/resume/" class="nav-link">Resume</a>
+        <a href="/the-clay/lab/" class="nav-link">Lab</a>
+        <a href="/the-clay/about/" class="nav-link">About</a>
       </div>
       <div class="nav-actions">
-        <button class="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme">
+        <button class="theme-toggle" aria-label="Toggle theme">
           <svg class="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
           <svg class="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
-        <button class="nav-mobile-toggle" aria-label="Menu">
-          <span></span><span></span><span></span>
-        </button>
+        <button class="nav-mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
       </div>
     </div>
   </nav>
 
-  <!-- Mobile menu -->
   <div class="nav-mobile-menu">
     <a href="/the-clay/" class="nav-mobile-link">Home</a>
     <a href="/the-clay/stream/" class="nav-mobile-link">Stream</a>
@@ -58,118 +51,90 @@
     <a href="/the-clay/about/" class="nav-mobile-link">About</a>
   </div>
 
-  <!-- Main Content -->
+  <!-- Main -->
   <main class="page-content">
     <div class="container">
 
-      <!-- Hero -->
+      <!-- Hero: Quote, not introduction -->
       <section class="hero">
-        <div class="hero-eyebrow" data-greeting>Good afternoon. Let's skip the small talk.</div>
-        <h1 class="hero-title text-balance">I'm <span class="text-gradient">J.</span></h1>
-        <p class="hero-subtitle">
-          IT Manager by day. Tech nerd always. 51 years old and building things with AI openly&mdash;because the people who get it, get it. And the people who don't weren't going to anyway.
-        </p>
-        <div class="hero-cta-group">
-          <a href="/the-clay/about/" class="btn btn-primary">
-            The full story
-            <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
-          <a href="/the-clay/lab/" class="btn btn-secondary">
-            See what I'm building
-          </a>
+        <div class="hero-glow"></div>
+        <div class="hero-quote-container">
+          <p class="hero-quote" data-hero-quote>I'm the artist, AI is the clay.</p>
+        </div>
+        <div class="hero-attribution">
+          <span class="hero-dash">&mdash;</span>
+          <span class="hero-name">J Doss</span>
+          <span class="hero-detail">IT Manager &middot; Sierra Nevada, CA &middot; 51</span>
+        </div>
+        <div class="hero-scroll-hint">
+          <span>Scroll</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
         </div>
       </section>
 
-      <!-- Marquee -->
-      <div class="marquee-wrap">
-        <div class="marquee">
-          <span class="marquee-item">Systems Thinker <span class="marquee-dot"></span></span>
-          <span class="marquee-item">Government IT <span class="marquee-dot"></span></span>
-          <span class="marquee-item">AI Builder <span class="marquee-dot"></span></span>
-          <span class="marquee-item">80s Kid <span class="marquee-dot"></span></span>
-          <span class="marquee-item">Traeger Enthusiast <span class="marquee-dot"></span></span>
-          <span class="marquee-item">ADHD-Powered <span class="marquee-dot"></span></span>
-          <span class="marquee-item">Sierra Nevada <span class="marquee-dot"></span></span>
-          <span class="marquee-item">Team Builder <span class="marquee-dot"></span></span>
-        </div>
-      </div>
-
-      <!-- What This Is -->
-      <section class="section">
-        <div class="divider-label animate-on-scroll">What you'll find here</div>
-        <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-
-          <a href="/the-clay/stream/" class="card card-interactive card-tilt animate-on-scroll" style="transition-delay: 50ms;">
-            <div class="card-accent card-accent-amber"></div>
-            <div class="card-icon card-icon-amber">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            </div>
-            <div class="card-label">Stream</div>
-            <div class="card-title">What I'm thinking</div>
-            <div class="card-body">Unfiltered thoughts on tech, work, life, and the 47 browser tabs I definitely need open. Most recent first.</div>
-          </a>
-
-          <a href="/the-clay/resume/" class="card card-interactive card-tilt animate-on-scroll" style="transition-delay: 150ms;">
-            <div class="card-accent card-accent-blue"></div>
-            <div class="card-icon card-icon-blue">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            </div>
-            <div class="card-label">Resume</div>
-            <div class="card-title">Where I've been</div>
-            <div class="card-body">From freelance design in the '90s to managing IT for an entire county. The career path wasn't linear. It was better.</div>
-          </a>
-
-          <a href="/the-clay/lab/" class="card card-interactive card-tilt animate-on-scroll" style="transition-delay: 250ms;">
-            <div class="card-accent card-accent-green"></div>
-            <div class="card-icon card-icon-green">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-            </div>
-            <div class="card-label">Lab</div>
-            <div class="card-title">What I'm building</div>
-            <div class="card-body">AI agents, iOS apps, this website, and whatever else catches my attention long enough to ship. ADHD project tracker.</div>
-          </a>
-
-          <a href="/the-clay/about/" class="card card-interactive card-tilt animate-on-scroll" style="transition-delay: 350ms;">
-            <div class="card-accent card-accent-purple"></div>
-            <div class="card-icon card-icon-purple">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            </div>
-            <div class="card-label">About</div>
-            <div class="card-title">Who I actually am</div>
-            <div class="card-body">The full story. Kansas to California. Atari to AI. Not a bio — a perspective. With ADHD as a feature, not a footnote.</div>
-          </a>
-
-        </div>
-      </section>
-
-      <!-- Philosophy -->
+      <!-- Typographic Nav — not cards, just text with conviction -->
       <section class="section animate-on-scroll">
-        <div class="about-pullquote">
-          "I'm the artist, AI is the clay. People who are scared of AI won't get me anyway. The ones who get it will see this as a signal."
-        </div>
-        <div class="ai-badge mt-lg">
-          <span class="ai-badge-dot"></span>
-          Built with Claude &middot; Shipped by J
-        </div>
+        <nav class="type-nav">
+          <a href="/the-clay/stream/" class="type-nav-link">
+            <span class="type-nav-number">01</span>
+            Read what I'm thinking
+            <span class="type-nav-arrow">&rarr;</span>
+          </a>
+          <a href="/the-clay/resume/" class="type-nav-link">
+            <span class="type-nav-number">02</span>
+            See where I've been
+            <span class="type-nav-arrow">&rarr;</span>
+          </a>
+          <a href="/the-clay/lab/" class="type-nav-link">
+            <span class="type-nav-number">03</span>
+            Watch what I'm building
+            <span class="type-nav-arrow">&rarr;</span>
+          </a>
+          <a href="/the-clay/about/" class="type-nav-link">
+            <span class="type-nav-number">04</span>
+            Learn who I actually am
+            <span class="type-nav-arrow">&rarr;</span>
+          </a>
+        </nav>
       </section>
 
-      <!-- Latest from Stream -->
-      <section class="section">
-        <div class="divider-label animate-on-scroll">Latest from the stream</div>
-        <div class="stream-entry animate-on-scroll">
+    </div>
+
+    <!-- Broken Grid Pullquote — breaks the container, tilts, demands attention -->
+    <div class="pullquote-break animate-on-scroll">
+      <div class="pullquote-break-inner">
+        <blockquote>People who are scared of AI won't get me anyway. The ones who understand? They'll see this site and know exactly what it means.</blockquote>
+        <cite>Built with Claude. Directed by J. The folder is called the-clay. Obviously.</cite>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <!-- Latest from Stream — just one, impactful -->
+      <section class="section animate-on-scroll">
+        <div class="divider-label">Latest from the stream</div>
+        <article class="stream-entry" data-tag="meta" style="margin-top: var(--space-xl);">
           <div class="stream-meta">
             <span class="stream-date">Feb 6, 2026</span>
             <span class="tag tag-amber">Meta</span>
           </div>
-          <div class="stream-title">The Claude Experiment</div>
+          <h2 class="stream-title">The Claude Experiment</h2>
           <div class="stream-body">
-            You're looking at it. I gave Claude a brief and said "build me a website." Not because I can't. Because I wanted to see what happens when you treat AI as clay, not a crutch. The results are what they are. Judge accordingly.
+            <p>You're looking at it. I gave Claude a brief and said "build me a website." Not because I can't. Because I wanted to see what happens when you treat AI as clay, not a crutch. The results are what they are. Judge accordingly.</p>
           </div>
-        </div>
+        </article>
         <a href="/the-clay/stream/" class="btn btn-ghost mt-xl">
-          Read more thoughts
+          More thoughts
           <svg class="btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
+      </section>
+
+      <!-- Made of Clay badge -->
+      <section class="section animate-on-scroll" style="padding-bottom: var(--space-5xl);">
+        <div class="ai-badge">
+          <span class="ai-badge-dot"></span>
+          Made of clay
+        </div>
       </section>
 
     </div>
@@ -181,7 +146,7 @@
       <div class="footer-inner">
         <div class="footer-brand">
           <div class="footer-logo">doss<span class="nav-logo-dot">.</span>me</div>
-          <div class="footer-tagline">IT Manager by day. Tech nerd always. Living in the grey between systems and soul since 1974.</div>
+          <div class="footer-tagline">Vision: J. Medium: Claude. Folder: <code class="text-mono">/the-clay/</code>. Obviously.</div>
         </div>
         <div class="footer-links">
           <div class="footer-col">
@@ -201,17 +166,11 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <span class="footer-bottom-text">Built with Claude. Directed by a human. The folder is called <code class="text-mono">the-clay</code> and that's on purpose.</span>
+        <span class="footer-bottom-text">Imagined by J. Sculpted from clay. The clay is Claude, and that's the point.</span>
         <div class="footer-social">
-          <a href="https://github.com/jcjdoss" target="_blank" rel="noopener" aria-label="GitHub">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-          </a>
-          <a href="https://linkedin.com/in/jdoss" target="_blank" rel="noopener" aria-label="LinkedIn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-          </a>
-          <a href="https://x.com/whatmefocus" target="_blank" rel="noopener" aria-label="X">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          </a>
+          <a href="https://github.com/jcjdoss" target="_blank" rel="noopener" aria-label="GitHub"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+          <a href="https://linkedin.com/in/jdoss" target="_blank" rel="noopener" aria-label="LinkedIn"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          <a href="https://x.com/whatmefocus" target="_blank" rel="noopener" aria-label="X"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
         </div>
       </div>
     </div>

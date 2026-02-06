@@ -1,23 +1,33 @@
 /* ============================================================
-   doss.me — the-clay edition
-   Interactive magic. Premium feel. Every pixel earns its place.
+   doss.me — the-clay edition v2
+   Dark-first. Quote hero. Premium interactions.
    ============================================================ */
 
 (function () {
   'use strict';
 
-  // ---- Theme Management ----
+  // ---- Theme Management (dark default) ----
   const THEME_KEY = 'doss-theme';
   function getPreferredTheme() {
     const stored = localStorage.getItem(THEME_KEY);
     if (stored) return stored;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    // Default to dark. Light is the escape hatch.
+    return 'dark';
   }
   function setTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
     localStorage.setItem(THEME_KEY, theme);
   }
-  setTheme(getPreferredTheme());
+
+  // Apply theme immediately (before DOM ready)
+  const initialTheme = getPreferredTheme();
+  if (initialTheme === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
 
   // ---- DOM Ready ----
   document.addEventListener('DOMContentLoaded', () => {
@@ -32,32 +42,25 @@
     initCardTilt();
     initCounterAnimation();
     initPageTransitions();
-    initMarquee();
-    initGreeting();
+    initHeroQuotes();
     initEasterEggs();
   });
 
-  // ---- Page Entrance Animation ----
+  // ---- Page Entrance ----
   function initPageEntrance() {
     document.body.classList.add('page-enter');
-    setTimeout(() => {
-      document.body.classList.remove('page-enter');
-    }, 1500);
+    setTimeout(() => document.body.classList.remove('page-enter'), 1500);
   }
 
   // ---- Theme Toggle ----
   function initThemeToggle() {
-    const toggles = document.querySelectorAll('.theme-toggle');
-    toggles.forEach(toggle => {
+    document.querySelectorAll('.theme-toggle').forEach(toggle => {
       toggle.addEventListener('click', () => {
-        const current = document.documentElement.getAttribute('data-theme');
-        const next = current === 'dark' ? 'light' : 'dark';
+        const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+        const next = isLight ? 'dark' : 'light';
         setTheme(next);
-        // Add a little rotation animation
         toggle.style.transform = 'rotate(180deg) scale(0.8)';
-        setTimeout(() => {
-          toggle.style.transform = '';
-        }, 300);
+        setTimeout(() => { toggle.style.transform = ''; }, 300);
       });
     });
   }
@@ -67,7 +70,6 @@
     const toggle = document.querySelector('.nav-mobile-toggle');
     const menu = document.querySelector('.nav-mobile-menu');
     if (!toggle || !menu) return;
-
     toggle.addEventListener('click', () => {
       const isOpen = toggle.classList.contains('active');
       toggle.classList.toggle('active');
@@ -76,14 +78,10 @@
         document.body.style.overflow = '';
       } else {
         menu.style.display = 'flex';
-        requestAnimationFrame(() => {
-          menu.classList.add('open');
-        });
+        requestAnimationFrame(() => menu.classList.add('open'));
         document.body.style.overflow = 'hidden';
       }
     });
-
-    // Close on link click
     menu.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => {
         toggle.classList.remove('active');
@@ -93,32 +91,20 @@
     });
   }
 
-  // ---- Scroll-Triggered Animations ----
+  // ---- Scroll Animations ----
   function initScrollAnimations() {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
-          // Stagger children if they have delay classes
-          const children = entry.target.querySelectorAll('.stagger-child');
-          children.forEach((child, i) => {
-            child.style.transitionDelay = `${i * 80 + 100}ms`;
-            child.classList.add('visible');
-          });
           observer.unobserve(entry.target);
         }
       });
-    }, {
-      threshold: 0.1,
-      rootMargin: '0px 0px -60px 0px'
-    });
-
-    document.querySelectorAll('.animate-on-scroll').forEach(el => {
-      observer.observe(el);
-    });
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
   }
 
-  // ---- Scroll Progress Bar ----
+  // ---- Scroll Progress ----
   function initScrollProgress() {
     const bar = document.querySelector('.scroll-progress');
     if (!bar) return;
@@ -126,10 +112,8 @@
     window.addEventListener('scroll', () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          const scrolled = window.scrollY;
-          const height = document.documentElement.scrollHeight - window.innerHeight;
-          const progress = height > 0 ? (scrolled / height) * 100 : 0;
-          bar.style.width = progress + '%';
+          const h = document.documentElement.scrollHeight - window.innerHeight;
+          bar.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
           ticking = false;
         });
         ticking = true;
@@ -137,23 +121,18 @@
     }, { passive: true });
   }
 
-  // ---- Nav Show/Hide on Scroll ----
+  // ---- Nav Show/Hide ----
   function initNavScroll() {
     const nav = document.querySelector('.nav');
     if (!nav) return;
-    let lastScrollY = 0;
-    let ticking = false;
-
+    let lastY = 0, ticking = false;
     window.addEventListener('scroll', () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          const currentScrollY = window.scrollY;
-          if (currentScrollY > 120 && currentScrollY > lastScrollY + 5) {
-            nav.classList.add('nav-hidden');
-          } else if (currentScrollY < lastScrollY - 5 || currentScrollY < 120) {
-            nav.classList.remove('nav-hidden');
-          }
-          lastScrollY = currentScrollY;
+          const y = window.scrollY;
+          if (y > 120 && y > lastY + 5) nav.classList.add('nav-hidden');
+          else if (y < lastY - 5 || y < 120) nav.classList.remove('nav-hidden');
+          lastY = y;
           ticking = false;
         });
         ticking = true;
@@ -161,48 +140,42 @@
     }, { passive: true });
   }
 
-  // ---- Cursor Glow Effect ----
+  // ---- Cursor Glow ----
   function initCursorGlow() {
-    if (window.matchMedia('(pointer: coarse)').matches) return; // skip on touch devices
-    let mouseTimer;
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+    let timer;
     document.addEventListener('mousemove', (e) => {
       document.body.classList.add('cursor-active');
       document.body.style.setProperty('--cursor-x', e.clientX + 'px');
       document.body.style.setProperty('--cursor-y', e.clientY + 'px');
-      clearTimeout(mouseTimer);
-      mouseTimer = setTimeout(() => {
-        document.body.classList.remove('cursor-active');
-      }, 3000);
+      clearTimeout(timer);
+      timer = setTimeout(() => document.body.classList.remove('cursor-active'), 3000);
     });
   }
 
-  // ---- Magnetic Button Effect ----
+  // ---- Magnetic Buttons ----
   function initMagneticButtons() {
     if (window.matchMedia('(pointer: coarse)').matches) return;
-    document.querySelectorAll('.btn, .card-interactive').forEach(el => {
+    document.querySelectorAll('.btn').forEach(el => {
       el.addEventListener('mousemove', (e) => {
-        const rect = el.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-        el.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px)`;
+        const r = el.getBoundingClientRect();
+        const x = e.clientX - r.left - r.width / 2;
+        const y = e.clientY - r.top - r.height / 2;
+        el.style.transform = `translate(${x * 0.12}px, ${y * 0.12}px)`;
       });
-      el.addEventListener('mouseleave', () => {
-        el.style.transform = '';
-      });
+      el.addEventListener('mouseleave', () => { el.style.transform = ''; });
     });
   }
 
-  // ---- Card Tilt Effect ----
+  // ---- Card Tilt ----
   function initCardTilt() {
     if (window.matchMedia('(pointer: coarse)').matches) return;
     document.querySelectorAll('.card-tilt').forEach(card => {
       card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width;
-        const y = (e.clientY - rect.top) / rect.height;
-        const tiltX = (y - 0.5) * -8;
-        const tiltY = (x - 0.5) * 8;
-        card.style.transform = `perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateY(-4px)`;
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;
+        const y = (e.clientY - r.top) / r.height;
+        card.style.transform = `perspective(800px) rotateX(${(y-0.5)*-8}deg) rotateY(${(x-0.5)*8}deg) translateY(-4px)`;
       });
       card.addEventListener('mouseleave', () => {
         card.style.transform = '';
@@ -216,7 +189,6 @@
   function initCounterAnimation() {
     const counters = document.querySelectorAll('[data-count]');
     if (!counters.length) return;
-
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -225,163 +197,135 @@
         }
       });
     }, { threshold: 0.5 });
-
-    counters.forEach(counter => observer.observe(counter));
+    counters.forEach(c => observer.observe(c));
   }
 
   function animateCounter(el) {
     const target = parseInt(el.getAttribute('data-count'), 10);
     const suffix = el.getAttribute('data-suffix') || '';
     const prefix = el.getAttribute('data-prefix') || '';
-    const duration = 1500;
+    const dur = 1800;
     const start = performance.now();
-
-    function update(now) {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      // Ease out cubic
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const current = Math.round(eased * target);
-      el.textContent = prefix + current.toLocaleString() + suffix;
-      if (progress < 1) requestAnimationFrame(update);
+    function tick(now) {
+      const p = Math.min((now - start) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = prefix + Math.round(eased * target).toLocaleString() + suffix;
+      if (p < 1) requestAnimationFrame(tick);
     }
-    requestAnimationFrame(update);
+    requestAnimationFrame(tick);
   }
 
   // ---- Page Transitions ----
   function initPageTransitions() {
     document.querySelectorAll('a').forEach(link => {
       if (link.hostname !== window.location.hostname) return;
-      if (link.getAttribute('href').startsWith('#')) return;
-      if (link.hasAttribute('data-no-transition')) return;
-
+      if ((link.getAttribute('href') || '').startsWith('#')) return;
       link.addEventListener('click', (e) => {
         const href = link.getAttribute('href');
         if (!href) return;
         e.preventDefault();
         document.body.classList.add('page-exit');
-        setTimeout(() => {
-          window.location.href = href;
-        }, 280);
+        setTimeout(() => { window.location.href = href; }, 280);
       });
     });
   }
 
-  // ---- Marquee Duplication ----
-  function initMarquee() {
-    document.querySelectorAll('.marquee').forEach(marquee => {
-      // Clone content for seamless loop
-      const content = marquee.innerHTML;
-      marquee.innerHTML = content + content;
-    });
-  }
-
-  // ---- Time-Based Greeting ----
-  function initGreeting() {
-    const el = document.querySelector('[data-greeting]');
+  // ---- Hero Quote Rotation ----
+  function initHeroQuotes() {
+    const el = document.querySelector('[data-hero-quote]');
     if (!el) return;
-    const hour = new Date().getHours();
-    let greeting;
-    if (hour < 5) greeting = "You're up late. I like that.";
-    else if (hour < 12) greeting = "Good morning. Coffee first, then scroll.";
-    else if (hour < 17) greeting = "Good afternoon. Let's skip the small talk.";
-    else if (hour < 21) greeting = "Good evening. Grab a seat.";
-    else greeting = "Night owl? Same.";
-    el.textContent = greeting;
+
+    const quotes = [
+      "I'm the artist, AI is the clay.",
+      "GREAT. Not fine. Never fine.",
+      "47 open tabs is not chaos. It's cartography.",
+      "Nuance over hot takes.",
+      "The people who get it, get it.",
+      "Everyone has a resume. Not everyone has personality.",
+      "I see the world in grey. That's where the interesting stuff lives.",
+      "Positive by choice, not by naivety."
+    ];
+
+    let current = 0;
+    let interval;
+
+    function cycle() {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(10px)';
+      setTimeout(() => {
+        current = (current + 1) % quotes.length;
+        el.textContent = quotes[current];
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      }, 400);
+    }
+
+    // Auto-cycle
+    interval = setInterval(cycle, 5500);
+
+    // Click to advance
+    el.addEventListener('click', () => {
+      clearInterval(interval);
+      cycle();
+      interval = setInterval(cycle, 5500);
+    });
   }
 
   // ---- Easter Eggs ----
   function initEasterEggs() {
     // Konami code
-    const konamiCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
-    let konamiIndex = 0;
+    const code = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+    let idx = 0;
     document.addEventListener('keydown', (e) => {
-      if (e.key === konamiCode[konamiIndex]) {
-        konamiIndex++;
-        if (konamiIndex === konamiCode.length) {
-          konamiIndex = 0;
-          activateRetroMode();
+      if (e.key === code[idx]) {
+        idx++;
+        if (idx === code.length) {
+          idx = 0;
+          showRetroOverlay();
         }
-      } else {
-        konamiIndex = 0;
-      }
+      } else { idx = 0; }
     });
 
-    // Click the logo 5 times
-    let logoClicks = 0;
+    // Logo 5-click
+    let clicks = 0;
     const logo = document.querySelector('.nav-logo');
     if (logo) {
       logo.addEventListener('click', (e) => {
-        logoClicks++;
-        if (logoClicks >= 5) {
+        clicks++;
+        if (clicks >= 5) {
           e.preventDefault();
-          logoClicks = 0;
-          showEasterEggMessage();
+          clicks = 0;
+          showToast();
         }
       });
     }
   }
 
-  function activateRetroMode() {
-    const overlay = document.createElement('div');
-    overlay.style.cssText = `
-      position: fixed; inset: 0; z-index: 99999;
-      background: #000; color: #0f0;
-      font-family: 'Courier New', monospace;
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column; font-size: 1.2rem;
-      animation: fadeIn 0.5s ease-out;
-      cursor: pointer;
-    `;
-    overlay.innerHTML = `
-      <pre style="color: #0f0; text-align: center; line-height: 1.5;">
-  ╔══════════════════════════════════╗
-  ║   KONAMI CODE ACCEPTED          ║
-  ║                                 ║
-  ║   > 80s kid detected            ║
-  ║   > Loading Atari 2600...       ║
-  ║   > Just kidding.               ║
-  ║   > But you knew the code.      ║
-  ║   > That makes us friends.      ║
-  ║                                 ║
-  ║   [CLICK TO RETURN]             ║
-  ╚══════════════════════════════════╝
-      </pre>
-    `;
-    overlay.addEventListener('click', () => overlay.remove());
-    document.body.appendChild(overlay);
+  function showRetroOverlay() {
+    const d = document.createElement('div');
+    d.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#000;color:#0f0;font-family:"Courier New",monospace;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:1.1rem;cursor:pointer;animation:fadeIn .5s ease-out;';
+    d.innerHTML = '<pre style="color:#0f0;text-align:center;line-height:1.6">\n  ╔═══════════════════════════════════╗\n  ║   KONAMI CODE ACCEPTED           ║\n  ║                                  ║\n  ║   > 80s kid detected             ║\n  ║   > Loading Atari 2600...        ║\n  ║   > Just kidding.                ║\n  ║   > But you knew the code.       ║\n  ║   > That makes us friends.       ║\n  ║                                  ║\n  ║   [CLICK TO RETURN]              ║\n  ╚═══════════════════════════════════╝\n</pre>';
+    d.addEventListener('click', () => d.remove());
+    document.body.appendChild(d);
   }
 
-  function showEasterEggMessage() {
-    const messages = [
+  function showToast() {
+    const msgs = [
       "You found the secret. There is no secret. Just curiosity.",
-      "5 clicks on a logo? You're either testing something or bored. Either way, respect.",
-      "This site was built with Claude. You're reading JavaScript written by AI, reviewed by a human. Wild times.",
-      "Fun fact: The folder this lives in is called 'the-clay.' Because J is the artist. Get it?",
-      "GREAT. (Not fine. GREAT.)"
+      "5 clicks on a logo? You're either testing or bored. Either way, respect.",
+      "Fun fact: This folder is called 'the-clay.' I'm the artist. Get it?",
+      "GREAT. (Not fine. GREAT.)",
+      "This site was built by AI, directed by a human. You're reading the evidence."
     ];
-    const msg = messages[Math.floor(Math.random() * messages.length)];
-    const toast = document.createElement('div');
-    toast.style.cssText = `
-      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px);
-      background: var(--color-surface); color: var(--color-text);
-      padding: 1rem 1.5rem; border-radius: 12px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-      border: 1px solid var(--color-border-strong);
-      font-size: 0.9rem; max-width: 400px; text-align: center;
-      z-index: 99999; opacity: 0;
-      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    `;
-    toast.textContent = msg;
-    document.body.appendChild(toast);
-    requestAnimationFrame(() => {
-      toast.style.opacity = '1';
-      toast.style.transform = 'translateX(-50%) translateY(0)';
-    });
+    const t = document.createElement('div');
+    t.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--color-surface);color:var(--color-text);padding:1rem 1.5rem;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.3);border:1px solid var(--color-accent);font-size:.9rem;max-width:400px;text-align:center;z-index:99999;opacity:0;transition:opacity .3s ease,transform .3s cubic-bezier(.34,1.56,.64,1);';
+    t.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+    document.body.appendChild(t);
+    requestAnimationFrame(() => { t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)'; });
     setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateX(-50%) translateY(20px)';
-      setTimeout(() => toast.remove(), 300);
+      t.style.opacity = '0';
+      t.style.transform = 'translateX(-50%) translateY(20px)';
+      setTimeout(() => t.remove(), 300);
     }, 4000);
   }
 
