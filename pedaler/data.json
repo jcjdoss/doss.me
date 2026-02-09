@@ -1,0 +1,76 @@
+{
+  "lastUpdated": "2026-02-09T14:44:59.224Z",
+  "status": {
+    "energy": 8,
+    "focus": 7,
+    "cognitiveLoad": 41,
+    "newIdeas": 1,
+    "theOneThing": "[MUST BE SET TO PROCEED]"
+  },
+  "priorities": {
+    "today": [
+      {
+        "content": "Mando's Performance Evaluation",
+        "score": 230,
+        "reason": "Team member waiting, Urgent tag, 8 days overdue",
+        "context": "OVERDUE 5 days - mentioned multiple times",
+        "overdue": false,
+        "daysOverdue": 0
+      },
+      {
+        "content": "Chamber punch list timeline",
+        "score": 135,
+        "reason": "Urgent tag, 3 days overdue",
+        "context": "Due Feb 6 - project coordination",
+        "overdue": false,
+        "daysOverdue": 0
+      },
+      {
+        "content": "Call Dad (belated birthday)",
+        "score": 120,
+        "reason": "12 days overdue",
+        "context": "Personal relationship maintenance - overdue",
+        "overdue": false,
+        "daysOverdue": 0
+      },
+      {
+        "content": "Microsoft EA renewal decision",
+        "score": 110,
+        "reason": "Urgent tag, Due within 48h",
+        "context": "Feb 11 deadline for acceptance",
+        "overdue": false,
+        "daysOverdue": 0
+      }
+    ],
+    "week": [
+      {
+        "content": "PDeLR Dashboard integration with real systems",
+        "reason": "Perfect energy match (high), Dopamine-positive task"
+      },
+      {
+        "content": "Share PDeLR methodology insights on @whatmefocus",
+        "reason": "Perfect energy match (high), Dopamine-positive task"
+      },
+      {
+        "content": "TSA PreCheck preparation",
+        "reason": "Energy mismatch"
+      }
+    ],
+    "month": []
+  },
+  "alerts": [
+    "🎯 THE ONE THING not set - use decision engine in PRIORITIES-TODAY.md",
+    "👥 Personal relationships need attention: Call Dad (belated birthday)"
+  ],
+  "recommendations": [
+    "⚡ High energy morning - tackle: PDeLR Dashboard integration with real systems",
+    "🟢 High energy: Perfect for complex tasks - prioritize @energy-high items"
+  ],
+  "patterns": {
+    "executionState": "optimal-execution",
+    "riskFactors": [],
+    "optimizations": [
+      "High energy - tackle complex projects"
+    ]
+  }
+}
