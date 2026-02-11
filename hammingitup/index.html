@@ -1,0 +1,2308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SatTrack Pro - Ham Radio Satellite Tracker</title>
+<link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.126/Build/Cesium/Widgets/widgets.css" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-primary: #0a0e14;
+  --bg-secondary: #111820;
+  --bg-tertiary: #1a2130;
+  --bg-panel: #0f1520;
+  --border: #1e2a3a;
+  --border-bright: #2d3f55;
+  --text-primary: #d4dce8;
+  --text-secondary: #7a8ba0;
+  --text-muted: #4a5a6e;
+  --accent: #4da6ff;
+  --accent-dim: #2a5a8f;
+  --green: #00e676;
+  --green-dim: rgba(0, 230, 118, 0.15);
+  --red: #ff5252;
+  --red-dim: rgba(255, 82, 82, 0.12);
+  --yellow: #ffca28;
+  --gold: #ffd54f;
+  --gold-dim: rgba(255, 213, 79, 0.15);
+  --orange: #ff9100;
+  --cyan: #00e5ff;
+  --sidebar-width: 320px;
+}
+
+html, body { height: 100%; font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', Consolas, monospace; background: var(--bg-primary); color: var(--text-primary); overflow: hidden; font-size: 12px; }
+
+#app { display: flex; height: 100%; flex-direction: column; }
+
+/* Header */
+#header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 12px; background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+  height: 36px; flex-shrink: 0; z-index: 1000;
+}
+#header h1 { font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+#header h1 .callsign { color: var(--cyan); }
+#header h1 .ver { color: var(--text-muted); font-weight: 400; font-size: 10px; margin-left: 6px; }
+#header-right { display: flex; align-items: center; gap: 10px; }
+#clock { font-size: 12px; color: var(--accent); letter-spacing: 0.5px; }
+#tle-status { font-size: 10px; color: var(--text-muted); }
+.btn-icon { background: none; border: 1px solid var(--border); color: var(--text-secondary); border-radius: 4px; padding: 3px 8px; cursor: pointer; font-size: 10px; font-family: inherit; transition: all 0.15s; text-transform: uppercase; letter-spacing: 0.5px; }
+.btn-icon:hover { background: var(--bg-tertiary); color: var(--accent); border-color: var(--accent-dim); }
+
+/* Main content */
+#main { display: flex; flex: 1; min-height: 0; }
+
+/* Sidebar */
+#sidebar {
+  width: var(--sidebar-width); background: var(--bg-secondary); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0;
+}
+
+.section-header { padding: 6px 10px; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); background: var(--bg-primary); border-bottom: 1px solid var(--border); font-weight: 600; }
+
+/* Satellite list */
+#sat-list { flex: 1; overflow-y: auto; min-height: 0; }
+#sat-list::-webkit-scrollbar { width: 4px; }
+#sat-list::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+#sat-list::-webkit-scrollbar-track { background: transparent; }
+
+.sat-category { padding: 5px 10px 2px; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 600; background: rgba(0,0,0,0.2); }
+
+.sat-item {
+  display: flex; align-items: center; gap: 6px; padding: 4px 10px;
+  cursor: pointer; transition: background 0.1s; user-select: none; border-left: 2px solid transparent;
+}
+.sat-item:hover { background: rgba(77, 166, 255, 0.05); }
+.sat-item.active { background: rgba(77, 166, 255, 0.08); border-left-color: var(--accent); }
+.sat-item input[type="checkbox"] { accent-color: var(--accent); flex-shrink: 0; cursor: pointer; width: 12px; height: 12px; }
+.sat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.sat-item .sat-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11px; }
+.sat-item .sat-elev { font-size: 10px; color: var(--text-muted); min-width: 32px; text-align: right; }
+.sat-item .sat-elev.above { color: var(--green); font-weight: 600; }
+.sat-item .sat-rf-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-left: 2px; }
+.sat-item .sat-rf-dot.in-range { background: var(--green); box-shadow: 0 0 4px var(--green); }
+.sat-item .sat-rf-dot.out-range { background: var(--border-bright); }
+
+/* Details panel */
+#details-panel {
+  background: var(--bg-panel); border-top: 1px solid var(--border);
+  flex-shrink: 0; overflow-y: auto; max-height: 55%;
+}
+#details-panel::-webkit-scrollbar { width: 4px; }
+#details-panel::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+.detail-header { display: flex; align-items: center; gap: 6px; padding: 8px 10px 4px; }
+.detail-header .detail-name-dot { width: 8px; height: 8px; border-radius: 50%; }
+.detail-header .detail-sat-name { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+.detail-header .detail-norad { font-size: 9px; color: var(--text-muted); margin-left: auto; }
+
+/* Satellite craft graphic */
+.sat-graphic { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+.sat-craft-svg { flex-shrink: 0; filter: drop-shadow(0 0 4px rgba(77,166,255,0.15)); }
+.sat-graphic-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.sat-graphic-info .sg-row { display: flex; justify-content: space-between; }
+.sat-graphic-info .sg-label { font-size: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.sat-graphic-info .sg-value { font-size: 10px; }
+.sat-graphic-info .sg-value.above-hz { color: var(--green); }
+.sat-graphic-info .sg-value.below-hz { color: var(--red); }
+
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 0 10px; }
+.detail-row { display: flex; justify-content: space-between; padding: 2px 0; border-bottom: 1px solid rgba(30,42,58,0.5); }
+.detail-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.detail-value { font-size: 11px; color: var(--text-primary); text-align: right; }
+
+/* Visibility badges */
+.vis-row { display: flex; gap: 6px; padding: 6px 10px; flex-wrap: wrap; }
+.vis-badge {
+  display: flex; align-items: center; gap: 4px; padding: 3px 8px;
+  border-radius: 3px; font-size: 9px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+  border: 1px solid;
+}
+.vis-badge.rf-yes { background: var(--green-dim); color: var(--green); border-color: rgba(0,230,118,0.3); }
+.vis-badge.rf-no { background: var(--red-dim); color: var(--red); border-color: rgba(255,82,82,0.2); }
+.vis-badge.vis-yes { background: var(--gold-dim); color: var(--gold); border-color: rgba(255,213,79,0.3); }
+.vis-badge.vis-no { background: rgba(74,90,110,0.15); color: var(--text-muted); border-color: rgba(74,90,110,0.3); }
+.vis-dot { width: 5px; height: 5px; border-radius: 50%; }
+.vis-badge.rf-yes .vis-dot { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.vis-badge.rf-no .vis-dot { background: var(--red); }
+.vis-badge.vis-yes .vis-dot { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+.vis-badge.vis-no .vis-dot { background: var(--text-muted); }
+
+/* Frequency & Doppler section */
+.freq-section { padding: 4px 10px 6px; }
+.freq-row { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; }
+.freq-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.freq-value { font-size: 11px; color: var(--cyan); }
+.freq-doppler { font-size: 10px; color: var(--orange); }
+.freq-doppler.positive { color: var(--orange); }
+.freq-doppler.negative { color: var(--accent); }
+
+/* Signal meter */
+.signal-meter { padding: 4px 10px 6px; }
+.signal-meter-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+.signal-bar-container { display: flex; gap: 2px; height: 12px; align-items: flex-end; }
+.signal-bar {
+  width: 6px; border-radius: 1px; transition: height 0.3s, background 0.3s;
+  background: var(--border);
+}
+.signal-bar.active.s1 { background: var(--green); height: 3px; }
+.signal-bar.active.s2 { background: var(--green); height: 4px; }
+.signal-bar.active.s3 { background: var(--green); height: 5px; }
+.signal-bar.active.s4 { background: var(--green); height: 6px; }
+.signal-bar.active.s5 { background: var(--yellow); height: 7px; }
+.signal-bar.active.s6 { background: var(--yellow); height: 8px; }
+.signal-bar.active.s7 { background: var(--orange); height: 9px; }
+.signal-bar.active.s8 { background: var(--orange); height: 10px; }
+.signal-bar.active.s9 { background: var(--red); height: 12px; }
+.signal-bar:not(.active) { height: 3px; }
+.signal-value { font-size: 10px; margin-left: 6px; color: var(--text-secondary); }
+
+/* Azimuth compass */
+.compass-section { padding: 6px 10px; display: flex; gap: 12px; align-items: center; }
+.compass-container { position: relative; width: 70px; height: 70px; flex-shrink: 0; }
+.compass-ring {
+  width: 70px; height: 70px; border-radius: 50%; border: 1px solid var(--border-bright);
+  position: relative; background: radial-gradient(circle, var(--bg-tertiary) 0%, var(--bg-primary) 100%);
+}
+.compass-cardinal {
+  position: absolute; font-size: 8px; font-weight: 700; color: var(--text-muted);
+}
+.compass-n { top: 1px; left: 50%; transform: translateX(-50%); color: var(--red); }
+.compass-s { bottom: 1px; left: 50%; transform: translateX(-50%); }
+.compass-e { right: 2px; top: 50%; transform: translateY(-50%); }
+.compass-w { left: 2px; top: 50%; transform: translateY(-50%); }
+.compass-needle {
+  position: absolute; top: 50%; left: 50%; width: 2px; height: 28px;
+  transform-origin: bottom center; border-radius: 1px;
+  background: linear-gradient(to top, var(--accent), var(--cyan));
+  box-shadow: 0 0 6px var(--accent);
+  transition: transform 0.5s ease-out;
+}
+.compass-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 6px; height: 6px; border-radius: 50%; background: var(--accent); border: 1px solid #fff; z-index: 1; }
+.compass-data { flex: 1; }
+.compass-data .cd-row { display: flex; justify-content: space-between; padding: 1px 0; }
+.compass-data .cd-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.compass-data .cd-value { font-size: 11px; }
+
+/* Next pass / AOS-LOS */
+.pass-section { padding: 6px 10px; border-top: 1px solid var(--border); }
+.pass-title { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.pass-info { display: flex; gap: 8px; flex-wrap: wrap; }
+.pass-chip {
+  padding: 3px 8px; border-radius: 3px; font-size: 10px;
+  background: var(--bg-tertiary); border: 1px solid var(--border);
+}
+.pass-chip .pc-label { color: var(--text-muted); }
+.pass-chip .pc-value { color: var(--accent); }
+.pass-chip .pc-value.urgent { color: var(--green); }
+.pass-quality { display: inline-block; padding: 1px 5px; border-radius: 2px; font-size: 8px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-left: 4px; }
+.pass-quality.excellent { background: rgba(0,230,118,0.2); color: var(--green); }
+.pass-quality.good { background: rgba(255,202,40,0.2); color: var(--yellow); }
+.pass-quality.fair { background: rgba(255,145,0,0.2); color: var(--orange); }
+.pass-quality.poor { background: rgba(255,82,82,0.15); color: var(--red); }
+
+.no-selection { color: var(--text-muted); font-size: 11px; padding: 20px 10px; text-align: center; letter-spacing: 0.5px; }
+
+/* Map / Cesium container */
+#map-container { flex: 1; position: relative; }
+#cesiumContainer { width: 100%; height: 100%; background: var(--bg-primary); }
+
+/* Cesium dark-theme overrides */
+.cesium-viewer-bottom { display: none !important; }
+.cesium-viewer .cesium-widget-credits { display: none !important; }
+.cesium-viewer-toolbar { position: absolute; top: 8px; right: 8px; }
+.cesium-button { background: var(--bg-secondary) !important; border: 1px solid var(--border) !important; color: var(--text-primary) !important; border-radius: 4px !important; }
+.cesium-button:hover { background: var(--bg-tertiary) !important; border-color: var(--accent-dim) !important; }
+.cesium-viewer-geocoderContainer { display: none !important; }
+.cesium-viewer-animationContainer { display: none !important; }
+.cesium-viewer-timelineContainer { display: none !important; }
+.cesium-viewer-fullscreenContainer { display: none !important; }
+.cesium-infoBox { display: none !important; }
+.cesium-selection-wrapper { display: none !important; }
+.cesium-baseLayerPicker-dropDown { background: var(--bg-secondary) !important; border: 1px solid var(--border-bright) !important; border-radius: 6px !important; }
+.cesium-baseLayerPicker-itemLabel { color: var(--text-primary) !important; font-family: inherit !important; font-size: 11px !important; }
+.cesium-baseLayerPicker-sectionTitle { color: var(--text-muted) !important; font-family: inherit !important; }
+.cesium-navigation-help { display: none !important; }
+.cesium-navigationHelpButton-wrapper { display: none !important; }
+
+/* Map overlay: grid square label */
+#grid-overlay {
+  position: absolute; top: 8px; left: 50%; transform: translateX(-50%); z-index: 999;
+  background: rgba(10, 14, 20, 0.85); border: 1px solid var(--border);
+  border-radius: 4px; padding: 4px 8px; font-size: 10px; pointer-events: none;
+}
+#grid-overlay .grid-label { color: var(--text-muted); font-size: 8px; text-transform: uppercase; letter-spacing: 1px; }
+#grid-overlay .grid-value { color: var(--cyan); font-size: 13px; font-weight: 700; letter-spacing: 1px; }
+
+/* Track button */
+.btn-track { background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-muted); border-radius: 3px; padding: 1px 6px; cursor: pointer; font-size: 9px; font-family: inherit; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.15s; }
+.btn-track:hover { color: var(--accent); border-color: var(--accent-dim); }
+.btn-track.active { color: var(--cyan); border-color: var(--cyan); background: rgba(0,229,255,0.1); }
+
+/* LOS line legend */
+#los-legend {
+  position: absolute; bottom: 8px; right: 8px; z-index: 999;
+  background: rgba(10, 14, 20, 0.85); border: 1px solid var(--border);
+  border-radius: 4px; padding: 4px 8px; font-size: 9px; pointer-events: none; display: none;
+}
+#los-legend .los-label { color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Floating map layer panel */
+#map-layers-panel {
+  position: absolute; top: 8px; right: 8px; z-index: 999;
+  display: flex; flex-direction: column; gap: 4px; align-items: flex-end;
+}
+#map-layers-toggle {
+  background: rgba(10, 14, 20, 0.9); border: 1px solid var(--border);
+  border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 9px;
+  font-family: inherit; color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 1px; transition: all 0.15s;
+}
+#map-layers-toggle:hover { color: var(--accent); border-color: var(--accent-dim); }
+#map-layers-toggle.open { color: var(--accent); border-color: var(--accent-dim); background: rgba(10, 14, 20, 0.95); }
+#map-layers-drawer {
+  display: none; background: rgba(10, 14, 20, 0.95); border: 1px solid var(--border);
+  border-radius: 6px; padding: 8px; min-width: 200px;
+}
+#map-layers-drawer.open { display: block; }
+.layer-section-title {
+  font-size: 8px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted);
+  margin-top: 6px; margin-bottom: 3px; padding-bottom: 2px; border-bottom: 1px solid var(--border);
+}
+.layer-section-title:first-child { margin-top: 0; }
+.layer-btn {
+  display: flex; align-items: center; gap: 6px; width: 100%; padding: 3px 4px;
+  background: none; border: none; cursor: pointer; font-family: inherit;
+  font-size: 10px; color: var(--text-secondary); border-radius: 3px; transition: all 0.12s;
+}
+.layer-btn:hover { background: rgba(77, 166, 255, 0.06); }
+.layer-btn.active { color: var(--accent); }
+.layer-btn .layer-dot {
+  width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--border-bright);
+  flex-shrink: 0; transition: all 0.12s;
+}
+.layer-btn.active .layer-dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 4px var(--accent); }
+.layer-btn .layer-label { flex: 1; text-align: left; }
+.layer-btn .layer-key { font-size: 8px; color: var(--text-muted); }
+
+/* Bottom bar */
+#bottom-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 12px; background: var(--bg-secondary); border-top: 1px solid var(--border);
+  height: 28px; flex-shrink: 0; z-index: 1000;
+}
+#observer-info { display: flex; align-items: center; gap: 8px; }
+#observer-coords { color: var(--text-secondary); }
+#observer-grid { color: var(--cyan); font-weight: 600; }
+.btn-sm {
+  background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-muted);
+  border-radius: 3px; padding: 1px 6px; cursor: pointer; font-size: 9px; font-family: inherit;
+  text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.15s;
+}
+.btn-sm:hover { color: var(--accent); border-color: var(--accent-dim); }
+#tracking-stats { color: var(--text-muted); font-size: 10px; display: flex; gap: 12px; }
+#tracking-stats .stat-label { color: var(--text-muted); }
+#tracking-stats .stat-value { color: var(--text-secondary); }
+#tracking-stats .stat-value.highlight { color: var(--green); }
+
+/* Modals */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7); z-index: 2000; display: flex;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.hidden { display: none; }
+.modal {
+  background: var(--bg-secondary); border: 1px solid var(--border-bright); border-radius: 8px;
+  padding: 16px; width: 340px; max-width: 90vw;
+}
+.modal h3 { font-size: 12px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+.modal label { font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+.modal input, .modal select {
+  width: 100%; padding: 5px 8px; background: var(--bg-primary); border: 1px solid var(--border);
+  border-radius: 4px; color: var(--text-primary); font-size: 12px; margin-bottom: 8px; font-family: inherit;
+}
+.modal input:focus, .modal select:focus { outline: none; border-color: var(--accent-dim); }
+.modal-buttons { display: flex; gap: 6px; margin-top: 6px; }
+.modal-buttons button { flex: 1; padding: 5px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; font-family: inherit; text-transform: uppercase; letter-spacing: 0.5px; }
+.btn-primary { background: var(--accent); color: #fff; border: none; }
+.btn-primary:hover { filter: brightness(1.15); }
+.btn-cancel { background: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-cancel:hover { background: var(--border); }
+
+/* Settings */
+.settings-grid { display: grid; gap: 8px; }
+.settings-row { display: flex; align-items: center; justify-content: space-between; }
+.settings-row label { font-size: 10px; color: var(--text-secondary); }
+.settings-row input, .settings-row select { width: 100px; margin-bottom: 0; }
+
+/* Loading */
+#loading-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--bg-primary); z-index: 3000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+}
+#loading-overlay.hidden { display: none; }
+.spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+#loading-text { font-size: 11px; color: var(--text-secondary); letter-spacing: 0.5px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  #sidebar { width: 100%; height: 40%; border-right: none; border-bottom: 1px solid var(--border); }
+  #main { flex-direction: column; }
+  :root { --sidebar-width: 100%; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div id="loading-text">ACQUIRING SATELLITE DATA...</div>
+  </div>
+
+  <div id="header">
+    <h1><span class="callsign">SAT</span>TRACK<span class="ver">v3.0</span></h1>
+    <div id="header-right">
+      <span id="tle-status"></span>
+      <span id="clock"></span>
+      <button class="btn-icon" id="btn-settings">CFG</button>
+    </div>
+  </div>
+
+  <div id="main">
+    <div id="sidebar">
+      <div class="section-header">Satellite Constellation</div>
+      <div id="sat-list"></div>
+      <div class="section-header">Telemetry</div>
+      <div id="details-panel">
+        <div class="no-selection">SELECT A BIRD TO VIEW TELEMETRY</div>
+      </div>
+    </div>
+    <div id="map-container">
+      <div id="cesiumContainer"></div>
+      <div id="grid-overlay">
+        <div class="grid-label">Maidenhead</div>
+        <div class="grid-value" id="observer-grid-map">--</div>
+      </div>
+      <div id="los-legend"><span class="los-label">LOS LINE ACTIVE</span></div>
+      <div id="map-layers-panel">
+        <button id="map-layers-toggle">LAYERS</button>
+        <div id="map-layers-drawer">
+          <div class="layer-section-title">Base Map</div>
+          <button class="layer-btn active" data-basemap="dark"><span class="layer-dot"></span><span class="layer-label">Dark</span></button>
+          <button class="layer-btn" data-basemap="dark-labels"><span class="layer-dot"></span><span class="layer-label">Dark + Labels</span></button>
+          <button class="layer-btn" data-basemap="satellite"><span class="layer-dot"></span><span class="layer-label">Satellite (ESRI)</span></button>
+          <button class="layer-btn" data-basemap="terrain"><span class="layer-dot"></span><span class="layer-label">Terrain</span></button>
+
+          <div class="layer-section-title">Ham Radio</div>
+          <button class="layer-btn" data-overlay="gridsquares"><span class="layer-dot"></span><span class="layer-label">Grid Squares</span><span class="layer-key">G</span></button>
+          <button class="layer-btn" data-overlay="muf"><span class="layer-dot"></span><span class="layer-label">MUF / Propagation</span><span class="layer-key">M</span></button>
+          <button class="layer-btn" data-overlay="grayline"><span class="layer-dot"></span><span class="layer-label">Gray Line</span><span class="layer-key">Y</span></button>
+
+          <div class="layer-section-title">Weather / Overlays</div>
+          <button class="layer-btn" data-overlay="radar"><span class="layer-dot"></span><span class="layer-label">Precip Radar</span><span class="layer-key">R</span></button>
+          <button class="layer-btn" data-overlay="aurora"><span class="layer-dot"></span><span class="layer-label">Aurora Forecast</span><span class="layer-key">A</span></button>
+          <button class="layer-btn" data-overlay="labels"><span class="layer-dot"></span><span class="layer-label">Map Labels</span><span class="layer-key">L</span></button>
+          <button class="layer-btn" data-overlay="nautical"><span class="layer-dot"></span><span class="layer-label">Nautical Charts</span><span class="layer-key">N</span></button>
+          <button class="layer-btn" data-overlay="terminator"><span class="layer-dot active"></span><span class="layer-label">Day/Night</span><span class="layer-key">D</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="bottom-bar">
+    <div id="observer-info">
+      <span style="color:var(--accent);font-size:9px;text-transform:uppercase;letter-spacing:1px;">QTH:</span>
+      <span id="observer-coords">--</span>
+      <span id="observer-grid" title="Maidenhead Grid Locator">--</span>
+      <button class="btn-sm" id="btn-gps">GPS</button>
+      <button class="btn-sm" id="btn-edit-loc">QTH</button>
+      <button class="btn-track" id="btn-track">TRACK</button>
+    </div>
+    <div id="tracking-stats"></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="location-modal">
+  <div class="modal">
+    <h3>Set QTH (Observer Location)</h3>
+    <label>Latitude</label>
+    <input type="number" id="input-lat" step="0.0001" min="-90" max="90" placeholder="39.7392">
+    <label>Longitude</label>
+    <input type="number" id="input-lon" step="0.0001" min="-180" max="180" placeholder="-104.9903">
+    <label>Altitude (meters ASL)</label>
+    <input type="number" id="input-alt" step="1" min="0" placeholder="0">
+    <label>Maidenhead Grid (auto-computed)</label>
+    <input type="text" id="input-grid" readonly style="color:var(--cyan);">
+    <div class="modal-buttons">
+      <button class="btn-cancel" id="btn-loc-cancel">Cancel</button>
+      <button class="btn-primary" id="btn-loc-save">Save QTH</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="settings-modal">
+  <div class="modal">
+    <h3>Configuration</h3>
+    <div class="settings-grid">
+      <div class="settings-row"><label>Min Elev (RF)</label><input type="number" id="setting-min-elev" value="5" min="0" max="90" step="1"></div>
+      <div class="settings-row"><label>Update Rate</label><select id="setting-interval"><option value="500">500ms</option><option value="1000" selected>1000ms</option><option value="2000">2000ms</option></select></div>
+      <div class="settings-row">
+        <label>Base Map</label>
+        <select id="setting-basemap">
+          <option value="dark">Dark (CARTO)</option>
+          <option value="dark-labels">Dark + Labels</option>
+          <option value="satellite">Satellite (ESRI)</option>
+          <option value="terrain">Terrain (OpenTopo)</option>
+        </select>
+      </div>
+      <div class="settings-row"><label>Speed of Light</label><input type="text" value="299,792,458 m/s" readonly style="color:var(--text-muted);font-size:9px;text-align:right;"></div>
+      <div style="border-top:1px solid var(--border); padding-top:6px; margin-top:2px;">
+        <div style="font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Overlays</div>
+        <div class="settings-row"><label>Precipitation Radar</label><input type="checkbox" id="overlay-radar" style="width:auto;"></div>
+        <div class="settings-row"><label>Aurora Forecast</label><input type="checkbox" id="overlay-aurora" style="width:auto;"></div>
+        <div class="settings-row"><label>Map Labels</label><input type="checkbox" id="overlay-labels" style="width:auto;"></div>
+        <div class="settings-row"><label>Nautical Charts</label><input type="checkbox" id="overlay-nautical" style="width:auto;"></div>
+      </div>
+    </div>
+    <div class="modal-buttons" style="margin-top:10px;">
+      <button class="btn-cancel" id="btn-refresh-tle">Refresh TLE</button>
+      <button class="btn-primary" id="btn-settings-close">73</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cesium.com/downloads/cesiumjs/releases/1.126/Build/Cesium/Cesium.js"></script>
+<script src="https://unpkg.com/satellite.js@5.0.0/dist/satellite.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js"></script>
+<script>
+'use strict';
+
+const EARTH_R = 6371.0;
+const C = 299792.458; // km/s speed of light
+const DEG2RAD = Math.PI / 180;
+const RAD2DEG = 180 / Math.PI;
+
+const SATELLITE_CATALOG = [
+  { name: 'ISS (ZARYA)',      noradId: 25544, category: 'Space Stations', uplink: 145.825,  downlink: 437.800,  mode: 'FM Voice/APRS', color: '#4da6ff' },
+  { name: 'ISS (NAUKA)',      noradId: 49044, category: 'Space Stations', uplink: null,      downlink: 437.800,  mode: 'Telemetry',     color: '#80caff' },
+  { name: 'SO-50',            noradId: 27607, category: 'Amateur Radio',  uplink: 145.850,  downlink: 436.795,  mode: 'FM Repeater',   color: '#ff5c8a' },
+  { name: 'AO-91 (FOX-1B)',   noradId: 43017, category: 'Amateur Radio',  uplink: 435.250,  downlink: 145.960,  mode: 'FM Transponder',color: '#56d364' },
+  { name: 'AO-95 (FOX-1Cliff)',noradId: 43770, category: 'Amateur Radio', uplink: 435.300,  downlink: 145.920,  mode: 'FM Transponder',color: '#db61a2' },
+  { name: 'XW-3 (CAS-9)',     noradId: 50466, category: 'Amateur Radio',  uplink: 435.150,  downlink: 145.870,  mode: 'Linear Transp', color: '#f0883e' },
+  { name: 'AO-73 (FUNcube-1)',noradId: 39444, category: 'Amateur Radio',  uplink: 435.150,  downlink: 145.935,  mode: 'Linear/Telem',  color: '#d2a8ff' },
+  { name: 'TEVEL-1',          noradId: 63217, category: 'Amateur Radio',  uplink: 145.970,  downlink: 436.400,  mode: 'FM Transponder', color: '#e3b341' },
+  { name: 'NOAA 15',          noradId: 25338, category: 'Weather/APT',    uplink: null,      downlink: 137.620,  mode: 'APT 2400bps',   color: '#79c0ff' },
+  { name: 'NOAA 18',          noradId: 28654, category: 'Weather/APT',    uplink: null,      downlink: 137.9125, mode: 'APT 2400bps',   color: '#7ee787' },
+  { name: 'NOAA 19',          noradId: 33591, category: 'Weather/APT',    uplink: null,      downlink: 137.100,  mode: 'APT 2400bps',   color: '#ffa657' },
+  { name: 'FOX-1A (AO-85)',   noradId: 40967, category: 'Amateur Radio',  uplink: 435.180,  downlink: 145.980,  mode: 'FM Transponder', color: '#ff6b6b' },
+];
+
+const CELESTRAK_GROUPS = ['stations', 'amateur', 'noaa'];
+
+// ============================================================
+// MAIDENHEAD GRID LOCATOR
+// ============================================================
+function latLonToGrid(lat, lon) {
+  const lo = lon + 180;
+  const la = lat + 90;
+  const a = String.fromCharCode(65 + Math.floor(lo / 20));
+  const b = String.fromCharCode(65 + Math.floor(la / 10));
+  const c = Math.floor((lo % 20) / 2);
+  const d = Math.floor(la % 10);
+  const e = String.fromCharCode(97 + Math.floor((lo % 2) * 12));
+  const f = String.fromCharCode(97 + Math.floor((la % 1) * 24));
+  return `${a}${b}${c}${d}${e}${f}`;
+}
+
+// ============================================================
+// DOPPLER SHIFT
+// ============================================================
+function computeDoppler(freqMHz, rangeRateKmS) {
+  const shiftMHz = -freqMHz * (rangeRateKmS / C);
+  return shiftMHz;
+}
+
+function getRangeRate(satrec, observerGd, date) {
+  const dt = 0.5;
+  const d1 = new Date(date.getTime() - dt * 500);
+  const d2 = new Date(date.getTime() + dt * 500);
+  const la1 = getLookAngles(satrec, observerGd, d1);
+  const la2 = getLookAngles(satrec, observerGd, d2);
+  if (!la1 || !la2) return 0;
+  return (la2.range - la1.range) / dt;
+}
+
+// ============================================================
+// SIGNAL STRENGTH ESTIMATION
+// ============================================================
+function estimateSignalLevel(elevation, range, altKm) {
+  if (elevation < 0) return 0;
+  const maxRange = Math.sqrt((EARTH_R + altKm) ** 2 - EARTH_R ** 2);
+  const rangeFactor = 1 - (range / (maxRange * 1.2));
+  const elevFactor = Math.sin(elevation * DEG2RAD);
+  const combined = (rangeFactor * 0.4 + elevFactor * 0.6);
+  return Math.max(0, Math.min(9, Math.round(combined * 9)));
+}
+
+// ============================================================
+// STATE
+// ============================================================
+const state = {
+  satellites: {},
+  activeSatId: null,
+  visibleSatIds: new Set(),
+  observer: { lat: 39.7392, lon: -104.9903, alt: 0 },
+  observerGd: null,
+  settings: { minElevation: 5, updateInterval: 1000, baseMap: 'dark' },
+  // Cesium state
+  viewer: null,
+  entities: {},       // { [nid]: { point, pastTrack, futureTrack } }
+  footprintOuter: null,
+  footprintInner: null,
+  observerEntity: null,
+  losEntity: null,
+  lastTerminatorTime: 0,
+  imageryLayers: {},  // { radar, aurora, labels, nautical }
+  trackingMode: false,
+  lastCalcTime: 0, lastTrackTime: 0,
+  nextPassCache: {}, animFrameId: null,
+};
+
+// ============================================================
+// TLE FETCHING
+// ============================================================
+async function fetchTLEData(forceRefresh = false) {
+  const cacheKey = 'sat_tracker_tle_v2';
+  if (!forceRefresh) {
+    try {
+      const cached = JSON.parse(localStorage.getItem(cacheKey));
+      if (cached && Date.now() - cached.timestamp < 24 * 3600 * 1000) {
+        parseTLECache(cached.data);
+        return true;
+      }
+    } catch (e) {}
+  }
+
+  const allTLEs = {};
+  const fetches = CELESTRAK_GROUPS.map(async (group) => {
+    try {
+      const url = `https://celestrak.org/NORAD/elements/gp.php?GROUP=${group}&FORMAT=tle`;
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const text = await resp.text();
+      const lines = text.trim().split('\n');
+      for (let i = 0; i + 2 < lines.length; i += 3) {
+        const name = lines[i].trim();
+        const line1 = lines[i + 1].trim();
+        const line2 = lines[i + 2].trim();
+        if (line1.startsWith('1 ') && line2.startsWith('2 ')) {
+          const noradId = parseInt(line2.substring(2, 7).trim());
+          allTLEs[noradId] = { name, line1, line2 };
+        }
+      }
+    } catch (e) {
+      console.warn(`TLE group ${group} failed:`, e);
+    }
+  });
+
+  await Promise.all(fetches);
+  if (Object.keys(allTLEs).length === 0) throw new Error('No TLE data fetched');
+
+  const missing = SATELLITE_CATALOG.filter(c => !allTLEs[c.noradId]);
+  for (const sat of missing) {
+    try {
+      const resp = await fetch(`https://celestrak.org/NORAD/elements/gp.php?CATNR=${sat.noradId}&FORMAT=tle`);
+      if (resp.ok) {
+        const text = await resp.text();
+        const lines = text.trim().split('\n');
+        if (lines.length >= 3 && lines[1].startsWith('1 ')) {
+          allTLEs[sat.noradId] = { name: lines[0].trim(), line1: lines[1].trim(), line2: lines[2].trim() };
+        }
+      }
+    } catch (e) {}
+  }
+
+  try { localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: allTLEs })); } catch (e) {}
+  parseTLECache(allTLEs);
+  return true;
+}
+
+function parseTLECache(tleData) {
+  for (const cat of SATELLITE_CATALOG) {
+    const tle = tleData[cat.noradId];
+    if (!tle) { console.warn(`TLE missing: ${cat.name} (${cat.noradId})`); continue; }
+    try {
+      const satrec = satellite.twoline2satrec(tle.line1, tle.line2);
+      const epochYear = satrec.epochyr < 57 ? satrec.epochyr + 2000 : satrec.epochyr + 1900;
+      const epochDate = new Date(Date.UTC(epochYear, 0, 1));
+      epochDate.setUTCDate(epochDate.getUTCDate() + satrec.epochdays - 1);
+      const ageHours = (Date.now() - epochDate.getTime()) / 3600000;
+
+      state.satellites[cat.noradId] = {
+        satrec, catalogEntry: cat, tle,
+        position: null, lookAngles: null,
+        rfVisible: false, visVisible: false,
+        rangeRate: 0, signalLevel: 0,
+        tleAgeHours: ageHours,
+      };
+    } catch (e) {
+      console.warn(`TLE parse failed: ${cat.name}:`, e);
+    }
+  }
+}
+
+// ============================================================
+// ORBITAL CALCULATIONS
+// ============================================================
+function getSatPosition(satrec, date) {
+  const posVel = satellite.propagate(satrec, date);
+  if (!posVel.position) return null;
+  const gmst = satellite.gstime(date);
+  const posGd = satellite.eciToGeodetic(posVel.position, gmst);
+  return {
+    lat: satellite.degreesLat(posGd.latitude),
+    lon: satellite.degreesLong(posGd.longitude),
+    alt: posGd.height,
+    eci: posVel.position, vel: posVel.velocity, gmst,
+  };
+}
+
+function getLookAngles(satrec, observerGd, date) {
+  const posVel = satellite.propagate(satrec, date);
+  if (!posVel.position) return null;
+  const gmst = satellite.gstime(date);
+  const ecf = satellite.eciToEcf(posVel.position, gmst);
+  const look = satellite.ecfToLookAngles(observerGd, ecf);
+  return { azimuth: look.azimuth * RAD2DEG, elevation: look.elevation * RAD2DEG, range: look.rangeSat };
+}
+
+function computeGroundTrack(satrec, now, pastMin, futureMin, stepSec) {
+  const past = [], future = [];
+  for (let off = -pastMin * 60; off <= futureMin * 60; off += stepSec) {
+    const d = new Date(now.getTime() + off * 1000);
+    const p = getSatPosition(satrec, d);
+    if (!p) continue;
+    const pt = [p.lat, p.lon];
+    if (off <= 0) past.push(pt);
+    if (off >= 0) future.push(pt);
+  }
+  return { pastTrack: past, futureTrack: future };
+}
+
+function getOrbitalPeriod(satrec) { return 2 * Math.PI / satrec.no; }
+
+function getFootprintRadius(altKm) {
+  return EARTH_R * Math.acos(EARTH_R / (EARTH_R + altKm));
+}
+
+function getFootprintRadiusAtElev(altKm, elevDeg) {
+  const elevRad = elevDeg * DEG2RAD;
+  const sinRho = EARTH_R / (EARTH_R + altKm);
+  const eta = Math.acos(sinRho * Math.cos(elevRad)) - elevRad;
+  return EARTH_R * eta;
+}
+
+// ============================================================
+// VISIBILITY
+// ============================================================
+function isSatInSunlight(eci, date) {
+  const jd = satellite.jday(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+  let sunEci;
+  try {
+    const sd = satellite.sunPosition(jd);
+    sunEci = sd && sd.position ? sd.position : null;
+  } catch (e) { sunEci = null; }
+  if (!sunEci) return true;
+
+  const s2s = { x: sunEci.x - eci.x, y: sunEci.y - eci.y, z: sunEci.z - eci.z };
+  const s2e = { x: -eci.x, y: -eci.y, z: -eci.z };
+  const sm = Math.sqrt(s2s.x ** 2 + s2s.y ** 2 + s2s.z ** 2);
+  const em = Math.sqrt(s2e.x ** 2 + s2e.y ** 2 + s2e.z ** 2);
+  if (sm === 0 || em === 0) return true;
+  const dot = s2s.x * s2e.x + s2s.y * s2e.y + s2s.z * s2e.z;
+  const angle = Math.acos(Math.max(-1, Math.min(1, dot / (sm * em))));
+  return angle > Math.asin(Math.min(1, EARTH_R / em));
+}
+
+function isObserverDark(lat, lon, date) {
+  return SunCalc.getPosition(date, lat, lon).altitude < -6 * DEG2RAD;
+}
+
+function computeVisualVis(sat, oGd, oLat, oLon, date) {
+  const la = getLookAngles(sat.satrec, oGd, date);
+  if (!la || la.elevation < 0) return false;
+  const pv = satellite.propagate(sat.satrec, date);
+  if (!pv.position) return false;
+  return isSatInSunlight(pv.position, date) && isObserverDark(oLat, oLon, date);
+}
+
+// ============================================================
+// NEXT PASS
+// ============================================================
+function findNextPass(satrec, oGd, minEl, start) {
+  const step = 30, maxSteps = (24 * 3600) / step;
+  let inPass = false, passStart = null, maxE = 0, maxEAz = 0;
+
+  const cur = getLookAngles(satrec, oGd, start);
+  if (cur && cur.elevation >= minEl) {
+    for (let i = 0; i < 600; i++) {
+      const d = new Date(start.getTime() + i * step * 1000);
+      const la = getLookAngles(satrec, oGd, d);
+      if (!la || la.elevation < minEl) { start = d; break; }
+    }
+  }
+
+  for (let i = 0; i < maxSteps; i++) {
+    const d = new Date(start.getTime() + i * step * 1000);
+    const la = getLookAngles(satrec, oGd, d);
+    if (!la) continue;
+    if (la.elevation >= minEl && !inPass) { inPass = true; passStart = d; maxE = la.elevation; maxEAz = la.azimuth; }
+    else if (la.elevation >= minEl && inPass && la.elevation > maxE) { maxE = la.elevation; maxEAz = la.azimuth; }
+    else if (la.elevation < minEl && inPass) {
+      return { start: passStart, end: d, maxEl: maxE, maxElAz: maxEAz, duration: (d - passStart) / 1000 };
+    }
+  }
+  return null;
+}
+
+// ============================================================
+// CESIUM — HELPER: Color from hex
+// ============================================================
+function hexToColor(hex, alpha) {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  return new Cesium.Color(r, g, b, alpha !== undefined ? alpha : 1.0);
+}
+
+// ============================================================
+// CESIUM — MAP INIT
+// ============================================================
+function initMap() {
+  // Cesium Ion not needed — disable default token
+  Cesium.Ion.defaultAccessToken = undefined;
+
+  state.viewer = new Cesium.Viewer('cesiumContainer', {
+    baseLayer: false,
+    baseLayerPicker: false,
+    geocoder: false,
+    homeButton: false,
+    sceneModePicker: false,
+    selectionIndicator: false,
+    timeline: false,
+    animation: false,
+    fullscreenButton: false,
+    vrButton: false,
+    navigationHelpButton: false,
+    infoBox: false,
+    creditContainer: document.createElement('div'), // hide credits
+    skyBox: false,
+    skyAtmosphere: new Cesium.SkyAtmosphere(),
+    contextOptions: {
+      webgl: { alpha: false },
+    },
+  });
+
+  const viewer = state.viewer;
+  const scene = viewer.scene;
+
+  // Dark space background
+  scene.backgroundColor = new Cesium.Color(0.04, 0.055, 0.08, 1.0);
+
+  // Disable Cesium built-in lighting (too aggressive on dark tiles).
+  // We draw our own terminator overlay for a subtle day/night effect.
+  scene.globe.enableLighting = false;
+
+  // Globe appearance
+  scene.globe.baseColor = new Cesium.Color(0.10, 0.12, 0.18, 1.0);
+  scene.globe.showGroundAtmosphere = true;
+  scene.fog.enabled = false;
+
+  // Add dark CartoDB tiles as base imagery
+  applyBaseMap(state.settings.baseMap || 'dark');
+
+  // Observer entity
+  state.observerEntity = viewer.entities.add({
+    position: Cesium.Cartesian3.fromDegrees(state.observer.lon, state.observer.lat, 0),
+    point: {
+      pixelSize: 10,
+      color: hexToColor('#4da6ff'),
+      outlineColor: Cesium.Color.WHITE,
+      outlineWidth: 2,
+      heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+    },
+    label: {
+      text: 'QTH',
+      font: '11px monospace',
+      fillColor: hexToColor('#4da6ff'),
+      outlineColor: Cesium.Color.BLACK,
+      outlineWidth: 2,
+      style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+      verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+      pixelOffset: new Cesium.Cartesian2(0, -14),
+      heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+    },
+  });
+
+  // LOS line entity (observer → satellite, shown when above horizon)
+  state.losEntity = viewer.entities.add({
+    polyline: {
+      positions: [],
+      width: 1,
+      material: new Cesium.PolylineDashMaterialProperty({
+        color: new Cesium.Color(0.3, 1.0, 0.3, 0.4),
+        dashLength: 8,
+      }),
+      show: false,
+    },
+  });
+
+  // Terminator overlay — canvas-based imagery layer (avoids polygon geometry issues)
+  initTerminatorOverlay();
+
+  // Initial camera view — global
+  viewer.camera.setView({
+    destination: Cesium.Cartesian3.fromDegrees(0, 20, 25000000),
+  });
+
+  // Disable default double-click entity tracking
+  viewer.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+
+  // Start loading overlay data
+  loadRainViewerRadar();
+  loadAuroraData();
+  setInterval(loadRainViewerRadar, 5 * 60 * 1000);
+  setInterval(loadAuroraData, 10 * 60 * 1000);
+}
+
+// ============================================================
+// TERMINATOR OVERLAY (canvas-based imagery layer)
+// ============================================================
+const TERM_CANVAS_W = 360;
+const TERM_CANVAS_H = 180;
+let terminatorCanvas = null;
+let terminatorCtx = null;
+let terminatorLayer = null;
+
+function getSubsolarPoint(date) {
+  // Days since J2000.0 (2000-01-01 12:00 TT)
+  const T = (date.getTime() / 86400000) - 10957.5;
+  const L0 = (280.460 + 0.9856474 * T) % 360;
+  const M = ((357.528 + 0.9856003 * T) % 360) * Math.PI / 180;
+  const eclLon = (L0 + 1.915 * Math.sin(M) + 0.020 * Math.sin(2 * M)) * Math.PI / 180;
+  const obliquity = 23.439 * Math.PI / 180;
+  const decl = Math.asin(Math.sin(obliquity) * Math.sin(eclLon));
+  const ra = Math.atan2(Math.cos(obliquity) * Math.sin(eclLon), Math.cos(eclLon));
+  const gmst = satellite.gstime(satellite.jday(
+    date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(),
+    date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()
+  ));
+  let lon = ((ra - gmst) * 180 / Math.PI) % 360;
+  if (lon > 180) lon -= 360;
+  if (lon < -180) lon += 360;
+  return { lat: decl * 180 / Math.PI, lon: lon };
+}
+
+function initTerminatorOverlay() {
+  terminatorCanvas = document.createElement('canvas');
+  terminatorCanvas.width = TERM_CANVAS_W;
+  terminatorCanvas.height = TERM_CANVAS_H;
+  terminatorCtx = terminatorCanvas.getContext('2d');
+  paintTerminator(new Date());
+
+  const provider = new Cesium.SingleTileImageryProvider({
+    url: terminatorCanvas.toDataURL(),
+    rectangle: Cesium.Rectangle.fromDegrees(-180, -90, 180, 90),
+  });
+  terminatorLayer = state.viewer.imageryLayers.addImageryProvider(provider);
+  terminatorLayer.alpha = 0.55;
+}
+
+function paintTerminator(date) {
+  if (!terminatorCtx) return;
+  const ctx = terminatorCtx;
+  const w = TERM_CANVAS_W;
+  const h = TERM_CANVAS_H;
+  const sub = getSubsolarPoint(date);
+
+  ctx.clearRect(0, 0, w, h);
+
+  const DEG = Math.PI / 180;
+  const subLatR = sub.lat * DEG;
+  const subLonR = sub.lon * DEG;
+
+  // For each pixel, compute angular distance from subsolar point
+  // If > 90° → night (dark), with smooth gradient near terminator
+  const imgData = ctx.createImageData(w, h);
+  const data = imgData.data;
+
+  for (let y = 0; y < h; y++) {
+    const lat = (90 - y) * DEG; // pixel row → latitude in radians
+    const sinLat = Math.sin(lat);
+    const cosLat = Math.cos(lat);
+    for (let x = 0; x < w; x++) {
+      const lon = (x - 180) * DEG; // pixel col → longitude in radians
+      // Angular distance from subsolar point (spherical law of cosines)
+      const cosAngle = sinLat * Math.sin(subLatR) + cosLat * Math.cos(subLatR) * Math.cos(lon - subLonR);
+      // cosAngle > 0 → day, < 0 → night; 0 = terminator
+      // Smooth transition over ~6° (twilight zone)
+      const twilightWidth = 0.10; // ~6° in cosine space
+      let nightFactor;
+      if (cosAngle > twilightWidth) {
+        nightFactor = 0; // full day
+      } else if (cosAngle < -twilightWidth) {
+        nightFactor = 1; // full night
+      } else {
+        nightFactor = 0.5 - (cosAngle / (2 * twilightWidth)); // smooth gradient
+      }
+
+      const idx = (y * w + x) * 4;
+      data[idx]     = 0;   // R
+      data[idx + 1] = 2;   // G
+      data[idx + 2] = 12;  // B
+      data[idx + 3] = Math.round(nightFactor * 255); // A
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+}
+
+function updateTerminator(date) {
+  if (!terminatorCanvas || !terminatorLayer) return;
+  paintTerminator(date);
+  // Update the imagery layer by swapping the provider
+  const viewer = state.viewer;
+  const alpha = terminatorLayer.alpha;
+  const idx = viewer.imageryLayers.indexOf(terminatorLayer);
+  viewer.imageryLayers.remove(terminatorLayer, false);
+  const provider = new Cesium.SingleTileImageryProvider({
+    url: terminatorCanvas.toDataURL(),
+    rectangle: Cesium.Rectangle.fromDegrees(-180, -90, 180, 90),
+  });
+  terminatorLayer = viewer.imageryLayers.addImageryProvider(provider, idx);
+  terminatorLayer.alpha = alpha;
+}
+
+// ============================================================
+// CESIUM — BASE MAP SWITCHING
+// ============================================================
+function applyBaseMap(mapId) {
+  const viewer = state.viewer;
+  // Remove all current imagery layers
+  viewer.imageryLayers.removeAll();
+
+  let provider;
+  switch (mapId) {
+    case 'dark-labels':
+      provider = new Cesium.UrlTemplateImageryProvider({
+        url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+        subdomains: 'abcd',
+        maximumLevel: 18,
+        credit: 'CartoDB',
+      });
+      break;
+    case 'satellite':
+      provider = new Cesium.UrlTemplateImageryProvider({
+        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        maximumLevel: 18,
+        credit: 'ESRI',
+      });
+      break;
+    case 'terrain':
+      provider = new Cesium.UrlTemplateImageryProvider({
+        url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+        subdomains: 'abc',
+        maximumLevel: 17,
+        credit: 'OpenTopoMap',
+      });
+      break;
+    case 'dark':
+    default:
+      provider = new Cesium.UrlTemplateImageryProvider({
+        url: 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png',
+        subdomains: 'abcd',
+        maximumLevel: 18,
+        credit: 'CartoDB',
+      });
+      break;
+  }
+
+  const baseLayer = viewer.imageryLayers.addImageryProvider(provider);
+  // Slight brightness boost for dark tiles
+  baseLayer.brightness = 1.3;
+  baseLayer.contrast = 1.05;
+  baseLayer.gamma = 0.95;
+
+  // Re-add any active overlays on top
+  reapplyOverlays();
+}
+
+function reapplyOverlays() {
+  // Re-add overlay layers that are toggled on
+  const overlayIds = ['radar', 'aurora', 'labels', 'nautical'];
+  for (const id of overlayIds) {
+    if (state.imageryLayers[id]) {
+      const layer = state.imageryLayers[id];
+      // Check if layer is still in the collection
+      if (state.viewer.imageryLayers.indexOf(layer) === -1) {
+        // Layer was removed — recreate if toggle is on
+        const cb = document.getElementById('overlay-' + id);
+        if (cb && cb.checked) {
+          toggleOverlay(id, true);
+        } else {
+          state.imageryLayers[id] = null;
+        }
+      }
+    }
+  }
+}
+
+// ============================================================
+// OVERLAY MANAGEMENT
+// ============================================================
+function toggleOverlay(id, on) {
+  const viewer = state.viewer;
+
+  // Remove existing layer if any
+  if (state.imageryLayers[id]) {
+    viewer.imageryLayers.remove(state.imageryLayers[id], false);
+    state.imageryLayers[id] = null;
+  }
+
+  // Special case: terminator
+  if (id === 'terminator') {
+    if (terminatorLayer) {
+      viewer.imageryLayers.remove(terminatorLayer, false);
+      terminatorLayer = null;
+    }
+    if (on) initTerminatorOverlay();
+    return;
+  }
+
+  if (!on) return;
+
+  let provider;
+  switch (id) {
+    case 'labels':
+      provider = new Cesium.UrlTemplateImageryProvider({
+        url: 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png',
+        subdomains: 'abcd',
+        maximumLevel: 18,
+      });
+      break;
+    case 'nautical':
+      provider = new Cesium.UrlTemplateImageryProvider({
+        url: 'https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png',
+        maximumLevel: 18,
+      });
+      break;
+    case 'radar':
+      loadRainViewerRadar(true);
+      return;
+    case 'aurora':
+      loadAuroraData(true);
+      return;
+    case 'gridsquares':
+      createGridSquareOverlay();
+      return;
+    case 'muf':
+      loadMufOverlay();
+      return;
+    case 'grayline':
+      createGrayLineOverlay();
+      return;
+  }
+
+  if (provider) {
+    const layer = viewer.imageryLayers.addImageryProvider(provider);
+    layer.alpha = id === 'nautical' ? 0.7 : 1.0;
+    state.imageryLayers[id] = layer;
+  }
+}
+
+// ============================================================
+// RAINVIEWER RADAR OVERLAY
+// ============================================================
+async function loadRainViewerRadar(force) {
+  if (!force) {
+    const cb = document.getElementById('overlay-radar');
+    if (!cb || !cb.checked) return;
+  }
+
+  try {
+    const resp = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+    if (!resp.ok) return;
+    const data = await resp.json();
+    const frames = data.radar && data.radar.past;
+    if (!frames || frames.length === 0) return;
+    const latest = frames[frames.length - 1];
+    const host = data.host || 'https://tilecache.rainviewer.com';
+    const tileUrl = `${host}${latest.path}/256/{z}/{x}/{y}/6/1_1.png`;
+
+    // Remove old radar layer
+    if (state.imageryLayers.radar) {
+      state.viewer.imageryLayers.remove(state.imageryLayers.radar, false);
+    }
+
+    const provider = new Cesium.UrlTemplateImageryProvider({
+      url: tileUrl,
+      maximumLevel: 18,
+    });
+    const layer = state.viewer.imageryLayers.addImageryProvider(provider);
+    layer.alpha = 0.55;
+    state.imageryLayers.radar = layer;
+  } catch (e) {
+    console.warn('RainViewer load failed:', e);
+  }
+}
+
+// ============================================================
+// NOAA AURORA OVERLAY
+// ============================================================
+async function loadAuroraData(force) {
+  if (!force) {
+    const cb = document.getElementById('overlay-aurora');
+    if (!cb || !cb.checked) return;
+  }
+
+  try {
+    const resp = await fetch('https://services.swpc.noaa.gov/json/ovation_aurora_latest.json');
+    if (!resp.ok) return;
+    const data = await resp.json();
+    const coords = data.coordinates || data;
+    if (!Array.isArray(coords) || coords.length === 0) return;
+
+    // Render aurora to a canvas and use as SingleTileImageryProvider
+    const canvas = document.createElement('canvas');
+    canvas.width = 720;   // 2 pixels per degree longitude
+    canvas.height = 360;  // 2 pixels per degree latitude
+    const ctx = canvas.getContext('2d');
+
+    for (const point of coords) {
+      let lon = point[0] > 180 ? point[0] - 360 : point[0];
+      const lat = point[1];
+      const intensity = point[2];
+      if (intensity < 10) continue;
+
+      // Map to canvas coords
+      const x = (lon + 180) * 2;
+      const y = (90 - lat) * 2;
+
+      // Color based on intensity
+      if (intensity < 20) ctx.fillStyle = 'rgba(0, 120, 50, 0.4)';
+      else if (intensity < 35) ctx.fillStyle = 'rgba(0, 200, 50, 0.5)';
+      else if (intensity < 55) ctx.fillStyle = 'rgba(50, 255, 50, 0.6)';
+      else if (intensity < 75) ctx.fillStyle = 'rgba(100, 255, 100, 0.7)';
+      else ctx.fillStyle = 'rgba(150, 255, 150, 0.8)';
+
+      ctx.fillRect(x - 1, y - 1, 3, 3);
+    }
+
+    // Remove old aurora layer
+    if (state.imageryLayers.aurora) {
+      state.viewer.imageryLayers.remove(state.imageryLayers.aurora, false);
+    }
+
+    const provider = new Cesium.SingleTileImageryProvider({
+      url: canvas.toDataURL(),
+      rectangle: Cesium.Rectangle.fromDegrees(-180, -90, 180, 90),
+    });
+    const layer = state.viewer.imageryLayers.addImageryProvider(provider);
+    layer.alpha = 0.7;
+    state.imageryLayers.aurora = layer;
+  } catch (e) {
+    console.warn('Aurora data load failed:', e);
+  }
+}
+
+// ============================================================
+// HAM RADIO — MAIDENHEAD GRID SQUARE OVERLAY
+// ============================================================
+function createGridSquareOverlay() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 720;
+  canvas.height = 360;
+  const ctx = canvas.getContext('2d');
+
+  ctx.strokeStyle = 'rgba(0, 229, 255, 0.25)';
+  ctx.lineWidth = 0.5;
+  ctx.font = '7px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  const fieldLetters = 'ABCDEFGHIJKLMNOPQR';
+
+  // Draw Maidenhead field grid (18 x 18 fields, each 20° lon x 10° lat)
+  for (let fi = 0; fi < 18; fi++) {
+    for (let fj = 0; fj < 18; fj++) {
+      const lonDeg = fi * 20 - 180;
+      const latDeg = fj * 10 - 90;
+      const x = (lonDeg + 180) * 2;
+      const y = (90 - latDeg - 10) * 2;
+      const w = 20 * 2;
+      const h = 10 * 2;
+
+      // Field border
+      ctx.strokeStyle = 'rgba(0, 229, 255, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x, y, w, h);
+
+      // Field label (e.g., AA, AB, ..., RR)
+      const label = fieldLetters[fi] + fieldLetters[fj];
+      ctx.fillStyle = 'rgba(0, 229, 255, 0.35)';
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText(label, x + w / 2, y + h / 2);
+
+      // Sub-grid (10 squares per field: 2° lon x 1° lat each)
+      ctx.strokeStyle = 'rgba(0, 229, 255, 0.1)';
+      ctx.lineWidth = 0.3;
+      for (let si = 1; si < 10; si++) {
+        const sx = x + si * (w / 10);
+        ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx, y + h); ctx.stroke();
+      }
+      for (let sj = 1; sj < 10; sj++) {
+        const sy = y + sj * (h / 10);
+        ctx.beginPath(); ctx.moveTo(x, sy); ctx.lineTo(x + w, sy); ctx.stroke();
+      }
+    }
+  }
+
+  const provider = new Cesium.SingleTileImageryProvider({
+    url: canvas.toDataURL(),
+    rectangle: Cesium.Rectangle.fromDegrees(-180, -90, 180, 90),
+  });
+  const layer = state.viewer.imageryLayers.addImageryProvider(provider);
+  layer.alpha = 0.8;
+  state.imageryLayers.gridsquares = layer;
+}
+
+// ============================================================
+// HAM RADIO — MUF / PROPAGATION MAP
+// ============================================================
+async function loadMufOverlay() {
+  // Use KC2G PropMap for real-time MUF data (Maximum Usable Frequency)
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = 720;
+    canvas.height = 360;
+    const ctx = canvas.getContext('2d');
+
+    // Compute a simulated MUF map based on subsolar point and time of day
+    // Real MUF depends on ionospheric F2 layer critical frequency
+    const date = new Date();
+    const sub = getSubsolarPoint(date);
+    const DEG = Math.PI / 180;
+    const subLatR = sub.lat * DEG;
+    const subLonR = sub.lon * DEG;
+
+    for (let y = 0; y < 360; y++) {
+      const lat = (90 - y / 2) * DEG;
+      const sinLat = Math.sin(lat);
+      const cosLat = Math.cos(lat);
+      for (let x = 0; x < 720; x++) {
+        const lon = (x / 2 - 180) * DEG;
+        // Solar zenith angle
+        const cosZenith = sinLat * Math.sin(subLatR) + cosLat * Math.cos(subLatR) * Math.cos(lon - subLonR);
+        // MUF approximation: higher on day side, peaks near subsolar, drops at night
+        // Typical range: 3-30 MHz
+        let mufNorm;
+        if (cosZenith > 0.1) {
+          mufNorm = 0.3 + 0.7 * Math.pow(cosZenith, 0.5); // day side
+        } else if (cosZenith > -0.1) {
+          mufNorm = 0.2 + 0.3 * (cosZenith + 0.1) / 0.2; // twilight
+        } else {
+          mufNorm = 0.05 + 0.15 * Math.max(0, 1 + cosZenith * 3); // night side
+        }
+        // Latitude factor — MUF higher at equator/low latitudes
+        const latFactor = Math.cos(lat) * 0.3 + 0.7;
+        mufNorm *= latFactor;
+
+        // Color: blue (low MUF) → green → yellow → red (high MUF)
+        let r, g, b;
+        if (mufNorm < 0.25) {
+          r = 0; g = 0; b = Math.round(100 * mufNorm / 0.25);
+        } else if (mufNorm < 0.5) {
+          const t = (mufNorm - 0.25) / 0.25;
+          r = 0; g = Math.round(180 * t); b = Math.round(100 * (1 - t));
+        } else if (mufNorm < 0.75) {
+          const t = (mufNorm - 0.5) / 0.25;
+          r = Math.round(200 * t); g = Math.round(180); b = 0;
+        } else {
+          const t = (mufNorm - 0.75) / 0.25;
+          r = Math.round(200 + 55 * t); g = Math.round(180 * (1 - t * 0.6)); b = 0;
+        }
+
+        const idx = (y * 720 + x) * 4;
+        const imgData = ctx.getImageData(x, y, 1, 1);
+        imgData.data[0] = r;
+        imgData.data[1] = g;
+        imgData.data[2] = b;
+        imgData.data[3] = Math.round(mufNorm * 120); // semi-transparent
+        ctx.putImageData(imgData, x, y);
+      }
+    }
+
+    // Add legend labels
+    ctx.font = 'bold 10px monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.textAlign = 'left';
+    ctx.fillText('MUF HIGH', 10, 20);
+    ctx.fillStyle = 'rgba(255,200,0,0.6)';
+    ctx.fillRect(85, 12, 30, 10);
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fillText('LOW', 10, 345);
+    ctx.fillStyle = 'rgba(0,0,100,0.6)';
+    ctx.fillRect(40, 337, 30, 10);
+
+    const provider = new Cesium.SingleTileImageryProvider({
+      url: canvas.toDataURL(),
+      rectangle: Cesium.Rectangle.fromDegrees(-180, -90, 180, 90),
+    });
+    const layer = state.viewer.imageryLayers.addImageryProvider(provider);
+    layer.alpha = 0.5;
+    state.imageryLayers.muf = layer;
+  } catch (e) {
+    console.warn('MUF overlay failed:', e);
+  }
+}
+
+// ============================================================
+// HAM RADIO — GRAY LINE OVERLAY
+// ============================================================
+function createGrayLineOverlay() {
+  // The gray line (twilight zone) is the band around the terminator
+  // where HF propagation is enhanced — signals travel along the terminator
+  const canvas = document.createElement('canvas');
+  canvas.width = 720;
+  canvas.height = 360;
+  const ctx = canvas.getContext('2d');
+
+  const date = new Date();
+  const sub = getSubsolarPoint(date);
+  const DEG = Math.PI / 180;
+  const subLatR = sub.lat * DEG;
+  const subLonR = sub.lon * DEG;
+
+  const imgData = ctx.createImageData(720, 360);
+  const data = imgData.data;
+
+  for (let y = 0; y < 360; y++) {
+    const lat = (90 - y / 2) * DEG;
+    const sinLat = Math.sin(lat);
+    const cosLat = Math.cos(lat);
+    for (let x = 0; x < 720; x++) {
+      const lon = (x / 2 - 180) * DEG;
+      const cosAngle = sinLat * Math.sin(subLatR) + cosLat * Math.cos(subLatR) * Math.cos(lon - subLonR);
+      // Gray line: the band where cosAngle is near 0 (terminator ± ~10°)
+      const dist = Math.abs(cosAngle); // distance from terminator
+      let intensity;
+      if (dist < 0.05) {
+        intensity = 1.0; // right on the terminator — strongest
+      } else if (dist < 0.18) {
+        intensity = Math.max(0, 1.0 - (dist - 0.05) / 0.13); // fade out
+      } else {
+        intensity = 0;
+      }
+
+      if (intensity > 0) {
+        const idx = (y * 720 + x) * 4;
+        data[idx]     = 255; // R — golden glow
+        data[idx + 1] = 180;
+        data[idx + 2] = 50;
+        data[idx + 3] = Math.round(intensity * 120);
+      }
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+
+  const provider = new Cesium.SingleTileImageryProvider({
+    url: canvas.toDataURL(),
+    rectangle: Cesium.Rectangle.fromDegrees(-180, -90, 180, 90),
+  });
+  const layer = state.viewer.imageryLayers.addImageryProvider(provider);
+  layer.alpha = 0.6;
+  state.imageryLayers.grayline = layer;
+}
+
+// ============================================================
+// CESIUM — SATELLITE ENTITIES
+// ============================================================
+function addSatMarker(nid) {
+  if (state.entities[nid]) return;
+  const sat = state.satellites[nid];
+  if (!sat) return;
+  const c = sat.catalogEntry;
+  const col = hexToColor(c.color);
+  const isActive = nid === state.activeSatId;
+  const viewer = state.viewer;
+
+  // Satellite point at orbital altitude
+  const pointEntity = viewer.entities.add({
+    position: Cesium.Cartesian3.fromDegrees(0, 0, 400000), // placeholder
+    point: {
+      pixelSize: isActive ? 12 : 7,
+      color: col,
+      outlineColor: Cesium.Color.WHITE.withAlpha(0.7),
+      outlineWidth: isActive ? 2 : 1,
+      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+    },
+    label: {
+      text: c.name,
+      font: '10px monospace',
+      fillColor: col,
+      outlineColor: Cesium.Color.BLACK,
+      outlineWidth: 2,
+      style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+      verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+      pixelOffset: new Cesium.Cartesian2(0, -12),
+      show: isActive,
+      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+    },
+  });
+
+  // Past track (dashed, on ground surface)
+  const pastTrack = viewer.entities.add({
+    polyline: {
+      positions: [],
+      width: isActive ? 2 : 1.5,
+      material: new Cesium.PolylineDashMaterialProperty({
+        color: col.withAlpha(0.25),
+        dashLength: 8,
+      }),
+      clampToGround: true,
+    },
+  });
+
+  // Future track (solid, on ground surface)
+  const futureTrack = viewer.entities.add({
+    polyline: {
+      positions: [],
+      width: isActive ? 2.5 : 1.5,
+      material: col.withAlpha(isActive ? 0.6 : 0.3),
+      clampToGround: true,
+    },
+  });
+
+  state.entities[nid] = { point: pointEntity, pastTrack, futureTrack };
+}
+
+function removeSatMarker(nid) {
+  const ents = state.entities[nid];
+  if (!ents) return;
+  const viewer = state.viewer;
+  viewer.entities.remove(ents.point);
+  viewer.entities.remove(ents.pastTrack);
+  viewer.entities.remove(ents.futureTrack);
+  delete state.entities[nid];
+}
+
+function updateSatEntityStyle(nid, isActive) {
+  const ents = state.entities[nid];
+  if (!ents) return;
+  const sat = state.satellites[nid];
+  if (!sat) return;
+  const col = hexToColor(sat.catalogEntry.color);
+
+  ents.point.point.pixelSize = isActive ? 12 : 7;
+  ents.point.point.outlineWidth = isActive ? 2 : 1;
+  ents.point.label.show = isActive;
+
+  ents.pastTrack.polyline.width = isActive ? 2 : 1.5;
+  ents.futureTrack.polyline.width = isActive ? 2.5 : 1.5;
+  ents.futureTrack.polyline.material = col.withAlpha(isActive ? 0.6 : 0.3);
+}
+
+// ============================================================
+// CESIUM — GROUND TRACKS (no antimeridian splitting needed!)
+// ============================================================
+function updateTracks(nid, now) {
+  const sat = state.satellites[nid];
+  const ents = state.entities[nid];
+  if (!sat || !ents) return;
+
+  const period = getOrbitalPeriod(sat.satrec);
+  const { pastTrack, futureTrack } = computeGroundTrack(sat.satrec, now, period, period * 1.5, 30);
+
+  // Convert [lat, lon] arrays to Cesium Cartesian3 — NOTE: lon/lat swap!
+  if (pastTrack.length > 1) {
+    const pastDegrees = [];
+    for (const pt of pastTrack) { pastDegrees.push(pt[1], pt[0]); } // lon, lat
+    ents.pastTrack.polyline.positions = Cesium.Cartesian3.fromDegreesArray(pastDegrees);
+  } else {
+    ents.pastTrack.polyline.positions = [];
+  }
+
+  if (futureTrack.length > 1) {
+    const futureDegrees = [];
+    for (const pt of futureTrack) { futureDegrees.push(pt[1], pt[0]); } // lon, lat
+    ents.futureTrack.polyline.positions = Cesium.Cartesian3.fromDegreesArray(futureDegrees);
+  } else {
+    ents.futureTrack.polyline.positions = [];
+  }
+}
+
+// ============================================================
+// CESIUM — FOOTPRINTS
+// ============================================================
+function updateFootprint(pos) {
+  const viewer = state.viewer;
+
+  // Remove old footprints
+  if (state.footprintOuter) { viewer.entities.remove(state.footprintOuter); state.footprintOuter = null; }
+  if (state.footprintInner) { viewer.entities.remove(state.footprintInner); state.footprintInner = null; }
+  if (!pos || state.activeSatId == null) return;
+
+  const sat = state.satellites[state.activeSatId];
+  if (!sat) return;
+  const col = hexToColor(sat.catalogEntry.color);
+
+  // Outer ring: 0° elevation (horizon footprint)
+  const r0 = getFootprintRadius(pos.alt) * 1000; // meters
+  state.footprintOuter = viewer.entities.add({
+    position: Cesium.Cartesian3.fromDegrees(pos.lon, pos.lat),
+    ellipse: {
+      semiMajorAxis: r0,
+      semiMinorAxis: r0,
+      height: 0,
+      material: col.withAlpha(0.04),
+      outline: true,
+      outlineColor: col.withAlpha(0.2),
+      outlineWidth: 1,
+    },
+  });
+
+  // Inner ring: min elevation footprint
+  const rMin = getFootprintRadiusAtElev(pos.alt, state.settings.minElevation) * 1000;
+  state.footprintInner = viewer.entities.add({
+    position: Cesium.Cartesian3.fromDegrees(pos.lon, pos.lat),
+    ellipse: {
+      semiMajorAxis: rMin,
+      semiMinorAxis: rMin,
+      height: 0,
+      material: col.withAlpha(0.06),
+      outline: true,
+      outlineColor: col.withAlpha(0.4),
+      outlineWidth: 2,
+    },
+  });
+}
+
+// ============================================================
+// CESIUM — LOS LINE (observer → satellite)
+// ============================================================
+function updateLosLine(pos) {
+  const losEntity = state.losEntity;
+  if (!pos || state.activeSatId == null) {
+    losEntity.polyline.show = false;
+    document.getElementById('los-legend').style.display = 'none';
+    return;
+  }
+  const sat = state.satellites[state.activeSatId];
+  if (!sat || !sat.lookAngles || sat.lookAngles.elevation < 0) {
+    losEntity.polyline.show = false;
+    document.getElementById('los-legend').style.display = 'none';
+    return;
+  }
+
+  // Observer position on surface → Satellite position at altitude
+  losEntity.polyline.positions = [
+    Cesium.Cartesian3.fromDegrees(state.observer.lon, state.observer.lat, (state.observer.alt || 0)),
+    Cesium.Cartesian3.fromDegrees(pos.lon, pos.lat, pos.alt * 1000),
+  ];
+  losEntity.polyline.show = true;
+  document.getElementById('los-legend').style.display = 'block';
+}
+
+// ============================================================
+// OBSERVER
+// ============================================================
+function setObserverLocation(lat, lon, altM) {
+  state.observer = { lat, lon, alt: altM || 0 };
+  state.observerGd = { longitude: satellite.degreesToRadians(lon), latitude: satellite.degreesToRadians(lat), height: (altM || 0) / 1000 };
+  localStorage.setItem('sat_tracker_observer', JSON.stringify(state.observer));
+
+  // Update Cesium observer entity
+  if (state.observerEntity) {
+    state.observerEntity.position = Cesium.Cartesian3.fromDegrees(lon, lat, 0);
+  }
+
+  updateObserverDisplay();
+  state.nextPassCache = {};
+  state.lastTrackTime = 0;
+}
+
+function loadObserverLocation() {
+  try {
+    const s = JSON.parse(localStorage.getItem('sat_tracker_observer'));
+    if (s && typeof s.lat === 'number') { setObserverLocation(s.lat, s.lon, s.alt); return; }
+  } catch (e) {}
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      p => setObserverLocation(p.coords.latitude, p.coords.longitude, p.coords.altitude || 0),
+      () => setObserverLocation(39.7392, -104.9903, 0),
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  } else setObserverLocation(39.7392, -104.9903, 0);
+}
+
+function updateObserverDisplay() {
+  const { lat, lon } = state.observer;
+  const grid = latLonToGrid(lat, lon);
+  document.getElementById('observer-coords').textContent = `${Math.abs(lat).toFixed(4)}${lat >= 0 ? 'N' : 'S'} ${Math.abs(lon).toFixed(4)}${lon >= 0 ? 'E' : 'W'}`;
+  document.getElementById('observer-grid').textContent = grid.toUpperCase();
+  document.getElementById('observer-grid-map').textContent = grid.toUpperCase();
+}
+
+// ============================================================
+// SIDEBAR UI
+// ============================================================
+function buildSatelliteList() {
+  const el = document.getElementById('sat-list');
+  el.innerHTML = '';
+  const cats = {};
+  for (const c of SATELLITE_CATALOG) { if (!cats[c.category]) cats[c.category] = []; cats[c.category].push(c); }
+
+  for (const [cn, sats] of Object.entries(cats)) {
+    const cd = document.createElement('div'); cd.className = 'sat-category'; cd.textContent = cn; el.appendChild(cd);
+    for (const s of sats) {
+      if (!state.satellites[s.noradId]) continue;
+      const item = document.createElement('div'); item.className = 'sat-item'; item.dataset.noradId = s.noradId;
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = state.visibleSatIds.has(s.noradId);
+      cb.addEventListener('change', e => { e.stopPropagation(); toggleSatVis(s.noradId, cb.checked); });
+      const dot = document.createElement('div'); dot.className = 'sat-dot'; dot.style.background = s.color;
+      const nm = document.createElement('span'); nm.className = 'sat-name'; nm.textContent = s.name;
+      const ev = document.createElement('span'); ev.className = 'sat-elev'; ev.dataset.elevFor = s.noradId; ev.textContent = '--';
+      const rf = document.createElement('span'); rf.className = 'sat-rf-dot out-range'; rf.dataset.rfFor = s.noradId;
+      item.append(cb, dot, nm, ev, rf);
+      item.addEventListener('click', e => { if (e.target === cb) return; selectSat(s.noradId); if (!cb.checked) { cb.checked = true; toggleSatVis(s.noradId, true); } });
+      el.appendChild(item);
+    }
+  }
+}
+
+function selectSat(nid) {
+  const prevActive = state.activeSatId;
+  state.activeSatId = nid;
+  document.querySelectorAll('.sat-item').forEach(e => e.classList.toggle('active', parseInt(e.dataset.noradId) === nid));
+
+  // Update entity styles
+  if (prevActive != null && state.entities[prevActive]) updateSatEntityStyle(prevActive, false);
+  if (state.entities[nid]) updateSatEntityStyle(nid, true);
+
+  state.lastTrackTime = 0;
+  delete state.nextPassCache[nid];
+
+  // Camera flyTo satellite position — far enough out to see globe curvature
+  const sat = state.satellites[nid];
+  if (sat && sat.position) {
+    const pos = sat.position;
+    state.viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(pos.lon, pos.lat - 8, pos.alt * 1000 + 15000000),
+      orientation: {
+        heading: 0,
+        pitch: Cesium.Math.toRadians(-75),
+        roll: 0,
+      },
+      duration: 1.5,
+    });
+  }
+
+  updateDetailsPanel();
+}
+
+function toggleSatVis(nid, vis) {
+  if (vis) {
+    state.visibleSatIds.add(nid);
+    addSatMarker(nid);
+    updateTracks(nid, new Date());
+  } else {
+    state.visibleSatIds.delete(nid);
+    removeSatMarker(nid);
+    if (state.activeSatId === nid) {
+      updateFootprint(null);
+      updateLosLine(null);
+    }
+  }
+}
+
+function getSatType(cat) {
+  if (cat.name.startsWith('ISS')) return 'iss';
+  if (cat.name.startsWith('NOAA')) return 'noaa';
+  return 'cubesat'; // SO-50, AO-*, XW-3, TEVEL, FOX-1A
+}
+
+function buildSatSvg(type, col, rfVis, elev) {
+  const sz = 90;
+  const elevColor = elev >= 0 ? '#00e676' : '#4a5a6e';
+  let svg = `<svg class="sat-craft-svg" width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">`;
+
+  // Background glow
+  svg += `<defs>
+    <radialGradient id="sglow"><stop offset="0%" stop-color="${col}" stop-opacity="0.12"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></radialGradient>
+    <linearGradient id="spanel" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a3a6a"/><stop offset="100%" stop-color="#0d1f3d"/></linearGradient>
+    <linearGradient id="spanelLit" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a5a9a"/><stop offset="100%" stop-color="#1a3a6a"/></linearGradient>
+    <linearGradient id="sbody" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2a3444"/><stop offset="100%" stop-color="#1a2232"/></linearGradient>
+  </defs>`;
+  svg += `<circle cx="${sz/2}" cy="${sz/2}" r="40" fill="url(#sglow)"/>`;
+
+  if (type === 'iss') {
+    // === ISS — truss + 8 solar arrays + modules ===
+    const cx = 45, cy = 45;
+
+    // Main truss (horizontal beam)
+    svg += `<rect x="${cx-36}" y="${cy-1.5}" width="72" height="3" rx="1" fill="url(#sbody)" stroke="#3a4a5a" stroke-width="0.5"/>`;
+
+    // Solar array pairs (4 pairs along the truss)
+    const panelW = 13, panelH = 20;
+    const positions = [-30, -14, 14, 30];
+    positions.forEach((px, i) => {
+      const grad = i < 2 ? 'spanel' : 'spanelLit';
+      // Top panel
+      svg += `<rect x="${cx+px-panelW/2}" y="${cy-panelH-3}" width="${panelW}" height="${panelH}" rx="0.5" fill="url(#${grad})" stroke="#2a4a6a" stroke-width="0.4"/>`;
+      // Panel grid lines
+      for (let g = 1; g < 4; g++) {
+        svg += `<line x1="${cx+px-panelW/2}" y1="${cy-panelH-3+g*(panelH/4)}" x2="${cx+px+panelW/2}" y2="${cy-panelH-3+g*(panelH/4)}" stroke="#1a3050" stroke-width="0.3"/>`;
+      }
+      svg += `<line x1="${cx+px}" y1="${cy-panelH-3}" x2="${cx+px}" y2="${cy-3}" stroke="#1a3050" stroke-width="0.3"/>`;
+      // Bottom panel
+      svg += `<rect x="${cx+px-panelW/2}" y="${cy+3}" width="${panelW}" height="${panelH}" rx="0.5" fill="url(#${grad})" stroke="#2a4a6a" stroke-width="0.4"/>`;
+      for (let g = 1; g < 4; g++) {
+        svg += `<line x1="${cx+px-panelW/2}" y1="${cy+3+g*(panelH/4)}" x2="${cx+px+panelW/2}" y2="${cy+3+g*(panelH/4)}" stroke="#1a3050" stroke-width="0.3"/>`;
+      }
+      svg += `<line x1="${cx+px}" y1="${cy+3}" x2="${cx+px}" y2="${cy+3+panelH}" stroke="#1a3050" stroke-width="0.3"/>`;
+      // Strut connecting panel to truss
+      svg += `<line x1="${cx+px}" y1="${cy-3}" x2="${cx+px}" y2="${cy-1.5}" stroke="#3a4a5a" stroke-width="0.8"/>`;
+      svg += `<line x1="${cx+px}" y1="${cy+1.5}" x2="${cx+px}" y2="${cy+3}" stroke="#3a4a5a" stroke-width="0.8"/>`;
+    });
+
+    // Pressurized modules (center cluster)
+    svg += `<rect x="${cx-8}" y="${cy-4}" width="16" height="8" rx="2" fill="#1e2e3e" stroke="#3a5a7a" stroke-width="0.5"/>`;
+    svg += `<rect x="${cx-3}" y="${cy-7}" width="6" height="14" rx="1.5" fill="#1a2a3a" stroke="#3a5a7a" stroke-width="0.4"/>`;
+    // Docking ports
+    svg += `<circle cx="${cx}" cy="${cy-7}" r="1" fill="#4a6a8a" stroke="#5a7a9a" stroke-width="0.3"/>`;
+    svg += `<circle cx="${cx}" cy="${cy+7}" r="1" fill="#4a6a8a" stroke="#5a7a9a" stroke-width="0.3"/>`;
+    // Window glow
+    svg += `<rect x="${cx-5}" y="${cy-1.5}" width="2" height="2" rx="0.5" fill="#4da6ff" opacity="0.6"/>`;
+    svg += `<rect x="${cx+3}" y="${cy-1.5}" width="2" height="2" rx="0.5" fill="#4da6ff" opacity="0.4"/>`;
+
+    // RF signal indicator if visible
+    if (rfVis) {
+      svg += `<circle cx="${cx}" cy="${cy}" r="22" fill="none" stroke="${col}" stroke-opacity="0.12" stroke-width="0.5"/>`;
+      svg += `<circle cx="${cx}" cy="${cy}" r="28" fill="none" stroke="${col}" stroke-opacity="0.06" stroke-width="0.5"/>`;
+    }
+
+  } else if (type === 'noaa') {
+    // === NOAA POES — bus + single large solar paddle ===
+    const cx = 45, cy = 42;
+
+    // Main bus (rectangular body)
+    svg += `<rect x="${cx-7}" y="${cy-10}" width="14" height="22" rx="1.5" fill="url(#sbody)" stroke="#3a5a7a" stroke-width="0.5"/>`;
+
+    // Solar array (single long paddle to one side)
+    svg += `<rect x="${cx+9}" y="${cy-18}" width="22" height="36" rx="0.5" fill="url(#spanel)" stroke="#2a4a6a" stroke-width="0.4"/>`;
+    // Panel grid
+    for (let g = 1; g < 6; g++) {
+      svg += `<line x1="${cx+9}" y1="${cy-18+g*6}" x2="${cx+31}" y2="${cy-18+g*6}" stroke="#1a3050" stroke-width="0.3"/>`;
+    }
+    svg += `<line x1="${cx+20}" y1="${cy-18}" x2="${cx+20}" y2="${cy+18}" stroke="#1a3050" stroke-width="0.3"/>`;
+    // Strut
+    svg += `<rect x="${cx+7}" y="${cy-1}" width="3" height="2" fill="#3a4a5a"/>`;
+
+    // AVHRR scanner (top dome)
+    svg += `<circle cx="${cx}" cy="${cy-12}" r="4" fill="#1a2a3a" stroke="#4a6a8a" stroke-width="0.4"/>`;
+    svg += `<circle cx="${cx}" cy="${cy-12}" r="2" fill="#2a3a4a" stroke="#5a7a9a" stroke-width="0.3"/>`;
+
+    // Antenna boom (bottom)
+    svg += `<line x1="${cx}" y1="${cy+12}" x2="${cx}" y2="${cy+22}" stroke="#4a5a6a" stroke-width="0.8"/>`;
+    svg += `<line x1="${cx-4}" y1="${cy+22}" x2="${cx+4}" y2="${cy+22}" stroke="#4a5a6a" stroke-width="0.6"/>`;
+    svg += `<circle cx="${cx}" cy="${cy+22}" r="1.2" fill="#3a5a7a"/>`;
+
+    // Side antennas
+    svg += `<line x1="${cx-7}" y1="${cy+4}" x2="${cx-16}" y2="${cy+14}" stroke="#4a5a6a" stroke-width="0.6"/>`;
+    svg += `<circle cx="${cx-16}" cy="${cy+14}" r="0.8" fill="#5a7a9a"/>`;
+
+    // Details on bus
+    svg += `<rect x="${cx-5}" y="${cy-6}" width="3" height="3" rx="0.5" fill="#1a3050" stroke="#2a4a6a" stroke-width="0.3"/>`;
+    svg += `<rect x="${cx+2}" y="${cy-6}" width="3" height="3" rx="0.5" fill="#1a3050" stroke="#2a4a6a" stroke-width="0.3"/>`;
+    svg += `<rect x="${cx-4}" y="${cy}" width="8" height="4" rx="0.5" fill="#14222f" stroke="#2a3a4a" stroke-width="0.3"/>`;
+
+    if (rfVis) {
+      svg += `<circle cx="${cx}" cy="${cy}" r="20" fill="none" stroke="${col}" stroke-opacity="0.12" stroke-width="0.5"/>`;
+      svg += `<circle cx="${cx}" cy="${cy}" r="26" fill="none" stroke="${col}" stroke-opacity="0.06" stroke-width="0.5"/>`;
+    }
+
+  } else {
+    // === CubeSat — 1U/3U with deployable solar panels ===
+    const cx = 45, cy = 45;
+
+    // Main body (slightly elongated for 3U)
+    svg += `<rect x="${cx-6}" y="${cy-9}" width="12" height="18" rx="1" fill="url(#sbody)" stroke="#3a5a7a" stroke-width="0.5"/>`;
+
+    // Deployable solar panels (folded out like butterfly wings)
+    // Left panel
+    svg += `<rect x="${cx-26}" y="${cy-8}" width="18" height="16" rx="0.5" fill="url(#spanel)" stroke="#2a4a6a" stroke-width="0.4"/>`;
+    for (let g = 1; g < 4; g++) {
+      svg += `<line x1="${cx-26}" y1="${cy-8+g*4}" x2="${cx-8}" y2="${cy-8+g*4}" stroke="#1a3050" stroke-width="0.3"/>`;
+    }
+    svg += `<line x1="${cx-17}" y1="${cy-8}" x2="${cx-17}" y2="${cy+8}" stroke="#1a3050" stroke-width="0.3"/>`;
+    // Left hinge
+    svg += `<rect x="${cx-8}" y="${cy-1}" width="2" height="2" fill="#4a5a6a"/>`;
+
+    // Right panel
+    svg += `<rect x="${cx+8}" y="${cy-8}" width="18" height="16" rx="0.5" fill="url(#spanelLit)" stroke="#2a4a6a" stroke-width="0.4"/>`;
+    for (let g = 1; g < 4; g++) {
+      svg += `<line x1="${cx+8}" y1="${cy-8+g*4}" x2="${cx+26}" y2="${cy-8+g*4}" stroke="#1a3050" stroke-width="0.3"/>`;
+    }
+    svg += `<line x1="${cx+17}" y1="${cy-8}" x2="${cx+17}" y2="${cy+8}" stroke="#1a3050" stroke-width="0.3"/>`;
+    // Right hinge
+    svg += `<rect x="${cx+6}" y="${cy-1}" width="2" height="2" fill="#4a5a6a"/>`;
+
+    // Body details
+    svg += `<rect x="${cx-4}" y="${cy-6}" width="8" height="5" rx="0.5" fill="#14222f" stroke="#2a3a4a" stroke-width="0.3"/>`;
+    // Antenna (top)
+    svg += `<line x1="${cx}" y1="${cy-9}" x2="${cx}" y2="${cy-16}" stroke="#5a7a9a" stroke-width="0.6"/>`;
+    svg += `<line x1="${cx-3}" y1="${cy-15}" x2="${cx+3}" y2="${cy-15}" stroke="#5a7a9a" stroke-width="0.5"/>`;
+    // UHF antenna (bottom whip)
+    svg += `<line x1="${cx+3}" y1="${cy+9}" x2="${cx+6}" y2="${cy+18}" stroke="#5a7a9a" stroke-width="0.5"/>`;
+    svg += `<line x1="${cx-3}" y1="${cy+9}" x2="${cx-6}" y2="${cy+18}" stroke="#5a7a9a" stroke-width="0.5"/>`;
+
+    // Status LED
+    svg += `<circle cx="${cx}" cy="${cy+3}" r="1" fill="${col}" opacity="0.8"/>`;
+
+    if (rfVis) {
+      svg += `<circle cx="${cx}" cy="${cy}" r="20" fill="none" stroke="${col}" stroke-opacity="0.12" stroke-width="0.5"/>`;
+      svg += `<circle cx="${cx}" cy="${cy}" r="26" fill="none" stroke="${col}" stroke-opacity="0.06" stroke-width="0.5"/>`;
+    }
+  }
+
+  // Satellite color accent line at bottom
+  svg += `<rect x="15" y="${sz-4}" width="${sz-30}" height="1.5" rx="0.75" fill="${col}" opacity="0.5"/>`;
+
+  svg += '</svg>';
+  return svg;
+}
+
+function buildSatGraphic(cat, pos, look, sat) {
+  const type = getSatType(cat);
+  const elev = look ? look.elevation : -90;
+  const rfVis = sat.rfVisible;
+  const craftSvg = buildSatSvg(type, cat.color, rfVis, elev);
+
+  // Info beside the graphic
+  const altStr = pos ? `${pos.alt.toFixed(0)} km` : '--';
+  const rangeStr = look ? `${look.range.toFixed(0)} km` : '--';
+  const velStr = pos ? `${Math.sqrt(pos.vel.x ** 2 + pos.vel.y ** 2 + pos.vel.z ** 2).toFixed(1)} km/s` : '--';
+  const elevStr = look ? `${look.elevation.toFixed(1)}°` : '--';
+  const elevCls = look && look.elevation >= 0 ? 'above-hz' : 'below-hz';
+
+  return `<div class="sat-graphic">${craftSvg}<div class="sat-graphic-info">
+    <div class="sg-row"><span class="sg-label">ALT</span><span class="sg-value">${altStr}</span></div>
+    <div class="sg-row"><span class="sg-label">RANGE</span><span class="sg-value">${rangeStr}</span></div>
+    <div class="sg-row"><span class="sg-label">SPEED</span><span class="sg-value">${velStr}</span></div>
+    <div class="sg-row"><span class="sg-label">ELEV</span><span class="sg-value ${elevCls}">${elevStr}</span></div>
+  </div></div>`;
+}
+
+function updateDetailsPanel() {
+  const panel = document.getElementById('details-panel');
+  if (state.activeSatId == null || !state.satellites[state.activeSatId]) {
+    panel.innerHTML = '<div class="no-selection">SELECT A BIRD TO VIEW TELEMETRY</div>'; return;
+  }
+  const sat = state.satellites[state.activeSatId], cat = sat.catalogEntry, pos = sat.position, look = sat.lookAngles;
+  let h = '';
+
+  h += `<div class="detail-header"><span class="detail-name-dot" style="background:${cat.color}"></span><span class="detail-sat-name">${cat.name}</span><span class="detail-norad">#${cat.noradId}</span></div>`;
+
+  // Satellite orbit graphic
+  h += buildSatGraphic(cat, pos, look, sat);
+
+  h += '<div class="detail-grid">';
+  const r = (l, v) => `<div class="detail-row"><span class="detail-label">${l}</span><span class="detail-value">${v}</span></div>`;
+  if (pos) {
+    h += r('ALT', `${pos.alt.toFixed(1)} km`);
+    h += r('LAT', `${pos.lat.toFixed(4)}°`);
+    h += r('LON', `${pos.lon.toFixed(4)}°`);
+    h += r('PERIOD', `${getOrbitalPeriod(sat.satrec).toFixed(1)} min`);
+    h += r('GRID', latLonToGrid(pos.lat, pos.lon).toUpperCase());
+    h += r('VELOCITY', `${Math.sqrt(pos.vel.x ** 2 + pos.vel.y ** 2 + pos.vel.z ** 2).toFixed(2)} km/s`);
+  }
+  if (look) {
+    h += r('AZ', `${look.azimuth.toFixed(1)}°`);
+    h += r('EL', `${look.elevation.toFixed(1)}°`);
+    h += r('RANGE', `${look.range.toFixed(0)} km`);
+    h += r('RANGE RATE', `${(sat.rangeRate || 0).toFixed(3)} km/s`);
+  }
+  if (sat.tleAgeHours != null) {
+    const ageStr = sat.tleAgeHours < 24 ? `${sat.tleAgeHours.toFixed(0)}h` : `${(sat.tleAgeHours / 24).toFixed(1)}d`;
+    const ageColor = sat.tleAgeHours < 48 ? 'var(--green)' : sat.tleAgeHours < 168 ? 'var(--yellow)' : 'var(--red)';
+    h += `<div class="detail-row"><span class="detail-label">TLE AGE</span><span class="detail-value" style="color:${ageColor}">${ageStr}</span></div>`;
+  }
+  h += r('MODE', cat.mode);
+  h += '</div>';
+
+  h += '<div class="vis-row">';
+  h += sat.rfVisible
+    ? '<div class="vis-badge rf-yes"><span class="vis-dot"></span>AOS</div>'
+    : '<div class="vis-badge rf-no"><span class="vis-dot"></span>LOS</div>';
+  h += sat.visVisible
+    ? '<div class="vis-badge vis-yes"><span class="vis-dot"></span>OPTICAL</div>'
+    : '<div class="vis-badge vis-no"><span class="vis-dot"></span>NO VIS</div>';
+  h += '</div>';
+
+  h += '<div class="freq-section">';
+  if (cat.downlink) {
+    const dShift = computeDoppler(cat.downlink, sat.rangeRate || 0);
+    const corrected = cat.downlink + dShift;
+    const sign = dShift >= 0 ? '+' : '';
+    const cls = dShift >= 0 ? 'positive' : 'negative';
+    h += `<div class="freq-row"><span class="freq-label">DL</span><span class="freq-value">${corrected.toFixed(4)} MHz</span><span class="freq-doppler ${cls}">${sign}${(dShift * 1000).toFixed(1)} Hz</span></div>`;
+  }
+  if (cat.uplink) {
+    const uShift = computeDoppler(cat.uplink, sat.rangeRate || 0);
+    const corrected = cat.uplink - uShift;
+    const sign = -uShift >= 0 ? '+' : '';
+    const cls = -uShift >= 0 ? 'positive' : 'negative';
+    h += `<div class="freq-row"><span class="freq-label">UL</span><span class="freq-value">${corrected.toFixed(4)} MHz</span><span class="freq-doppler ${cls}">${sign}${(-uShift * 1000).toFixed(1)} Hz</span></div>`;
+  }
+  h += '</div>';
+
+  const sl = sat.signalLevel || 0;
+  h += '<div class="signal-meter"><div class="signal-meter-label">EST. SIGNAL</div><div class="signal-bar-container">';
+  for (let i = 1; i <= 9; i++) {
+    h += `<div class="signal-bar s${i} ${i <= sl ? 'active' : ''}"></div>`;
+  }
+  h += `<span class="signal-value">S${sl}</span></div></div>`;
+
+  if (look) {
+    const needleAngle = look.azimuth;
+    h += `<div class="compass-section">
+      <div class="compass-container"><div class="compass-ring">
+        <span class="compass-cardinal compass-n">N</span><span class="compass-cardinal compass-s">S</span>
+        <span class="compass-cardinal compass-e">E</span><span class="compass-cardinal compass-w">W</span>
+        <div class="compass-needle" style="transform:translate(-50%,-100%) rotate(${needleAngle}deg);"></div>
+        <div class="compass-center"></div>
+      </div></div>
+      <div class="compass-data">
+        <div class="cd-row"><span class="cd-label">AZ</span><span class="cd-value">${look.azimuth.toFixed(1)}°</span></div>
+        <div class="cd-row"><span class="cd-label">EL</span><span class="cd-value" style="color:${look.elevation >= 0 ? 'var(--green)' : 'var(--red)'}">${look.elevation.toFixed(1)}°</span></div>
+        <div class="cd-row"><span class="cd-label">BEARING</span><span class="cd-value">${azToBearing(look.azimuth)}</span></div>
+        <div class="cd-row"><span class="cd-label">DISTANCE</span><span class="cd-value">${look.range.toFixed(0)} km</span></div>
+      </div></div>`;
+  }
+
+  const pass = state.nextPassCache[state.activeSatId];
+  h += '<div class="pass-section"><div class="pass-title">Next Pass</div><div class="pass-info">';
+  if (pass) {
+    const tu = pass.start - new Date();
+    let ts;
+    if (tu <= 0) ts = '<span style="color:var(--green)">NOW!</span>';
+    else { const hr = Math.floor(tu / 3600000), mn = Math.floor((tu % 3600000) / 60000); ts = hr > 0 ? `${hr}h ${mn}m` : `${mn}m`; }
+    const quality = pass.maxEl >= 60 ? 'excellent' : pass.maxEl >= 30 ? 'good' : pass.maxEl >= 15 ? 'fair' : 'poor';
+    const qLabel = pass.maxEl >= 60 ? 'S9+' : pass.maxEl >= 30 ? 'FB' : pass.maxEl >= 15 ? 'OK' : 'QRP';
+    h += `<div class="pass-chip"><span class="pc-label">AOS </span><span class="pc-value ${tu <= 300000 ? 'urgent' : ''}">${ts}</span></div>`;
+    h += `<div class="pass-chip"><span class="pc-label">MAX </span><span class="pc-value">${pass.maxEl.toFixed(0)}°</span><span class="pass-quality ${quality}">${qLabel}</span></div>`;
+    h += `<div class="pass-chip"><span class="pc-label">DUR </span><span class="pc-value">${Math.round(pass.duration / 60)}m${Math.round(pass.duration % 60)}s</span></div>`;
+    h += `<div class="pass-chip"><span class="pc-label">AOS@</span><span class="pc-value">${pass.start.toUTCString().slice(17, 25)} UTC</span></div>`;
+  } else {
+    h += '<div class="pass-chip"><span class="pc-label">COMPUTING...</span></div>';
+  }
+  h += '</div></div>';
+
+  panel.innerHTML = h;
+}
+
+function azToBearing(az) {
+  const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+  return dirs[Math.round(az / 22.5) % 16];
+}
+
+function updateElevBadges() {
+  if (!state.observerGd) return;
+  const now = new Date();
+  for (const [nidStr, sat] of Object.entries(state.satellites)) {
+    const nid = parseInt(nidStr);
+    const el = document.querySelector(`[data-elev-for="${nid}"]`);
+    const rf = document.querySelector(`[data-rf-for="${nid}"]`);
+    if (!el) continue;
+    const la = getLookAngles(sat.satrec, state.observerGd, now);
+    if (la) {
+      el.textContent = `${la.elevation.toFixed(0)}°`;
+      el.classList.toggle('above', la.elevation >= state.settings.minElevation);
+      if (rf) { rf.classList.toggle('in-range', la.elevation >= state.settings.minElevation); rf.classList.toggle('out-range', la.elevation < state.settings.minElevation); }
+    }
+  }
+}
+
+// ============================================================
+// ANIMATION LOOP
+// ============================================================
+function animLoop() {
+  const now = Date.now();
+  if (now - state.lastCalcTime >= state.settings.updateInterval) {
+    state.lastCalcTime = now;
+    const date = new Date();
+    document.getElementById('clock').textContent = date.toUTCString().slice(0, -4).replace(/ GMT$/, '') + ' UTC';
+
+    // Sync Cesium clock
+    if (state.viewer) {
+      state.viewer.clock.currentTime = Cesium.JulianDate.fromDate(date);
+    }
+
+    // Update terminator overlay every 60s (it moves slowly)
+    if (now - (state.lastTerminatorTime || 0) >= 60000) {
+      state.lastTerminatorTime = now;
+      updateTerminator(date);
+    }
+
+    for (const nid of state.visibleSatIds) {
+      const sat = state.satellites[nid]; if (!sat) continue;
+      const pos = getSatPosition(sat.satrec, date); if (!pos) continue;
+      sat.position = pos;
+
+      // Update entity position at true 3D orbital altitude
+      const ents = state.entities[nid];
+      if (ents) {
+        ents.point.position = Cesium.Cartesian3.fromDegrees(pos.lon, pos.lat, pos.alt * 1000);
+      }
+
+      if (state.observerGd) {
+        sat.lookAngles = getLookAngles(sat.satrec, state.observerGd, date);
+        sat.rfVisible = sat.lookAngles && sat.lookAngles.elevation >= state.settings.minElevation;
+        sat.visVisible = computeVisualVis(sat, state.observerGd, state.observer.lat, state.observer.lon, date);
+        sat.rangeRate = getRangeRate(sat.satrec, state.observerGd, date);
+        sat.signalLevel = sat.lookAngles ? estimateSignalLevel(sat.lookAngles.elevation, sat.lookAngles.range, pos.alt) : 0;
+      }
+    }
+
+    if (state.activeSatId != null && state.satellites[state.activeSatId]) {
+      const activePos = state.satellites[state.activeSatId].position;
+      updateFootprint(activePos);
+      updateLosLine(activePos);
+
+      // Camera track mode — keep globe curvature visible
+      if (state.trackingMode && activePos) {
+        state.viewer.camera.flyTo({
+          destination: Cesium.Cartesian3.fromDegrees(activePos.lon, activePos.lat - 6, activePos.alt * 1000 + 12000000),
+          orientation: {
+            heading: 0,
+            pitch: Cesium.Math.toRadians(-78),
+            roll: 0,
+          },
+          duration: 0.5,
+        });
+      }
+    }
+
+    updateDetailsPanel();
+    updateElevBadges();
+
+    let above = 0;
+    for (const s of Object.values(state.satellites)) if (s.rfVisible) above++;
+    const statsEl = document.getElementById('tracking-stats');
+    statsEl.innerHTML = `<span><span class="stat-label">TRK:</span> <span class="stat-value">${state.visibleSatIds.size}</span></span><span><span class="stat-label">AOS:</span> <span class="stat-value ${above > 0 ? 'highlight' : ''}">${above}</span></span>`;
+  }
+
+  // Update ground tracks every 15 seconds
+  if (now - state.lastTrackTime >= 15000) {
+    state.lastTrackTime = now;
+    const date = new Date();
+    for (const nid of state.visibleSatIds) updateTracks(nid, date);
+  }
+
+  state.animFrameId = requestAnimationFrame(animLoop);
+}
+
+// Next pass background computation
+function bgComputePasses() {
+  if (!state.observerGd || state.activeSatId == null) return;
+  const sat = state.satellites[state.activeSatId]; if (!sat) return;
+  if (!state.nextPassCache[state.activeSatId]) {
+    const pass = findNextPass(sat.satrec, state.observerGd, state.settings.minElevation, new Date());
+    if (pass) state.nextPassCache[state.activeSatId] = pass;
+  }
+}
+setInterval(bgComputePasses, 2000);
+
+// ============================================================
+// EVENT HANDLERS
+// ============================================================
+function setupEvents() {
+  document.getElementById('btn-gps').addEventListener('click', () => {
+    if (!navigator.geolocation) return alert('No GPS');
+    navigator.geolocation.getCurrentPosition(
+      p => setObserverLocation(p.coords.latitude, p.coords.longitude, p.coords.altitude || 0),
+      e => alert('GPS failed: ' + e.message), { enableHighAccuracy: true, timeout: 10000 });
+  });
+
+  document.getElementById('btn-edit-loc').addEventListener('click', () => {
+    document.getElementById('input-lat').value = state.observer.lat;
+    document.getElementById('input-lon').value = state.observer.lon;
+    document.getElementById('input-alt').value = state.observer.alt || 0;
+    document.getElementById('input-grid').value = latLonToGrid(state.observer.lat, state.observer.lon).toUpperCase();
+    document.getElementById('location-modal').classList.remove('hidden');
+  });
+
+  ['input-lat', 'input-lon'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      const lat = parseFloat(document.getElementById('input-lat').value);
+      const lon = parseFloat(document.getElementById('input-lon').value);
+      if (!isNaN(lat) && !isNaN(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+        document.getElementById('input-grid').value = latLonToGrid(lat, lon).toUpperCase();
+      }
+    });
+  });
+
+  document.getElementById('btn-loc-cancel').addEventListener('click', () => document.getElementById('location-modal').classList.add('hidden'));
+  document.getElementById('btn-loc-save').addEventListener('click', () => {
+    const lat = parseFloat(document.getElementById('input-lat').value);
+    const lon = parseFloat(document.getElementById('input-lon').value);
+    const alt = parseFloat(document.getElementById('input-alt').value) || 0;
+    if (isNaN(lat) || isNaN(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) return alert('Bad QTH');
+    setObserverLocation(lat, lon, alt);
+    document.getElementById('location-modal').classList.add('hidden');
+  });
+
+  document.getElementById('btn-settings').addEventListener('click', () => {
+    document.getElementById('setting-min-elev').value = state.settings.minElevation;
+    document.getElementById('setting-interval').value = state.settings.updateInterval;
+    document.getElementById('setting-basemap').value = state.settings.baseMap || 'dark';
+    document.getElementById('settings-modal').classList.remove('hidden');
+  });
+
+  document.getElementById('btn-settings-close').addEventListener('click', () => {
+    state.settings.minElevation = parseInt(document.getElementById('setting-min-elev').value) || 5;
+    state.settings.updateInterval = parseInt(document.getElementById('setting-interval').value) || 1000;
+
+    // Base map change
+    const newBase = document.getElementById('setting-basemap').value;
+    if (newBase !== state.settings.baseMap) {
+      state.settings.baseMap = newBase;
+      applyBaseMap(newBase);
+    }
+
+    // Overlay toggles
+    ['radar', 'aurora', 'labels', 'nautical'].forEach(id => {
+      const cb = document.getElementById('overlay-' + id);
+      if (cb) toggleOverlay(id, cb.checked);
+    });
+
+    localStorage.setItem('sat_tracker_settings', JSON.stringify(state.settings));
+    state.nextPassCache = {};
+    document.getElementById('settings-modal').classList.add('hidden');
+  });
+
+  document.getElementById('btn-refresh-tle').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-refresh-tle');
+    btn.textContent = 'FETCHING...';
+    try { await fetchTLEData(true); btn.textContent = 'QSL!'; state.lastTrackTime = 0; }
+    catch (e) { btn.textContent = 'QRX FAIL'; }
+    setTimeout(() => btn.textContent = 'Refresh TLE', 2000);
+  });
+
+  // Track button — auto-follow camera
+  document.getElementById('btn-track').addEventListener('click', () => {
+    state.trackingMode = !state.trackingMode;
+    document.getElementById('btn-track').classList.toggle('active', state.trackingMode);
+  });
+
+  // Floating layer panel
+  document.getElementById('map-layers-toggle').addEventListener('click', () => {
+    const btn = document.getElementById('map-layers-toggle');
+    const drawer = document.getElementById('map-layers-drawer');
+    btn.classList.toggle('open');
+    drawer.classList.toggle('open');
+  });
+
+  // Base map buttons
+  document.querySelectorAll('[data-basemap]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mapId = btn.dataset.basemap;
+      document.querySelectorAll('[data-basemap]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.settings.baseMap = mapId;
+      applyBaseMap(mapId);
+      // Sync settings modal select
+      const sel = document.getElementById('setting-basemap');
+      if (sel) sel.value = mapId;
+      localStorage.setItem('sat_tracker_settings', JSON.stringify(state.settings));
+    });
+  });
+
+  // Overlay toggle buttons
+  document.querySelectorAll('[data-overlay]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.overlay;
+      const nowActive = btn.classList.toggle('active');
+      btn.querySelector('.layer-dot').classList.toggle('active', nowActive);
+      toggleOverlay(id, nowActive);
+      // Sync settings modal checkboxes
+      const cb = document.getElementById('overlay-' + id);
+      if (cb) cb.checked = nowActive;
+    });
+  });
+
+  // Mark the terminator button as active by default
+  const termBtn = document.querySelector('[data-overlay="terminator"]');
+  if (termBtn) { termBtn.classList.add('active'); termBtn.querySelector('.layer-dot').classList.add('active'); }
+
+  // Keyboard shortcuts for layers
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+    const keyMap = { g: 'gridsquares', m: 'muf', y: 'grayline', r: 'radar', a: 'aurora', l: 'labels', n: 'nautical', d: 'terminator' };
+    const overlayId = keyMap[e.key.toLowerCase()];
+    if (overlayId) {
+      const btn = document.querySelector(`[data-overlay="${overlayId}"]`);
+      if (btn) btn.click();
+    }
+  });
+
+  document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.add('hidden'); }));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('hidden')); document.getElementById('map-layers-drawer').classList.remove('open'); document.getElementById('map-layers-toggle').classList.remove('open'); } });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+async function init() {
+  try { const ss = JSON.parse(localStorage.getItem('sat_tracker_settings')); if (ss) Object.assign(state.settings, ss); } catch (e) {}
+  initMap();
+  loadObserverLocation();
+  setupEvents();
+
+  try {
+    await fetchTLEData();
+    const n = Object.keys(state.satellites).length;
+    document.getElementById('tle-status').textContent = `${n} BIRDS LOADED`;
+  } catch (e) {
+    document.getElementById('tle-status').textContent = 'TLE QRX FAIL';
+    document.getElementById('loading-text').textContent = 'UNABLE TO ACQUIRE TLE DATA. CHECK NET.';
+    return;
+  }
+
+  buildSatelliteList();
+
+  // Auto-show ISS
+  const iss = 25544;
+  if (state.satellites[iss]) {
+    state.visibleSatIds.add(iss);
+    addSatMarker(iss);
+    selectSat(iss);
+    const cb = document.querySelector(`.sat-item[data-norad-id="${iss}"] input[type="checkbox"]`);
+    if (cb) cb.checked = true;
+  }
+
+  document.getElementById('loading-overlay').classList.add('hidden');
+  state.lastTrackTime = 0;
+  animLoop();
+}
+
+init();
+</script>
+</body>
+</html>
