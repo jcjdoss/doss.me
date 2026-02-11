@@ -239,15 +239,19 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
 .cesium-navigation-help { display: none !important; }
 .cesium-navigationHelpButton-wrapper { display: none !important; }
 
-/* Map overlay: grid square label */
+/* Map overlay: station locator card (clickable) */
 #grid-overlay {
   position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 999;
-  background: rgba(10, 14, 20, 0.9); border: 1px solid var(--border-bright);
-  border-radius: 8px; padding: 8px 16px; pointer-events: none; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  display: flex; align-items: center; gap: 10px;
+  background: rgba(10, 14, 20, 0.92); border: 1px solid var(--border-bright);
+  border-radius: 10px; padding: 8px 18px; cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  display: flex; align-items: center; gap: 10px; transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
 }
-#grid-overlay .grid-label { color: var(--text-muted); font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
-#grid-overlay .grid-value { color: var(--cyan); font-size: 18px; font-weight: 800; letter-spacing: 2px; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; }
+#grid-overlay:hover { border-color: var(--accent-dim); background: rgba(10, 14, 20, 0.96); transform: translateX(-50%) scale(1.02); }
+#grid-overlay .grid-pin { color: var(--accent); flex-shrink: 0; }
+#grid-overlay .grid-info { display: flex; flex-direction: column; gap: 1px; }
+#grid-overlay .grid-value { color: var(--cyan); font-size: 18px; font-weight: 800; letter-spacing: 2px; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; line-height: 1; }
+#grid-overlay .grid-subtitle { color: var(--text-muted); font-size: 9px; font-weight: 500; letter-spacing: 0; }
 
 /* Track button */
 .btn-track { background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-muted); border-radius: 5px; padding: 3px 10px; cursor: pointer; font-size: 10px; font-family: inherit; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; font-weight: 700; }
@@ -303,12 +307,21 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
 /* Bottom bar */
 #bottom-bar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 20px; background: var(--bg-secondary); border-top: 1px solid var(--border);
-  height: 36px; flex-shrink: 0; z-index: 1000;
+  padding: 0 12px; background: var(--bg-secondary); border-top: 1px solid var(--border);
+  height: 42px; flex-shrink: 0; z-index: 1000;
 }
-#observer-info { display: flex; align-items: center; gap: 10px; }
-#observer-coords { color: var(--text-secondary); font-size: 12px; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 500; }
+#observer-info { display: flex; align-items: center; gap: 8px; }
+#qth-card {
+  display: flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 8px;
+  cursor: pointer; transition: all 0.2s; border: 1px solid transparent;
+}
+#qth-card:hover { background: rgba(77,166,255,0.06); border-color: var(--accent-dim); }
+#qth-card .qth-pin { color: var(--accent); flex-shrink: 0; }
+#qth-card .qth-details { display: flex; flex-direction: column; gap: 0; }
+#qth-card .qth-primary { display: flex; align-items: center; gap: 8px; }
+#observer-coords { color: var(--text-secondary); font-size: 11px; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 500; }
 #observer-grid { color: var(--cyan); font-weight: 700; font-size: 13px; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; letter-spacing: 1px; }
+#qth-card .qth-secondary { font-size: 9px; color: var(--text-muted); font-weight: 500; line-height: 1; }
 .btn-sm {
   background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-muted);
   border-radius: 5px; padding: 3px 10px; cursor: pointer; font-size: 10px; font-family: inherit;
@@ -490,9 +503,12 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
     </div>
     <div id="map-container">
       <div id="cesiumContainer"></div>
-      <div id="grid-overlay">
-        <div class="grid-label">Grid Locator</div>
-        <div class="grid-value" id="observer-grid-map">--</div>
+      <div id="grid-overlay" title="Click to edit your station profile">
+        <span class="grid-pin"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></span>
+        <div class="grid-info">
+          <div class="grid-value" id="observer-grid-map">--</div>
+          <div class="grid-subtitle" id="observer-place-label">Click to set your location</div>
+        </div>
       </div>
       <div id="los-legend"><span class="los-label">LOS LINE ACTIVE</span></div>
       <div id="map-layers-panel">
@@ -522,12 +538,18 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
 
   <div id="bottom-bar">
     <div id="observer-info">
-      <span style="color:var(--accent);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;">QTH</span>
-      <span id="observer-coords">--</span>
-      <span id="observer-grid" title="Maidenhead Grid Locator">--</span>
-      <span id="observer-zones" style="color:var(--text-muted);font-size:10px;font-weight:500;" title="ITU Zone / CQ Zone"></span>
+      <div id="qth-card" title="Click to edit your station profile">
+        <span class="qth-pin"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></span>
+        <div class="qth-details">
+          <div class="qth-primary">
+            <span id="observer-grid" title="Maidenhead Grid Locator">--</span>
+            <span id="observer-coords">--</span>
+            <span id="observer-zones" style="color:var(--text-muted);font-size:10px;font-weight:500;" title="ITU Zone / CQ Zone"></span>
+          </div>
+          <div class="qth-secondary" id="qth-place-hint">Click to set your station location</div>
+        </div>
+      </div>
       <button class="btn-sm" id="btn-gps">GPS</button>
-      <button class="btn-sm" id="btn-edit-loc">Edit</button>
       <button class="btn-track" id="btn-track">TRACK</button>
     </div>
     <div id="tracking-stats"></div>
@@ -2044,8 +2066,15 @@ function setObserverLocation(lat, lon, altM) {
 function loadObserverLocation() {
   try {
     const s = JSON.parse(localStorage.getItem('sat_tracker_observer'));
-    if (s && typeof s.lat === 'number') { setObserverLocation(s.lat, s.lon, s.alt); return; }
+    if (s && typeof s.lat === 'number') {
+      state.observer.countryCode = s.countryCode || '';
+      state.observer.placeName = s.placeName || '';
+      setObserverLocation(s.lat, s.lon, s.alt);
+      state._hasExistingLocation = true;
+      return;
+    }
   } catch (e) {}
+  state._hasExistingLocation = false;
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       p => setObserverLocation(p.coords.latitude, p.coords.longitude, p.coords.altitude || 0),
@@ -2056,7 +2085,7 @@ function loadObserverLocation() {
 }
 
 function updateObserverDisplay() {
-  const { lat, lon } = state.observer;
+  const { lat, lon, placeName } = state.observer;
   const grid = latLonToGrid(lat, lon);
   document.getElementById('observer-coords').textContent = `${Math.abs(lat).toFixed(4)}${lat >= 0 ? 'N' : 'S'} ${Math.abs(lon).toFixed(4)}${lon >= 0 ? 'E' : 'W'}`;
   document.getElementById('observer-grid').textContent = grid.toUpperCase();
@@ -2065,6 +2094,12 @@ function updateObserverDisplay() {
   const cqZ = getCQZone(lat, lon);
   const zonesEl = document.getElementById('observer-zones');
   if (zonesEl) zonesEl.textContent = `ITU ${ituZ} · CQ ${cqZ}`;
+  // Update place labels
+  const placeLabel = document.getElementById('observer-place-label');
+  const qthHint = document.getElementById('qth-place-hint');
+  const shortPlace = placeName ? placeName.split(',').slice(0, 2).join(',').trim() : '';
+  if (placeLabel) placeLabel.textContent = shortPlace || `${Math.abs(lat).toFixed(2)}${lat >= 0 ? 'N' : 'S'}, ${Math.abs(lon).toFixed(2)}${lon >= 0 ? 'E' : 'W'} · Click to edit`;
+  if (qthHint) qthHint.textContent = shortPlace || 'Click to set your station location';
 }
 
 // ============================================================
@@ -2554,14 +2589,20 @@ function setupEvents() {
       e => alert('GPS failed: ' + e.message), { enableHighAccuracy: true, timeout: 10000 });
   });
 
-  document.getElementById('btn-edit-loc').addEventListener('click', () => {
+  // Open Station Profile — accessible from multiple entry points
+  function openStationProfile() {
     document.getElementById('input-lat').value = state.observer.lat;
     document.getElementById('input-lon').value = state.observer.lon;
     document.getElementById('input-alt').value = state.observer.alt || 0;
     document.getElementById('input-location-search').value = state.observer.placeName || '';
     updateDerivedDisplay(state.observer.lat, state.observer.lon, state.observer.countryCode);
     document.getElementById('location-modal').classList.remove('hidden');
-  });
+  }
+
+  // QTH card in bottom bar → opens Station Profile
+  document.getElementById('qth-card').addEventListener('click', openStationProfile);
+  // Grid overlay on map → opens Station Profile
+  document.getElementById('grid-overlay').addEventListener('click', openStationProfile);
 
   // Geocoding search input
   const searchInput = document.getElementById('input-location-search');
@@ -2765,6 +2806,17 @@ async function init() {
   document.getElementById('loading-overlay').classList.add('hidden');
   state.lastTrackTime = 0;
   animLoop();
+
+  // First launch — auto-open Station Profile so user sets their location
+  if (!state._hasExistingLocation) {
+    setTimeout(() => {
+      document.getElementById('input-lat').value = state.observer.lat;
+      document.getElementById('input-lon').value = state.observer.lon;
+      document.getElementById('input-alt').value = state.observer.alt || 0;
+      updateDerivedDisplay(state.observer.lat, state.observer.lon, state.observer.countryCode);
+      document.getElementById('location-modal').classList.remove('hidden');
+    }, 1500);
+  }
 }
 
 init();
