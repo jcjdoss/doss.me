@@ -47,9 +47,18 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
 #header h1 .callsign { color: var(--cyan); }
 #header h1 .ver { color: var(--text-muted); font-weight: 500; font-size: 10px; margin-left: 8px; letter-spacing: 1px; }
 #header-right { display: flex; align-items: center; gap: 16px; }
-#clock { font-size: 14px; color: var(--accent); letter-spacing: 0.5px; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 500; }
-#tle-status { font-size: 11px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.5px; }
-.btn-icon { background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-secondary); border-radius: 6px; padding: 6px 14px; cursor: pointer; font-size: 11px; font-family: inherit; transition: all 0.2s; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+#header-divider { width: 1px; height: 24px; background: var(--border); }
+#tle-status {
+  font-size: 10px; color: var(--green); font-weight: 600; letter-spacing: 1px;
+  background: rgba(0,230,118,0.08); padding: 3px 10px; border-radius: 20px; border: 1px solid rgba(0,230,118,0.15);
+}
+#clock { font-size: 14px; color: var(--accent); letter-spacing: 0.5px; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 600; }
+.btn-icon {
+  display: inline-flex; align-items: center;
+  background: var(--bg-tertiary); border: 1px solid var(--border-bright); color: var(--text-secondary);
+  border-radius: 8px; padding: 7px 16px; cursor: pointer; font-size: 12px; font-family: inherit;
+  transition: all 0.2s; letter-spacing: 0.5px; font-weight: 600;
+}
 .btn-icon:hover { background: rgba(77,166,255,0.08); color: var(--accent); border-color: var(--accent-dim); }
 
 /* Main content */
@@ -337,10 +346,36 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
 .btn-cancel:hover { background: var(--border); }
 
 /* Settings */
-.settings-grid { display: grid; gap: 10px; }
+.settings-section-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted);
+  font-weight: 700; margin-top: 16px; margin-bottom: 8px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.settings-section-label:first-of-type { margin-top: 4px; }
+.settings-grid { display: grid; gap: 12px; }
 .settings-row { display: flex; align-items: center; justify-content: space-between; }
-.settings-row label { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
-.settings-row input, .settings-row select { width: 110px; margin-bottom: 0; font-size: 13px; }
+.settings-row > label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+.settings-label-group { display: flex; flex-direction: column; gap: 2px; }
+.settings-label-group label { font-size: 13px; color: var(--text-secondary); font-weight: 500; margin-bottom: 0; }
+.settings-hint { font-size: 10px; color: var(--text-muted); font-weight: 400; }
+.settings-input-wrap { display: flex; align-items: center; gap: 4px; }
+.settings-input-wrap input { width: 70px; margin-bottom: 0; text-align: center; font-size: 14px; }
+.settings-unit { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+.settings-row input, .settings-row select { width: 140px; margin-bottom: 0; font-size: 13px; }
+
+/* Toggle switch */
+.toggle { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; cursor: pointer; margin-bottom: 0 !important; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--border-bright); border-radius: 22px; transition: all 0.25s;
+}
+.toggle-slider::before {
+  content: ''; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px;
+  background: var(--text-muted); border-radius: 50%; transition: all 0.25s;
+}
+.toggle input:checked + .toggle-slider { background: var(--accent); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(18px); background: white; }
 
 /* Loading */
 #loading-overlay {
@@ -372,8 +407,9 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
     <h1><span class="callsign">SAT</span>TRACK<span class="ver">v3.0</span></h1>
     <div id="header-right">
       <span id="tle-status"></span>
+      <span id="header-divider"></span>
       <span id="clock"></span>
-      <button class="btn-icon" id="btn-settings">CFG</button>
+      <button class="btn-icon" id="btn-settings"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
     </div>
   </div>
 
@@ -424,7 +460,7 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
       <span id="observer-coords">--</span>
       <span id="observer-grid" title="Maidenhead Grid Locator">--</span>
       <button class="btn-sm" id="btn-gps">GPS</button>
-      <button class="btn-sm" id="btn-edit-loc">QTH</button>
+      <button class="btn-sm" id="btn-edit-loc">Edit</button>
       <button class="btn-track" id="btn-track">TRACK</button>
     </div>
     <div id="tracking-stats"></div>
@@ -433,49 +469,62 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
 
 <div class="modal-overlay hidden" id="location-modal">
   <div class="modal">
-    <h3>Set QTH (Observer Location)</h3>
-    <label>Latitude</label>
+    <h3>Observer Location</h3>
+    <label>Latitude (decimal degrees)</label>
     <input type="number" id="input-lat" step="0.0001" min="-90" max="90" placeholder="39.7392">
-    <label>Longitude</label>
+    <label>Longitude (decimal degrees)</label>
     <input type="number" id="input-lon" step="0.0001" min="-180" max="180" placeholder="-104.9903">
-    <label>Altitude (meters ASL)</label>
+    <label>Altitude (meters above sea level)</label>
     <input type="number" id="input-alt" step="1" min="0" placeholder="0">
-    <label>Maidenhead Grid (auto-computed)</label>
+    <label>Maidenhead Grid Locator</label>
     <input type="text" id="input-grid" readonly style="color:var(--cyan);">
     <div class="modal-buttons">
       <button class="btn-cancel" id="btn-loc-cancel">Cancel</button>
-      <button class="btn-primary" id="btn-loc-save">Save QTH</button>
+      <button class="btn-primary" id="btn-loc-save">Save Location</button>
     </div>
   </div>
 </div>
 
 <div class="modal-overlay hidden" id="settings-modal">
-  <div class="modal">
-    <h3>Configuration</h3>
+  <div class="modal" style="width:420px;">
+    <h3>Settings</h3>
+
+    <div class="settings-section-label">Tracking</div>
     <div class="settings-grid">
-      <div class="settings-row"><label>Min Elev (RF)</label><input type="number" id="setting-min-elev" value="5" min="0" max="90" step="1"></div>
-      <div class="settings-row"><label>Update Rate</label><select id="setting-interval"><option value="500">500ms</option><option value="1000" selected>1000ms</option><option value="2000">2000ms</option></select></div>
       <div class="settings-row">
-        <label>Base Map</label>
-        <select id="setting-basemap">
-          <option value="dark">Dark (CARTO)</option>
-          <option value="dark-labels">Dark + Labels</option>
-          <option value="satellite">Satellite (ESRI)</option>
-          <option value="terrain">Terrain (OpenTopo)</option>
-        </select>
+        <div class="settings-label-group"><label>Minimum Elevation</label><span class="settings-hint">Degrees above horizon for RF contact</span></div>
+        <div class="settings-input-wrap"><input type="number" id="setting-min-elev" value="5" min="0" max="90" step="1"><span class="settings-unit">&deg;</span></div>
       </div>
-      <div class="settings-row"><label>Speed of Light</label><input type="text" value="299,792,458 m/s" readonly style="color:var(--text-muted);font-size:9px;text-align:right;"></div>
-      <div style="border-top:1px solid var(--border); padding-top:6px; margin-top:2px;">
-        <div style="font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Overlays</div>
-        <div class="settings-row"><label>Precipitation Radar</label><input type="checkbox" id="overlay-radar" style="width:auto;"></div>
-        <div class="settings-row"><label>Aurora Forecast</label><input type="checkbox" id="overlay-aurora" style="width:auto;"></div>
-        <div class="settings-row"><label>Map Labels</label><input type="checkbox" id="overlay-labels" style="width:auto;"></div>
-        <div class="settings-row"><label>Nautical Charts</label><input type="checkbox" id="overlay-nautical" style="width:auto;"></div>
+      <div class="settings-row">
+        <div class="settings-label-group"><label>Refresh Rate</label><span class="settings-hint">How often positions update</span></div>
+        <select id="setting-interval"><option value="500">Fast (500ms)</option><option value="1000" selected>Normal (1s)</option><option value="2000">Slow (2s)</option></select>
       </div>
     </div>
-    <div class="modal-buttons" style="margin-top:10px;">
-      <button class="btn-cancel" id="btn-refresh-tle">Refresh TLE</button>
-      <button class="btn-primary" id="btn-settings-close">73</button>
+
+    <div class="settings-section-label">Map</div>
+    <div class="settings-grid">
+      <div class="settings-row">
+        <div class="settings-label-group"><label>Base Map Style</label></div>
+        <select id="setting-basemap">
+          <option value="dark">Dark</option>
+          <option value="dark-labels">Dark + Labels</option>
+          <option value="satellite">Satellite Imagery</option>
+          <option value="terrain">Terrain</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="settings-section-label">Map Overlays</div>
+    <div class="settings-grid">
+      <div class="settings-row"><label>Precipitation Radar</label><label class="toggle"><input type="checkbox" id="overlay-radar"><span class="toggle-slider"></span></label></div>
+      <div class="settings-row"><label>Aurora Forecast</label><label class="toggle"><input type="checkbox" id="overlay-aurora"><span class="toggle-slider"></span></label></div>
+      <div class="settings-row"><label>Map Labels</label><label class="toggle"><input type="checkbox" id="overlay-labels"><span class="toggle-slider"></span></label></div>
+      <div class="settings-row"><label>Nautical Charts</label><label class="toggle"><input type="checkbox" id="overlay-nautical"><span class="toggle-slider"></span></label></div>
+    </div>
+
+    <div class="modal-buttons" style="margin-top:16px;">
+      <button class="btn-cancel" id="btn-refresh-tle">Refresh TLE Data</button>
+      <button class="btn-primary" id="btn-settings-close">Save &amp; Close</button>
     </div>
   </div>
 </div>
