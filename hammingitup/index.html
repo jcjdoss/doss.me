@@ -345,6 +345,58 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
 .btn-cancel { background: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border); }
 .btn-cancel:hover { background: var(--border); }
 
+/* Location modal — Station Profile */
+.location-search-wrap {
+  position: relative; margin-bottom: 12px;
+}
+.location-search-wrap input {
+  padding-right: 36px;
+}
+.location-search-wrap .search-icon {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); pointer-events: none;
+}
+#location-results {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: 10;
+  background: var(--bg-primary); border: 1px solid var(--border-bright); border-radius: 6px;
+  max-height: 200px; overflow-y: auto; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+#location-results .loc-result {
+  padding: 8px 12px; cursor: pointer; font-size: 12px; color: var(--text-secondary);
+  border-bottom: 1px solid var(--border); transition: all 0.15s;
+}
+#location-results .loc-result:last-child { border-bottom: none; }
+#location-results .loc-result:hover { background: rgba(77,166,255,0.08); color: var(--text-primary); }
+#location-results .loc-result .loc-name { font-weight: 600; color: var(--text-primary); }
+#location-results .loc-result .loc-detail { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+.derived-data {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 12px;
+  border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+}
+.derived-item {
+  padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--bg-primary);
+}
+.derived-item:nth-child(odd) { border-right: 1px solid var(--border); }
+.derived-item .derived-label {
+  font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 600; margin-bottom: 2px;
+}
+.derived-item .derived-value {
+  font-size: 13px; color: var(--cyan); font-weight: 700; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+}
+.derived-item .derived-value.text-val { font-family: inherit; color: var(--text-primary); }
+.derived-item.full-width { grid-column: 1 / -1; border-right: none; }
+
+.coord-row { display: flex; gap: 8px; }
+.coord-row > div { flex: 1; }
+.coord-row label { font-size: 9px; }
+.coord-row input { font-size: 12px; padding: 6px 8px; }
+
+.loc-section-label {
+  font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted);
+  font-weight: 700; margin-top: 14px; margin-bottom: 6px; padding-bottom: 4px;
+}
+
 /* Settings */
 .settings-section-label {
   font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted);
@@ -459,6 +511,7 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
       <span style="color:var(--accent);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;">QTH</span>
       <span id="observer-coords">--</span>
       <span id="observer-grid" title="Maidenhead Grid Locator">--</span>
+      <span id="observer-zones" style="color:var(--text-muted);font-size:10px;font-weight:500;" title="ITU Zone / CQ Zone"></span>
       <button class="btn-sm" id="btn-gps">GPS</button>
       <button class="btn-sm" id="btn-edit-loc">Edit</button>
       <button class="btn-track" id="btn-track">TRACK</button>
@@ -468,17 +521,36 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
 </div>
 
 <div class="modal-overlay hidden" id="location-modal">
-  <div class="modal">
-    <h3>Observer Location</h3>
-    <label>Latitude (decimal degrees)</label>
-    <input type="number" id="input-lat" step="0.0001" min="-90" max="90" placeholder="39.7392">
-    <label>Longitude (decimal degrees)</label>
-    <input type="number" id="input-lon" step="0.0001" min="-180" max="180" placeholder="-104.9903">
-    <label>Altitude (meters above sea level)</label>
-    <input type="number" id="input-alt" step="1" min="0" placeholder="0">
-    <label>Maidenhead Grid Locator</label>
-    <input type="text" id="input-grid" readonly style="color:var(--cyan);">
-    <div class="modal-buttons">
+  <div class="modal" style="width:460px;">
+    <h3>Station Profile</h3>
+
+    <label>Search City, Address, or ZIP Code</label>
+    <div class="location-search-wrap">
+      <input type="text" id="input-location-search" placeholder="e.g. Denver CO, 80202, or 1600 Pennsylvania Ave" autocomplete="off">
+      <span class="search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <div id="location-results"></div>
+    </div>
+
+    <div class="loc-section-label">Coordinates</div>
+    <div class="coord-row">
+      <div><label>Latitude</label><input type="number" id="input-lat" step="0.0001" min="-90" max="90" placeholder="39.7392"></div>
+      <div><label>Longitude</label><input type="number" id="input-lon" step="0.0001" min="-180" max="180" placeholder="-104.9903"></div>
+      <div><label>Altitude (m)</label><input type="number" id="input-alt" step="1" min="0" placeholder="0"></div>
+    </div>
+
+    <div class="loc-section-label">Ham Radio Data</div>
+    <div class="derived-data" id="derived-data">
+      <div class="derived-item"><div class="derived-label">Grid Locator</div><div class="derived-value" id="derived-grid">--</div></div>
+      <div class="derived-item"><div class="derived-label">ITU Zone</div><div class="derived-value" id="derived-itu">--</div></div>
+      <div class="derived-item"><div class="derived-label">CQ Zone</div><div class="derived-value" id="derived-cq">--</div></div>
+      <div class="derived-item"><div class="derived-label">ITU Region</div><div class="derived-value" id="derived-region">--</div></div>
+      <div class="derived-item"><div class="derived-label">DXCC Entity</div><div class="derived-value text-val" id="derived-dxcc">--</div></div>
+      <div class="derived-item"><div class="derived-label">Callsign Prefix</div><div class="derived-value" id="derived-prefix">--</div></div>
+      <div class="derived-item"><div class="derived-label">UTC Offset</div><div class="derived-value" id="derived-utc">--</div></div>
+      <div class="derived-item"><div class="derived-label">Sunrise / Sunset</div><div class="derived-value" id="derived-sun">--</div></div>
+    </div>
+
+    <div class="modal-buttons" style="margin-top:16px;">
       <button class="btn-cancel" id="btn-loc-cancel">Cancel</button>
       <button class="btn-primary" id="btn-loc-save">Save Location</button>
     </div>
@@ -570,6 +642,250 @@ function latLonToGrid(lat, lon) {
   const e = String.fromCharCode(97 + Math.floor((lo % 2) * 12));
   const f = String.fromCharCode(97 + Math.floor((la % 1) * 24));
   return `${a}${b}${c}${d}${e}${f}`;
+}
+
+// ============================================================
+// HAM RADIO LOCATION DATA
+// ============================================================
+
+// ITU Region: 1=Europe/Africa/Middle East, 2=Americas, 3=Asia/Pacific
+function getITURegion(lat, lon) {
+  if (lon >= -170 && lon < -20) return 2; // Americas
+  if (lon >= -20 && lon < 60) return 1;   // Europe/Africa
+  if (lon >= 60 || lon < -170) return 3;  // Asia/Pacific
+  return 1;
+}
+
+// Approximate ITU Zone from lat/lon (simplified — 75 zones covering the globe)
+// This is a reasonable approximation; exact boundaries follow country borders
+function getITUZone(lat, lon) {
+  // North America
+  if (lat >= 50 && lon >= -170 && lon < -130) return 1;   // Alaska/NW Canada
+  if (lat >= 50 && lon >= -130 && lon < -80) return 2;    // Canada
+  if (lat >= 50 && lon >= -80 && lon < -50) return 3;     // NE Canada
+  if (lat >= 40 && lat < 50 && lon >= -130 && lon < -100) return 6; // NW US
+  if (lat >= 40 && lat < 50 && lon >= -100 && lon < -70) return 7;  // NE US
+  if (lat >= 25 && lat < 40 && lon >= -130 && lon < -100) return 6; // SW US
+  if (lat >= 25 && lat < 40 && lon >= -100 && lon < -70) return 8;  // SE US
+  if (lat >= 10 && lat < 25 && lon >= -120 && lon < -85) return 10; // Mexico/Central Am
+  if (lat >= 10 && lat < 25 && lon >= -85 && lon < -60) return 11;  // Caribbean
+  // South America
+  if (lat >= -10 && lat < 10 && lon >= -85 && lon < -50) return 12;  // N South America
+  if (lat >= -35 && lat < -10 && lon >= -80 && lon < -50) return 14; // Central SA
+  if (lat >= -35 && lat < -10 && lon >= -50 && lon < -30) return 15; // E Brazil
+  if (lat < -35 && lon >= -80 && lon < -50) return 16;               // S South America
+  // Europe
+  if (lat >= 55 && lon >= -20 && lon < 10) return 18;  // UK/Scandinavia/Iceland
+  if (lat >= 55 && lon >= 10 && lon < 30) return 18;   // N Europe
+  if (lat >= 45 && lat < 55 && lon >= -10 && lon < 10) return 27;  // W Europe
+  if (lat >= 45 && lat < 55 && lon >= 10 && lon < 30) return 28;   // C Europe
+  if (lat >= 35 && lat < 45 && lon >= -10 && lon < 20) return 33;  // S Europe
+  if (lat >= 35 && lat < 45 && lon >= 20 && lon < 45) return 39;   // E Med
+  // Russia
+  if (lat >= 55 && lon >= 30 && lon < 60) return 29;   // European Russia
+  if (lat >= 55 && lon >= 60 && lon < 90) return 30;   // W Siberia
+  if (lat >= 55 && lon >= 90 && lon < 120) return 31;  // C Siberia
+  if (lat >= 55 && lon >= 120 && lon < 170) return 32;  // E Siberia
+  // Africa
+  if (lat >= 20 && lat < 35 && lon >= -20 && lon < 20) return 33;  // N Africa
+  if (lat >= 20 && lat < 35 && lon >= 20 && lon < 45) return 34;   // NE Africa
+  if (lat >= 0 && lat < 20 && lon >= -20 && lon < 20) return 35;   // W Africa
+  if (lat >= 0 && lat < 20 && lon >= 20 && lon < 50) return 37;    // E Africa
+  if (lat >= -35 && lat < 0 && lon >= 10 && lon < 50) return 53;   // S Africa
+  // Middle East / Central Asia
+  if (lat >= 25 && lat < 45 && lon >= 45 && lon < 70) return 40;  // Middle East
+  if (lat >= 35 && lat < 55 && lon >= 45 && lon < 80) return 30;  // Central Asia
+  // South Asia
+  if (lat >= 5 && lat < 35 && lon >= 70 && lon < 90) return 41;   // India
+  if (lat >= 15 && lat < 35 && lon >= 90 && lon < 105) return 49;  // SE Asia
+  // East Asia
+  if (lat >= 35 && lat < 55 && lon >= 100 && lon < 130) return 44; // China/Mongolia
+  if (lat >= 30 && lat < 45 && lon >= 130 && lon < 145) return 45; // Japan
+  if (lat >= 15 && lat < 35 && lon >= 100 && lon < 120) return 49; // SE Asia
+  // Southeast Asia / Indonesia
+  if (lat >= -10 && lat < 15 && lon >= 95 && lon < 130) return 54; // Indonesia/Philippines
+  // Oceania
+  if (lat >= -50 && lat < -10 && lon >= 110 && lon < 155) return 55; // Australia
+  if (lat >= -50 && lat < -35 && lon >= 165 && lon < 180) return 60; // New Zealand
+  if (lat >= 0 && lat < 30 && lon >= 140 && lon <= 180) return 56;   // Pacific Islands
+  if (lat >= 0 && lat < 30 && lon >= -180 && lon < -120) return 61;  // Central Pacific
+  // Antarctica
+  if (lat < -60) return 67 + Math.floor(((lon + 180) % 360) / 90);
+  // Fallback — use longitude bands
+  const band = Math.floor(((lon + 180) % 360) / 20);
+  return Math.min(75, Math.max(1, band + 1));
+}
+
+// Approximate CQ Zone from lat/lon (40 zones for CQ contests)
+function getCQZone(lat, lon) {
+  // North America
+  if (lat >= 50 && lon >= -170 && lon < -130) return 1;    // NW NA / Alaska
+  if (lat >= 50 && lon >= -130 && lon < -70) return 2;     // Canada
+  if (lat >= 50 && lon >= -70 && lon < -50) return 2;      // Atlantic Canada
+  if (lat >= 30 && lat < 50 && lon >= -130 && lon < -100) return 3;  // W US
+  if (lat >= 30 && lat < 50 && lon >= -100 && lon < -70) return 4;   // Central/E US
+  if (lat >= 25 && lat < 50 && lon >= -70 && lon < -50) return 5;    // NE US/Maritimes
+  if (lat >= 10 && lat < 30 && lon >= -130 && lon < -85) return 6;   // Mexico
+  if (lat >= 10 && lat < 25 && lon >= -85 && lon < -60) return 8;    // Caribbean/Central Am
+  // South America
+  if (lat >= -10 && lat < 10 && lon >= -85 && lon < -50) return 9;   // N SA
+  if (lat >= -35 && lat < -10 && lon >= -80 && lon < -50) return 11;  // C SA / Brazil
+  if (lat < -35 && lon >= -80 && lon < -50) return 13;                // S SA
+  // Europe
+  if (lat >= 55 && lon >= -30 && lon < 40) return 14;  // N Europe
+  if (lat >= 45 && lat < 55 && lon >= -10 && lon < 20) return 14;   // W Europe
+  if (lat >= 45 && lat < 55 && lon >= 20 && lon < 50) return 15;    // E Europe
+  if (lat >= 35 && lat < 45 && lon >= -10 && lon < 20) return 14;   // S Europe
+  if (lat >= 35 && lat < 45 && lon >= 20 && lon < 50) return 20;    // E Med
+  // Russia / N Asia
+  if (lat >= 50 && lon >= 40 && lon < 80) return 16;     // European Russia/Urals
+  if (lat >= 50 && lon >= 80 && lon < 110) return 17;    // W Siberia
+  if (lat >= 50 && lon >= 110 && lon < 140) return 18;   // C Siberia
+  if (lat >= 50 && lon >= 140 && lon < 170) return 19;   // E Siberia
+  // Africa
+  if (lat >= 20 && lat < 38 && lon >= -20 && lon < 30) return 33;  // N Africa
+  if (lat >= 0 && lat < 20 && lon >= -20 && lon < 20) return 35;   // W Africa
+  if (lat >= 0 && lat < 20 && lon >= 20 && lon < 55) return 34;    // E Africa
+  if (lat >= -40 && lat < 0 && lon >= 10 && lon < 55) return 36;   // S Africa
+  // Middle East
+  if (lat >= 20 && lat < 45 && lon >= 30 && lon < 65) return 21;   // Middle East
+  // South/SE Asia
+  if (lat >= 10 && lat < 40 && lon >= 65 && lon < 90) return 22;   // India/Pakistan
+  if (lat >= 10 && lat < 35 && lon >= 90 && lon < 115) return 26;  // SE Asia
+  if (lat >= 35 && lat < 55 && lon >= 90 && lon < 130) return 23;  // China
+  if (lat >= 25 && lat < 45 && lon >= 130 && lon < 145) return 25;  // Japan/Korea
+  if (lat >= -10 && lat < 10 && lon >= 95 && lon < 140) return 28;  // Indonesia
+  // Oceania
+  if (lat >= -50 && lat < -10 && lon >= 110 && lon < 160) return 29; // Australia
+  if (lat >= -50 && lat < -30 && lon >= 160 && lon <= 180) return 32; // New Zealand
+  if (lat >= -30 && lat < 30 && lon >= 150 && lon <= 180) return 31;  // Pacific
+  if (lat >= -30 && lat < 30 && lon >= -180 && lon < -100) return 31; // Pacific
+  // Antarctica
+  if (lat < -60) return 39;
+  // Fallback
+  return 14;
+}
+
+// Country to DXCC entity and callsign prefix mapping
+const COUNTRY_HAM_DATA = {
+  'US': { dxcc: 'K (291)', prefix: 'K/W/N/AA-AL', name: 'United States' },
+  'CA': { dxcc: 'VE (1)', prefix: 'VE/VA/VY', name: 'Canada' },
+  'MX': { dxcc: 'XE (50)', prefix: 'XE/XA', name: 'Mexico' },
+  'GB': { dxcc: 'G (223)', prefix: 'G/M/2E', name: 'England' },
+  'DE': { dxcc: 'DL (230)', prefix: 'DL/DA-DR', name: 'Germany' },
+  'FR': { dxcc: 'F (227)', prefix: 'F', name: 'France' },
+  'ES': { dxcc: 'EA (281)', prefix: 'EA/EB/EC', name: 'Spain' },
+  'IT': { dxcc: 'I (248)', prefix: 'I/IK/IZ', name: 'Italy' },
+  'PT': { dxcc: 'CT (272)', prefix: 'CT', name: 'Portugal' },
+  'NL': { dxcc: 'PA (263)', prefix: 'PA/PD/PE', name: 'Netherlands' },
+  'BE': { dxcc: 'ON (209)', prefix: 'ON', name: 'Belgium' },
+  'CH': { dxcc: 'HB (287)', prefix: 'HB', name: 'Switzerland' },
+  'AT': { dxcc: 'OE (206)', prefix: 'OE', name: 'Austria' },
+  'PL': { dxcc: 'SP (269)', prefix: 'SP/SQ/SO', name: 'Poland' },
+  'CZ': { dxcc: 'OK (503)', prefix: 'OK', name: 'Czech Republic' },
+  'SE': { dxcc: 'SM (284)', prefix: 'SM/SA-SK', name: 'Sweden' },
+  'NO': { dxcc: 'LA (266)', prefix: 'LA/LB', name: 'Norway' },
+  'FI': { dxcc: 'OH (224)', prefix: 'OH', name: 'Finland' },
+  'DK': { dxcc: 'OZ (222)', prefix: 'OZ', name: 'Denmark' },
+  'IE': { dxcc: 'EI (245)', prefix: 'EI', name: 'Ireland' },
+  'RU': { dxcc: 'UA (15)', prefix: 'UA/RA/R', name: 'Russia' },
+  'UA': { dxcc: 'UR (288)', prefix: 'UR/UT/UX', name: 'Ukraine' },
+  'JP': { dxcc: 'JA (339)', prefix: 'JA/JH/JR', name: 'Japan' },
+  'KR': { dxcc: 'HL (137)', prefix: 'HL/DS', name: 'South Korea' },
+  'CN': { dxcc: 'BY (318)', prefix: 'BY/BV', name: 'China' },
+  'IN': { dxcc: 'VU (324)', prefix: 'VU/AT', name: 'India' },
+  'AU': { dxcc: 'VK (150)', prefix: 'VK', name: 'Australia' },
+  'NZ': { dxcc: 'ZL (170)', prefix: 'ZL', name: 'New Zealand' },
+  'BR': { dxcc: 'PY (108)', prefix: 'PY/PP/PR', name: 'Brazil' },
+  'AR': { dxcc: 'LU (100)', prefix: 'LU/LW', name: 'Argentina' },
+  'CL': { dxcc: 'CE (112)', prefix: 'CE', name: 'Chile' },
+  'CO': { dxcc: 'HK (116)', prefix: 'HK', name: 'Colombia' },
+  'ZA': { dxcc: 'ZS (462)', prefix: 'ZS/ZR', name: 'South Africa' },
+  'EG': { dxcc: 'SU (478)', prefix: 'SU', name: 'Egypt' },
+  'NG': { dxcc: '5N (450)', prefix: '5N', name: 'Nigeria' },
+  'KE': { dxcc: '5Z (430)', prefix: '5Z', name: 'Kenya' },
+  'IL': { dxcc: '4X (336)', prefix: '4X/4Z', name: 'Israel' },
+  'SA': { dxcc: 'HZ (378)', prefix: 'HZ', name: 'Saudi Arabia' },
+  'TH': { dxcc: 'HS (387)', prefix: 'HS', name: 'Thailand' },
+  'ID': { dxcc: 'YB (327)', prefix: 'YB/YC/YD', name: 'Indonesia' },
+  'PH': { dxcc: 'DU (375)', prefix: 'DU/DV/DX', name: 'Philippines' },
+  'MY': { dxcc: '9M (299)', prefix: '9M/9W', name: 'Malaysia' },
+  'SG': { dxcc: '9V (381)', prefix: '9V', name: 'Singapore' },
+  'GR': { dxcc: 'SV (236)', prefix: 'SV', name: 'Greece' },
+  'TR': { dxcc: 'TA (390)', prefix: 'TA/TB', name: 'Turkey' },
+  'RO': { dxcc: 'YO (275)', prefix: 'YO/YP/YR', name: 'Romania' },
+  'HU': { dxcc: 'HA (239)', prefix: 'HA/HG', name: 'Hungary' },
+  'HR': { dxcc: '9A (497)', prefix: '9A', name: 'Croatia' },
+};
+
+function getCountryHamData(countryCode) {
+  if (!countryCode) return null;
+  return COUNTRY_HAM_DATA[countryCode.toUpperCase()] || null;
+}
+
+// Estimate UTC offset from longitude (rough, doesn't account for timezone boundaries)
+function getUTCOffsetFromLon(lon) {
+  const offset = Math.round(lon / 15);
+  return offset >= 0 ? `UTC+${offset}` : `UTC${offset}`;
+}
+
+// Get sunrise/sunset for location using SunCalc
+function getSunTimes(lat, lon) {
+  const times = SunCalc.getTimes(new Date(), lat, lon);
+  const fmt = d => {
+    if (!d || isNaN(d.getTime())) return '--:--';
+    return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
+  };
+  return `${fmt(times.sunrise)} / ${fmt(times.sunset)} UTC`;
+}
+
+// Geocode a place name using OpenStreetMap Nominatim (free, no API key)
+let geocodeTimeout = null;
+async function geocodeSearch(query) {
+  if (!query || query.length < 2) return [];
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`;
+  try {
+    const resp = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+    if (!resp.ok) return [];
+    return await resp.json();
+  } catch (e) { return []; }
+}
+
+// Compute all derived ham radio data from lat/lon/country
+function computeDerivedHamData(lat, lon, countryCode) {
+  const grid = latLonToGrid(lat, lon).toUpperCase();
+  const ituZone = getITUZone(lat, lon);
+  const cqZone = getCQZone(lat, lon);
+  const ituRegion = getITURegion(lat, lon);
+  const utcOffset = getUTCOffsetFromLon(lon);
+  const sunTimes = getSunTimes(lat, lon);
+  const hamData = getCountryHamData(countryCode);
+
+  return {
+    grid,
+    ituZone,
+    cqZone,
+    ituRegion,
+    utcOffset,
+    sunTimes,
+    dxcc: hamData ? hamData.dxcc : '--',
+    prefix: hamData ? hamData.prefix : '--',
+    country: hamData ? hamData.name : (countryCode || '--'),
+  };
+}
+
+// Update the derived data display in the location modal
+function updateDerivedDisplay(lat, lon, countryCode) {
+  if (isNaN(lat) || isNaN(lon)) return;
+  const d = computeDerivedHamData(lat, lon, countryCode);
+  document.getElementById('derived-grid').textContent = d.grid;
+  document.getElementById('derived-itu').textContent = d.ituZone;
+  document.getElementById('derived-cq').textContent = d.cqZone;
+  document.getElementById('derived-region').textContent = `Region ${d.ituRegion}`;
+  document.getElementById('derived-dxcc').textContent = d.dxcc;
+  document.getElementById('derived-prefix').textContent = d.prefix;
+  document.getElementById('derived-utc').textContent = d.utcOffset;
+  document.getElementById('derived-sun').textContent = d.sunTimes;
 }
 
 // ============================================================
@@ -1695,7 +2011,9 @@ function updateLosLine(pos) {
 // OBSERVER
 // ============================================================
 function setObserverLocation(lat, lon, altM) {
-  state.observer = { lat, lon, alt: altM || 0 };
+  const cc = state.observer?.countryCode || '';
+  const pn = state.observer?.placeName || '';
+  state.observer = { lat, lon, alt: altM || 0, countryCode: cc, placeName: pn };
   state.observerGd = { longitude: satellite.degreesToRadians(lon), latitude: satellite.degreesToRadians(lat), height: (altM || 0) / 1000 };
   localStorage.setItem('sat_tracker_observer', JSON.stringify(state.observer));
 
@@ -1729,6 +2047,10 @@ function updateObserverDisplay() {
   document.getElementById('observer-coords').textContent = `${Math.abs(lat).toFixed(4)}${lat >= 0 ? 'N' : 'S'} ${Math.abs(lon).toFixed(4)}${lon >= 0 ? 'E' : 'W'}`;
   document.getElementById('observer-grid').textContent = grid.toUpperCase();
   document.getElementById('observer-grid-map').textContent = grid.toUpperCase();
+  const ituZ = getITUZone(lat, lon);
+  const cqZ = getCQZone(lat, lon);
+  const zonesEl = document.getElementById('observer-zones');
+  if (zonesEl) zonesEl.textContent = `ITU ${ituZ} · CQ ${cqZ}`;
 }
 
 // ============================================================
@@ -1770,15 +2092,20 @@ function selectSat(nid) {
   state.lastTrackTime = 0;
   delete state.nextPassCache[nid];
 
-  // Camera flyTo satellite position — far enough out to see globe curvature
+  // Camera flyTo satellite — position camera above the sub-satellite point
+  // looking down at the globe with the satellite visible in context
   const sat = state.satellites[nid];
   if (sat && sat.position) {
     const pos = sat.position;
+    const satAltM = pos.alt * 1000;
+    // Camera goes to same lon/lat as satellite, but much higher altitude
+    // This keeps the globe centered with the satellite dot visible on the globe
+    const cameraAlt = satAltM + 12000000; // 12,000km above satellite
     state.viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(pos.lon, pos.lat - 8, pos.alt * 1000 + 15000000),
+      destination: Cesium.Cartesian3.fromDegrees(pos.lon, pos.lat, cameraAlt),
       orientation: {
         heading: 0,
-        pitch: Cesium.Math.toRadians(-75),
+        pitch: Cesium.Math.toRadians(-90), // look straight down at globe
         roll: 0,
       },
       duration: 1.5,
@@ -2158,13 +2485,13 @@ function animLoop() {
       updateFootprint(activePos);
       updateLosLine(activePos);
 
-      // Camera track mode — keep globe curvature visible
+      // Camera track mode — follow satellite, looking down at globe
       if (state.trackingMode && activePos) {
         state.viewer.camera.flyTo({
-          destination: Cesium.Cartesian3.fromDegrees(activePos.lon, activePos.lat - 6, activePos.alt * 1000 + 12000000),
+          destination: Cesium.Cartesian3.fromDegrees(activePos.lon, activePos.lat, activePos.alt * 1000 + 10000000),
           orientation: {
             heading: 0,
-            pitch: Cesium.Math.toRadians(-78),
+            pitch: Cesium.Math.toRadians(-90),
             roll: 0,
           },
           duration: 0.5,
@@ -2217,28 +2544,79 @@ function setupEvents() {
     document.getElementById('input-lat').value = state.observer.lat;
     document.getElementById('input-lon').value = state.observer.lon;
     document.getElementById('input-alt').value = state.observer.alt || 0;
-    document.getElementById('input-grid').value = latLonToGrid(state.observer.lat, state.observer.lon).toUpperCase();
+    document.getElementById('input-location-search').value = state.observer.placeName || '';
+    updateDerivedDisplay(state.observer.lat, state.observer.lon, state.observer.countryCode);
     document.getElementById('location-modal').classList.remove('hidden');
   });
 
+  // Geocoding search input
+  const searchInput = document.getElementById('input-location-search');
+  const resultsDiv = document.getElementById('location-results');
+
+  searchInput.addEventListener('input', () => {
+    clearTimeout(geocodeTimeout);
+    const q = searchInput.value.trim();
+    if (q.length < 2) { resultsDiv.style.display = 'none'; return; }
+    geocodeTimeout = setTimeout(async () => {
+      const results = await geocodeSearch(q);
+      if (results.length === 0) { resultsDiv.style.display = 'none'; return; }
+      resultsDiv.innerHTML = '';
+      results.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'loc-result';
+        const name = r.display_name.split(',').slice(0, 2).join(',');
+        const detail = r.display_name.split(',').slice(2, 4).join(',').trim();
+        div.innerHTML = `<div class="loc-name">${name}</div><div class="loc-detail">${detail}</div>`;
+        div.addEventListener('click', () => {
+          const lat = parseFloat(r.lat);
+          const lon = parseFloat(r.lon);
+          const cc = r.address?.country_code?.toUpperCase() || '';
+          document.getElementById('input-lat').value = lat.toFixed(4);
+          document.getElementById('input-lon').value = lon.toFixed(4);
+          searchInput.value = r.display_name.split(',').slice(0, 3).join(',').trim();
+          state._pendingCountryCode = cc;
+          state._pendingPlaceName = searchInput.value;
+          updateDerivedDisplay(lat, lon, cc);
+          resultsDiv.style.display = 'none';
+        });
+        resultsDiv.appendChild(div);
+      });
+      resultsDiv.style.display = 'block';
+    }, 400);
+  });
+
+  // Close results when clicking outside
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.location-search-wrap')) resultsDiv.style.display = 'none';
+  });
+
+  // Update derived data when coordinates change manually
   ['input-lat', 'input-lon'].forEach(id => {
     document.getElementById(id).addEventListener('input', () => {
       const lat = parseFloat(document.getElementById('input-lat').value);
       const lon = parseFloat(document.getElementById('input-lon').value);
       if (!isNaN(lat) && !isNaN(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
-        document.getElementById('input-grid').value = latLonToGrid(lat, lon).toUpperCase();
+        updateDerivedDisplay(lat, lon, state._pendingCountryCode || state.observer.countryCode);
       }
     });
   });
 
-  document.getElementById('btn-loc-cancel').addEventListener('click', () => document.getElementById('location-modal').classList.add('hidden'));
+  document.getElementById('btn-loc-cancel').addEventListener('click', () => {
+    document.getElementById('location-modal').classList.add('hidden');
+    state._pendingCountryCode = null;
+    state._pendingPlaceName = null;
+  });
   document.getElementById('btn-loc-save').addEventListener('click', () => {
     const lat = parseFloat(document.getElementById('input-lat').value);
     const lon = parseFloat(document.getElementById('input-lon').value);
     const alt = parseFloat(document.getElementById('input-alt').value) || 0;
-    if (isNaN(lat) || isNaN(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) return alert('Bad QTH');
+    if (isNaN(lat) || isNaN(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) return alert('Invalid coordinates');
+    state.observer.countryCode = state._pendingCountryCode || state.observer.countryCode || '';
+    state.observer.placeName = state._pendingPlaceName || state.observer.placeName || '';
     setObserverLocation(lat, lon, alt);
     document.getElementById('location-modal').classList.add('hidden');
+    state._pendingCountryCode = null;
+    state._pendingPlaceName = null;
   });
 
   document.getElementById('btn-settings').addEventListener('click', () => {
