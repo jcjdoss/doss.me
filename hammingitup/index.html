@@ -229,6 +229,30 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
 .pass-quality.fair { background: rgba(255,145,0,0.2); color: var(--orange); }
 .pass-quality.poor { background: rgba(255,82,82,0.15); color: var(--red); }
 
+.pass-count { float: right; font-size: 9px; color: var(--text-muted); letter-spacing: 0.5px; font-weight: 500; opacity: 0.7; }
+.pass-table-wrap { margin-top: 10px; max-height: 220px; overflow-y: auto; border-radius: 8px; border: 1px solid var(--border); }
+.pass-table-wrap::-webkit-scrollbar { width: 4px; }
+.pass-table-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.pass-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.pass-table thead { position: sticky; top: 0; z-index: 1; }
+.pass-table th {
+  background: var(--bg-tertiary); color: var(--text-muted); font-size: 9px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.8px; padding: 6px 6px; text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.pass-table td { padding: 6px 6px; border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; }
+.pass-table .pass-num { color: var(--text-muted); font-size: 10px; font-weight: 600; width: 20px; text-align: center; }
+.pass-table .pass-time { font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-size: 10px; color: var(--text-secondary); white-space: nowrap; }
+.pass-table .pass-hms { color: var(--accent); font-weight: 600; font-size: 11px; }
+.pass-table .pass-az { color: var(--text-secondary); font-size: 11px; font-weight: 500; }
+.pass-table .pass-el { white-space: nowrap; }
+.pass-table .pass-dir { color: var(--text-muted); font-size: 9px; }
+.pass-table .pass-dur { font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; color: var(--text-secondary); font-size: 10px; font-weight: 500; white-space: nowrap; }
+.pass-row.active { background: rgba(0,230,118,0.08); }
+.pass-row.active .pass-hms { color: var(--green); }
+.pass-row.past { opacity: 0.35; }
+.pass-row:hover { background: rgba(255,255,255,0.03); }
+
 .no-selection { color: var(--text-muted); font-size: 13px; padding: 30px 18px; text-align: center; letter-spacing: 1px; font-weight: 500; }
 
 /* Map / Cesium container */
@@ -1269,6 +1293,34 @@ function findNextPass(satrec, oGd, minEl, start) {
     }
   }
   return null;
+}
+
+function findNextNPasses(satrec, oGd, minEl, start, count, hoursAhead) {
+  const passes = [];
+  let searchStart = new Date(start.getTime());
+  const deadline = new Date(start.getTime() + (hoursAhead || 24) * 3600000);
+  for (let n = 0; n < (count || 8); n++) {
+    if (searchStart >= deadline) break;
+    const p = findNextPass(satrec, oGd, minEl, searchStart);
+    if (!p || p.start >= deadline) break;
+    // Refine AOS/LOS with 1-second precision
+    let aosDate = new Date(p.start.getTime() - 30000);
+    for (let t = 0; t < 60; t++) {
+      const d = new Date(aosDate.getTime() + t * 1000);
+      const la = getLookAngles(satrec, oGd, d);
+      if (la && la.elevation >= minEl) { p.start = d; p.aosAz = la.azimuth; break; }
+    }
+    let losDate = new Date(p.end.getTime() - 30000);
+    for (let t = 0; t < 60; t++) {
+      const d = new Date(losDate.getTime() + t * 1000);
+      const la = getLookAngles(satrec, oGd, d);
+      if (!la || la.elevation < minEl) { p.end = d; p.losAz = la.azimuth || 0; break; }
+    }
+    p.duration = (p.end - p.start) / 1000;
+    passes.push(p);
+    searchStart = new Date(p.end.getTime() + 60000);
+  }
+  return passes;
 }
 
 // ============================================================
@@ -2555,23 +2607,57 @@ function updateDetailsPanel() {
       </div></div>`;
   }
 
-  const pass = state.nextPassCache[state.activeSatId];
-  h += '<div class="pass-section"><div class="pass-title">Next Pass Prediction</div><div class="pass-info">';
-  if (pass) {
+  const passData = state.nextPassCache[state.activeSatId];
+  const passes = Array.isArray(passData) ? passData : (passData ? [passData] : []);
+  h += '<div class="pass-section"><div class="pass-title">Pass Schedule <span class="pass-count">' + (passes.length > 0 ? passes.length + ' passes next 24h' : '') + '</span></div>';
+
+  if (passes.length > 0) {
+    // Next pass summary chips
+    const pass = passes[0];
     const tu = pass.start - new Date();
     let ts;
     if (tu <= 0) ts = '<span style="color:var(--green)">NOW!</span>';
     else { const hr = Math.floor(tu / 3600000), mn = Math.floor((tu % 3600000) / 60000); ts = hr > 0 ? `${hr}h ${mn}m` : `${mn}m`; }
     const quality = pass.maxEl >= 60 ? 'excellent' : pass.maxEl >= 30 ? 'good' : pass.maxEl >= 15 ? 'fair' : 'poor';
     const qLabel = pass.maxEl >= 60 ? 'S9+' : pass.maxEl >= 30 ? 'FB' : pass.maxEl >= 15 ? 'OK' : 'QRP';
-    h += `<div class="pass-chip"><span class="pc-label">In </span><span class="pc-value ${tu <= 300000 ? 'urgent' : ''}">${ts}</span></div>`;
+    h += '<div class="pass-info">';
+    h += `<div class="pass-chip"><span class="pc-label">Next In </span><span class="pc-value ${tu <= 300000 ? 'urgent' : ''}">${ts}</span></div>`;
     h += `<div class="pass-chip"><span class="pc-label">Max El </span><span class="pc-value">${pass.maxEl.toFixed(0)}°</span><span class="pass-quality ${quality}">${qLabel}</span></div>`;
-    h += `<div class="pass-chip"><span class="pc-label">Duration </span><span class="pc-value">${Math.round(pass.duration / 60)}m${Math.round(pass.duration % 60)}s</span></div>`;
-    h += `<div class="pass-chip"><span class="pc-label">AOS </span><span class="pc-value">${pass.start.toUTCString().slice(17, 25)} UTC</span></div>`;
+    h += `<div class="pass-chip"><span class="pc-label">Duration </span><span class="pc-value">${Math.round(pass.duration / 60)}m${Math.round(pass.duration % 60).toString().padStart(2,'0')}s</span></div>`;
+    h += '</div>';
+
+    // Full pass schedule table
+    h += '<div class="pass-table-wrap"><table class="pass-table"><thead><tr>';
+    h += '<th>#</th><th>AOS</th><th>AOS Az</th><th>Max El</th><th>LOS</th><th>LOS Az</th><th>Dur</th>';
+    h += '</tr></thead><tbody>';
+
+    const now = new Date();
+    passes.forEach((p, i) => {
+      const isActive = p.start <= now && p.end >= now;
+      const isPast = p.end < now;
+      const pq = p.maxEl >= 60 ? 'excellent' : p.maxEl >= 30 ? 'good' : p.maxEl >= 15 ? 'fair' : 'poor';
+      const pqL = p.maxEl >= 60 ? 'S9+' : p.maxEl >= 30 ? 'FB' : p.maxEl >= 15 ? 'OK' : 'QRP';
+      const aosAzDir = typeof p.aosAz === 'number' ? azToBearing(p.aosAz * 180 / Math.PI) : '--';
+      const losAzDir = typeof p.losAz === 'number' ? azToBearing(p.losAz * 180 / Math.PI) : '--';
+      const maxElAzDir = azToBearing(p.maxElAz * 180 / Math.PI);
+      const durM = Math.floor(p.duration / 60);
+      const durS = Math.round(p.duration % 60);
+      const rowClass = isActive ? 'pass-row active' : isPast ? 'pass-row past' : 'pass-row';
+      h += `<tr class="${rowClass}">`;
+      h += `<td class="pass-num">${i + 1}</td>`;
+      h += `<td class="pass-time">${p.start.toUTCString().slice(0, 16)}<br><span class="pass-hms">${p.start.toUTCString().slice(17, 25)}</span></td>`;
+      h += `<td class="pass-az">${aosAzDir}</td>`;
+      h += `<td class="pass-el"><span class="pass-quality ${pq}">${p.maxEl.toFixed(0)}° ${pqL}</span><br><span class="pass-dir">${maxElAzDir}</span></td>`;
+      h += `<td class="pass-time"><span class="pass-hms">${p.end.toUTCString().slice(17, 25)}</span></td>`;
+      h += `<td class="pass-az">${losAzDir}</td>`;
+      h += `<td class="pass-dur">${durM}m${durS.toString().padStart(2, '0')}s</td>`;
+      h += '</tr>';
+    });
+    h += '</tbody></table></div>';
   } else {
-    h += '<div class="pass-chip"><span class="pc-label">Computing...</span></div>';
+    h += '<div class="pass-info"><div class="pass-chip"><span class="pc-label">Computing...</span></div></div>';
   }
-  h += '</div></div>';
+  h += '</div>';
 
   panel.innerHTML = h;
 }
@@ -2677,16 +2763,18 @@ function animLoop() {
   state.animFrameId = requestAnimationFrame(animLoop);
 }
 
-// Next pass background computation
+// Next pass background computation — multi-pass schedule
 function bgComputePasses() {
   if (!state.observerGd || state.activeSatId == null) return;
   const sat = state.satellites[state.activeSatId]; if (!sat) return;
-  if (!state.nextPassCache[state.activeSatId]) {
-    const pass = findNextPass(sat.satrec, state.observerGd, state.settings.minElevation, new Date());
-    if (pass) state.nextPassCache[state.activeSatId] = pass;
+  const cached = state.nextPassCache[state.activeSatId];
+  // Recompute if no cache, or if first pass is now in the past
+  if (!cached || (Array.isArray(cached) && cached.length > 0 && cached[0].end < new Date())) {
+    const passes = findNextNPasses(sat.satrec, state.observerGd, state.settings.minElevation, new Date(), 10, 24);
+    state.nextPassCache[state.activeSatId] = passes;
   }
 }
-setInterval(bgComputePasses, 2000);
+setInterval(bgComputePasses, 3000);
 
 // ============================================================
 // EVENT HANDLERS
