@@ -43,9 +43,23 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
   padding: 0 20px; background: var(--bg-secondary); border-bottom: 1px solid var(--border);
   height: 52px; flex-shrink: 0; z-index: 1000;
 }
+#header-left { display: flex; align-items: center; gap: 16px; }
 #header h1 { font-size: 15px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
 #header h1 .callsign { color: var(--cyan); }
 #header h1 .ver { color: var(--text-muted); font-weight: 500; font-size: 10px; margin-left: 8px; letter-spacing: 1px; }
+#my-callsign-badge {
+  display: none; align-items: center; gap: 6px; padding: 4px 14px;
+  background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.2);
+  border-radius: 8px; cursor: pointer; transition: all 0.2s;
+}
+#my-callsign-badge:hover { background: rgba(0,229,255,0.14); border-color: rgba(0,229,255,0.35); }
+#my-callsign-badge.visible { display: flex; }
+#my-callsign-badge .cs-icon { color: var(--cyan); flex-shrink: 0; }
+#my-callsign-badge .cs-call {
+  font-size: 16px; font-weight: 800; color: var(--cyan); letter-spacing: 2px;
+  font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+}
+#my-callsign-badge .cs-label { font-size: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
 #header-right { display: flex; align-items: center; gap: 16px; }
 #header-divider { width: 1px; height: 24px; background: var(--border); }
 #tle-status {
@@ -383,6 +397,23 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
   font-size: 10px; color: var(--text-muted); margin-top: 4px; text-align: center;
   font-weight: 400; letter-spacing: 0;
 }
+/* Callsign input in modal */
+.callsign-row {
+  display: flex; align-items: flex-end; gap: 10px; margin-bottom: 16px;
+}
+.callsign-row .callsign-input-wrap { flex: 1; }
+.callsign-row .callsign-input-wrap label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 4px; display: block; }
+.callsign-row input#input-callsign {
+  width: 100%; padding: 10px 14px; font-size: 18px; font-weight: 800; letter-spacing: 3px;
+  text-transform: uppercase; background: var(--bg-primary); border: 1px solid var(--border-bright);
+  border-radius: 8px; color: var(--cyan); font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+}
+.callsign-row input#input-callsign:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(0,229,255,0.15); }
+.callsign-row input#input-callsign::placeholder { color: var(--text-muted); font-weight: 400; font-size: 13px; letter-spacing: 1px; }
+.callsign-detected {
+  font-size: 10px; color: var(--text-muted); margin-top: 3px; font-weight: 400;
+}
+.callsign-detected .cd-match { color: var(--green); font-weight: 600; }
 #location-results {
   position: absolute; top: 100%; left: 0; right: 0; z-index: 10; margin-top: 4px;
   background: var(--bg-secondary); border: 1px solid var(--border-bright); border-radius: 10px;
@@ -483,7 +514,13 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
   </div>
 
   <div id="header">
-    <h1><span class="callsign">SAT</span>TRACK<span class="ver">v3.0</span></h1>
+    <div id="header-left">
+      <h1><span class="callsign">SAT</span>TRACK<span class="ver">v3.0</span></h1>
+      <div id="my-callsign-badge" title="Your callsign — click to edit">
+        <span class="cs-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+        <span class="cs-call" id="header-callsign"></span>
+      </div>
+    </div>
     <div id="header-right">
       <span id="tle-status"></span>
       <span id="header-divider"></span>
@@ -559,6 +596,14 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
 <div class="modal-overlay hidden" id="location-modal">
   <div class="modal" style="width:460px;">
     <h3>Station Profile</h3>
+
+    <div class="callsign-row">
+      <div class="callsign-input-wrap">
+        <label>Your Callsign</label>
+        <input type="text" id="input-callsign" placeholder="e.g. W1AW" autocomplete="off" maxlength="10">
+        <div class="callsign-detected" id="callsign-detected"></div>
+      </div>
+    </div>
 
     <div class="location-search-wrap">
       <span class="search-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
@@ -857,6 +902,57 @@ const COUNTRY_HAM_DATA = {
 function getCountryHamData(countryCode) {
   if (!countryCode) return null;
   return COUNTRY_HAM_DATA[countryCode.toUpperCase()] || null;
+}
+
+// Callsign prefix → country code detection
+// Sorted longest-first so "VK" matches before "V"
+const CALLSIGN_PREFIXES = [
+  // Multi-char prefixes first
+  ['AA','US'],['AB','US'],['AC','US'],['AD','US'],['AE','US'],['AF','US'],['AG','US'],['AH','US'],['AI','US'],['AJ','US'],['AK','US'],['AL','US'],
+  ['BY','CN'],['BV','CN'],
+  ['CE','CL'],['CM','CU'],['CO','CU'],['CP','BO'],['CT','PT'],['CU','PT'],['CX','UY'],
+  ['DA','DE'],['DB','DE'],['DC','DE'],['DD','DE'],['DE','DE'],['DF','DE'],['DG','DE'],['DH','DE'],['DI','DE'],['DJ','DE'],['DK','DE'],['DL','DE'],['DM','DE'],['DN','DE'],['DO','DE'],['DP','DE'],['DQ','DE'],['DR','DE'],['DS','KR'],['DU','PH'],['DV','PH'],['DX','PH'],
+  ['EA','ES'],['EB','ES'],['EC','ES'],['ED','ES'],['EE','ES'],['EF','ES'],['EH','ES'],['EI','IE'],['EK','AM'],['EL','LR'],['EP','IR'],['ER','MD'],['ES','EE'],['ET','ET'],['EU','BY'],['EW','BY'],['EX','KG'],['EY','TJ'],['EZ','TM'],
+  ['F','FR'],
+  ['G','GB'],['GM','GB'],['GW','GB'],['GI','GB'],['GD','GB'],['GU','GB'],['GJ','GB'],
+  ['HA','HU'],['HB','CH'],['HC','EC'],['HH','HT'],['HI','DO'],['HK','CO'],['HL','KR'],['HP','PA'],['HR','HN'],['HS','TH'],['HZ','SA'],
+  ['I','IT'],['IK','IT'],['IZ','IT'],
+  ['JA','JP'],['JE','JP'],['JF','JP'],['JG','JP'],['JH','JP'],['JI','JP'],['JJ','JP'],['JK','JP'],['JL','JP'],['JM','JP'],['JN','JP'],['JO','JP'],['JP','JP'],['JQ','JP'],['JR','JP'],['JS','JP'],['JT','MN'],
+  ['K','US'],
+  ['LA','NO'],['LB','NO'],['LU','AR'],['LW','AR'],['LX','LU'],['LY','LT'],['LZ','BG'],
+  ['N','US'],
+  ['OA','PE'],['OD','LB'],['OE','AT'],['OF','FI'],['OG','FI'],['OH','FI'],['OI','FI'],['OK','CZ'],['OM','SK'],['ON','BE'],['OO','BE'],['OP','BE'],['OQ','BE'],['OR','BE'],['OS','BE'],['OT','BE'],['OU','DK'],['OV','DK'],['OW','DK'],['OX','DK'],['OY','DK'],['OZ','DK'],
+  ['PA','NL'],['PB','NL'],['PC','NL'],['PD','NL'],['PE','NL'],['PF','NL'],['PG','NL'],['PH','NL'],['PI','NL'],['PJ','NL'],['PP','BR'],['PQ','BR'],['PR','BR'],['PS','BR'],['PT','BR'],['PU','BR'],['PV','BR'],['PW','BR'],['PX','BR'],['PY','BR'],
+  ['RA','RU'],['RB','RU'],['RC','RU'],['RD','RU'],['RE','RU'],['RF','RU'],['RG','RU'],['RH','RU'],['RI','RU'],['RJ','RU'],['RK','RU'],['RL','RU'],['RM','RU'],['RN','RU'],['RO','RU'],['RP','RU'],['RQ','RU'],['RR','RU'],['RS','RU'],['RT','RU'],['RU','RU'],['RV','RU'],['RW','RU'],['RX','RU'],['RY','RU'],['RZ','RU'],
+  ['SA','SE'],['SB','SE'],['SC','SE'],['SD','SE'],['SE','SE'],['SF','SE'],['SG','SE'],['SH','SE'],['SI','SE'],['SJ','SE'],['SK','SE'],['SL','SE'],['SM','SE'],['SN','PL'],['SO','PL'],['SP','PL'],['SQ','PL'],['SR','PL'],['SU','EG'],['SV','GR'],['SW','GR'],['SX','GR'],['SY','GR'],['SZ','GR'],
+  ['TA','TR'],['TB','TR'],['TC','TR'],['TF','IS'],['TG','GT'],['TI','CR'],['TJ','CM'],['TK','FR'],['TL','CF'],['TN','CG'],['TR','GA'],['TT','TD'],['TU','CI'],['TY','BJ'],['TZ','ML'],
+  ['UA','RU'],['UB','RU'],['UC','RU'],['UD','RU'],['UE','RU'],['UF','RU'],['UG','RU'],['UH','RU'],['UI','RU'],['UN','KZ'],['UO','KZ'],['UP','KZ'],['UQ','KZ'],['UR','UA'],['US','UA'],['UT','UA'],['UU','UA'],['UV','UA'],['UW','UA'],['UX','UA'],['UY','UA'],['UZ','UA'],
+  ['VA','CA'],['VB','CA'],['VC','CA'],['VD','CA'],['VE','CA'],['VF','CA'],['VG','CA'],['VH','AU'],['VI','AU'],['VJ','AU'],['VK','AU'],['VL','AU'],['VM','AU'],['VN','AU'],['VO','CA'],['VP','GB'],['VQ','GB'],['VR','CN'],['VS','GB'],['VU','IN'],['VV','IN'],['VW','IN'],['VX','CA'],['VY','CA'],
+  ['W','US'],
+  ['XA','MX'],['XB','MX'],['XC','MX'],['XD','MX'],['XE','MX'],['XF','MX'],
+  ['YA','AF'],['YB','ID'],['YC','ID'],['YD','ID'],['YE','ID'],['YI','IQ'],['YJ','VU'],['YK','SY'],['YL','LV'],['YM','TR'],['YN','NI'],['YO','RO'],['YP','RO'],['YQ','RO'],['YR','RO'],['YS','SV'],['YT','RS'],['YU','RS'],['YV','VE'],['YW','VE'],['YX','VE'],['YY','VE'],
+  ['ZA','AL'],['ZB','GB'],['ZC','GB'],['ZD','GB'],['ZF','GB'],['ZL','NZ'],['ZM','NZ'],['ZP','PY'],['ZR','ZA'],['ZS','ZA'],['ZT','ZA'],['ZU','ZA'],
+  ['2E','GB'],['2D','GB'],['2I','GB'],['2M','GB'],['2W','GB'],
+  ['3A','MC'],['3B','MU'],['3C','GQ'],['3D','SZ'],['3V','TN'],['3W','VN'],['3X','GN'],
+  ['4J','AZ'],['4K','AZ'],['4L','GE'],['4O','ME'],['4S','LK'],['4U','CH'],['4X','IL'],['4Z','IL'],
+  ['5A','LY'],['5B','CY'],['5H','TZ'],['5N','NG'],['5R','MG'],['5T','MR'],['5U','NE'],['5V','TG'],['5W','WS'],['5X','UG'],['5Y','KE'],['5Z','KE'],
+  ['6W','SN'],['6Y','JM'],
+  ['7J','JP'],['7K','JP'],['7L','JP'],['7M','JP'],['7N','JP'],['7P','LS'],['7Q','MW'],['7X','DZ'],
+  ['8P','BB'],['8Q','MV'],['8R','GY'],
+  ['9A','HR'],['9G','GH'],['9H','MT'],['9J','ZM'],['9K','KW'],['9L','SL'],['9M','MY'],['9N','NP'],['9V','SG'],['9W','MY'],['9X','RW'],['9Y','TT'],
+];
+
+function detectCallsignCountry(callsign) {
+  if (!callsign || callsign.length < 2) return null;
+  const cs = callsign.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  // Try 2-char prefix first, then 1-char
+  for (const [prefix, cc] of CALLSIGN_PREFIXES) {
+    if (cs.startsWith(prefix)) {
+      const hamData = COUNTRY_HAM_DATA[cc];
+      return { countryCode: cc, name: hamData ? hamData.name : cc, prefix: prefix, dxcc: hamData ? hamData.dxcc : cc };
+    }
+  }
+  return null;
 }
 
 // Estimate UTC offset from longitude (rough, doesn't account for timezone boundaries)
@@ -2049,7 +2145,8 @@ function updateLosLine(pos) {
 function setObserverLocation(lat, lon, altM) {
   const cc = state.observer?.countryCode || '';
   const pn = state.observer?.placeName || '';
-  state.observer = { lat, lon, alt: altM || 0, countryCode: cc, placeName: pn };
+  const cs = state.observer?.callsign || '';
+  state.observer = { lat, lon, alt: altM || 0, countryCode: cc, placeName: pn, callsign: cs };
   state.observerGd = { longitude: satellite.degreesToRadians(lon), latitude: satellite.degreesToRadians(lat), height: (altM || 0) / 1000 };
   localStorage.setItem('sat_tracker_observer', JSON.stringify(state.observer));
 
@@ -2069,7 +2166,9 @@ function loadObserverLocation() {
     if (s && typeof s.lat === 'number') {
       state.observer.countryCode = s.countryCode || '';
       state.observer.placeName = s.placeName || '';
+      state.observer.callsign = s.callsign || '';
       setObserverLocation(s.lat, s.lon, s.alt);
+      updateCallsignBadge(s.callsign || '');
       state._hasExistingLocation = true;
       return;
     }
@@ -2082,6 +2181,17 @@ function loadObserverLocation() {
       { enableHighAccuracy: true, timeout: 8000 }
     );
   } else setObserverLocation(39.7392, -104.9903, 0);
+}
+
+function updateCallsignBadge(callsign) {
+  const badge = document.getElementById('my-callsign-badge');
+  const callEl = document.getElementById('header-callsign');
+  if (callsign && callsign.length >= 2) {
+    callEl.textContent = callsign;
+    badge.classList.add('visible');
+  } else {
+    badge.classList.remove('visible');
+  }
 }
 
 function updateObserverDisplay() {
@@ -2595,7 +2705,15 @@ function setupEvents() {
     document.getElementById('input-lon').value = state.observer.lon;
     document.getElementById('input-alt').value = state.observer.alt || 0;
     document.getElementById('input-location-search').value = state.observer.placeName || '';
+    document.getElementById('input-callsign').value = state.observer.callsign || '';
     updateDerivedDisplay(state.observer.lat, state.observer.lon, state.observer.countryCode);
+    // Show detected country from callsign if present
+    const cs = state.observer.callsign;
+    if (cs) {
+      const det = detectCallsignCountry(cs);
+      const detEl = document.getElementById('callsign-detected');
+      detEl.innerHTML = det ? `<span class="cd-match">${det.name}</span> — ${det.dxcc}` : '';
+    }
     document.getElementById('location-modal').classList.remove('hidden');
   }
 
@@ -2603,6 +2721,21 @@ function setupEvents() {
   document.getElementById('qth-card').addEventListener('click', openStationProfile);
   // Grid overlay on map → opens Station Profile
   document.getElementById('grid-overlay').addEventListener('click', openStationProfile);
+  // Callsign badge in header → opens Station Profile
+  document.getElementById('my-callsign-badge').addEventListener('click', openStationProfile);
+
+  // Callsign input — detect country from prefix as user types
+  document.getElementById('input-callsign').addEventListener('input', () => {
+    const cs = document.getElementById('input-callsign').value.trim();
+    const detEl = document.getElementById('callsign-detected');
+    if (cs.length < 2) { detEl.innerHTML = ''; return; }
+    const det = detectCallsignCountry(cs);
+    if (det) {
+      detEl.innerHTML = `Detected: <span class="cd-match">${det.name}</span> — ${det.dxcc}`;
+    } else {
+      detEl.innerHTML = '';
+    }
+  });
 
   // Geocoding search input
   const searchInput = document.getElementById('input-location-search');
@@ -2668,6 +2801,10 @@ function setupEvents() {
     if (isNaN(lat) || isNaN(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) return alert('Invalid coordinates');
     state.observer.countryCode = state._pendingCountryCode || state.observer.countryCode || '';
     state.observer.placeName = state._pendingPlaceName || state.observer.placeName || '';
+    // Save callsign
+    const callsign = document.getElementById('input-callsign').value.trim().toUpperCase();
+    state.observer.callsign = callsign;
+    updateCallsignBadge(callsign);
     setObserverLocation(lat, lon, alt);
     document.getElementById('location-modal').classList.add('hidden');
     state._pendingCountryCode = null;
