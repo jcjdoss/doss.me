@@ -29,27 +29,28 @@
   --gold-dim: rgba(255, 213, 79, 0.15);
   --orange: #ff9100;
   --cyan: #00e5ff;
-  --sidebar-width: 320px;
+  --sidebar-width: 420px;
 }
 
-html, body { height: 100%; font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', Consolas, monospace; background: var(--bg-primary); color: var(--text-primary); overflow: hidden; font-size: 12px; }
+html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-primary); color: var(--text-primary); overflow: hidden; font-size: 14px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+.mono { font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; }
 
 #app { display: flex; height: 100%; flex-direction: column; }
 
 /* Header */
 #header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 6px 12px; background: var(--bg-secondary); border-bottom: 1px solid var(--border);
-  height: 36px; flex-shrink: 0; z-index: 1000;
+  padding: 0 20px; background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+  height: 52px; flex-shrink: 0; z-index: 1000;
 }
-#header h1 { font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+#header h1 { font-size: 15px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
 #header h1 .callsign { color: var(--cyan); }
-#header h1 .ver { color: var(--text-muted); font-weight: 400; font-size: 10px; margin-left: 6px; }
-#header-right { display: flex; align-items: center; gap: 10px; }
-#clock { font-size: 12px; color: var(--accent); letter-spacing: 0.5px; }
-#tle-status { font-size: 10px; color: var(--text-muted); }
-.btn-icon { background: none; border: 1px solid var(--border); color: var(--text-secondary); border-radius: 4px; padding: 3px 8px; cursor: pointer; font-size: 10px; font-family: inherit; transition: all 0.15s; text-transform: uppercase; letter-spacing: 0.5px; }
-.btn-icon:hover { background: var(--bg-tertiary); color: var(--accent); border-color: var(--accent-dim); }
+#header h1 .ver { color: var(--text-muted); font-weight: 500; font-size: 10px; margin-left: 8px; letter-spacing: 1px; }
+#header-right { display: flex; align-items: center; gap: 16px; }
+#clock { font-size: 14px; color: var(--accent); letter-spacing: 0.5px; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 500; }
+#tle-status { font-size: 11px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.5px; }
+.btn-icon { background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-secondary); border-radius: 6px; padding: 6px 14px; cursor: pointer; font-size: 11px; font-family: inherit; transition: all 0.2s; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.btn-icon:hover { background: rgba(77,166,255,0.08); color: var(--accent); border-color: var(--accent-dim); }
 
 /* Main content */
 #main { display: flex; flex: 1; min-height: 0; }
@@ -60,7 +61,7 @@ html, body { height: 100%; font-family: 'SF Mono', 'Fira Code', 'Cascadia Code',
   display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0;
 }
 
-.section-header { padding: 6px 10px; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); background: var(--bg-primary); border-bottom: 1px solid var(--border); font-weight: 600; }
+.section-header { padding: 10px 18px; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); background: var(--bg-primary); border-bottom: 1px solid var(--border); font-weight: 700; }
 
 /* Satellite list */
 #sat-list { flex: 1; overflow-y: auto; min-height: 0; }
@@ -68,21 +69,21 @@ html, body { height: 100%; font-family: 'SF Mono', 'Fira Code', 'Cascadia Code',
 #sat-list::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
 #sat-list::-webkit-scrollbar-track { background: transparent; }
 
-.sat-category { padding: 5px 10px 2px; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 600; background: rgba(0,0,0,0.2); }
+.sat-category { padding: 10px 18px 6px; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 700; background: rgba(0,0,0,0.25); }
 
 .sat-item {
-  display: flex; align-items: center; gap: 6px; padding: 4px 10px;
-  cursor: pointer; transition: background 0.1s; user-select: none; border-left: 2px solid transparent;
+  display: flex; align-items: center; gap: 10px; padding: 9px 18px;
+  cursor: pointer; transition: all 0.15s; user-select: none; border-left: 3px solid transparent;
 }
 .sat-item:hover { background: rgba(77, 166, 255, 0.05); }
 .sat-item.active { background: rgba(77, 166, 255, 0.08); border-left-color: var(--accent); }
-.sat-item input[type="checkbox"] { accent-color: var(--accent); flex-shrink: 0; cursor: pointer; width: 12px; height: 12px; }
-.sat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.sat-item .sat-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11px; }
-.sat-item .sat-elev { font-size: 10px; color: var(--text-muted); min-width: 32px; text-align: right; }
-.sat-item .sat-elev.above { color: var(--green); font-weight: 600; }
-.sat-item .sat-rf-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-left: 2px; }
-.sat-item .sat-rf-dot.in-range { background: var(--green); box-shadow: 0 0 4px var(--green); }
+.sat-item input[type="checkbox"] { accent-color: var(--accent); flex-shrink: 0; cursor: pointer; width: 16px; height: 16px; }
+.sat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 4px currentColor; }
+.sat-item .sat-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; font-weight: 600; letter-spacing: 0.2px; }
+.sat-item .sat-elev { font-size: 13px; color: var(--text-muted); min-width: 44px; text-align: right; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 500; }
+.sat-item .sat-elev.above { color: var(--green); font-weight: 700; }
+.sat-item .sat-rf-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-left: 2px; }
+.sat-item .sat-rf-dot.in-range { background: var(--green); box-shadow: 0 0 8px var(--green); }
 .sat-item .sat-rf-dot.out-range { background: var(--border-bright); }
 
 /* Details panel */
@@ -93,117 +94,119 @@ html, body { height: 100%; font-family: 'SF Mono', 'Fira Code', 'Cascadia Code',
 #details-panel::-webkit-scrollbar { width: 4px; }
 #details-panel::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
 
-.detail-header { display: flex; align-items: center; gap: 6px; padding: 8px 10px 4px; }
-.detail-header .detail-name-dot { width: 8px; height: 8px; border-radius: 50%; }
-.detail-header .detail-sat-name { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
-.detail-header .detail-norad { font-size: 9px; color: var(--text-muted); margin-left: auto; }
+.detail-header { display: flex; align-items: center; gap: 10px; padding: 14px 18px 8px; }
+.detail-header .detail-name-dot { width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 6px currentColor; }
+.detail-header .detail-sat-name { font-size: 17px; font-weight: 800; letter-spacing: 0.3px; }
+.detail-header .detail-norad { font-size: 11px; color: var(--text-muted); margin-left: auto; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 500; }
 
 /* Satellite craft graphic */
-.sat-graphic { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-bottom: 1px solid var(--border); }
-.sat-craft-svg { flex-shrink: 0; filter: drop-shadow(0 0 4px rgba(77,166,255,0.15)); }
-.sat-graphic-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.sat-graphic-info .sg-row { display: flex; justify-content: space-between; }
-.sat-graphic-info .sg-label { font-size: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-.sat-graphic-info .sg-value { font-size: 10px; }
+.sat-graphic { display: flex; align-items: center; gap: 14px; padding: 10px 18px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.15); }
+.sat-craft-svg { flex-shrink: 0; filter: drop-shadow(0 0 6px rgba(77,166,255,0.2)); }
+.sat-graphic-info { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.sat-graphic-info .sg-row { display: flex; justify-content: space-between; align-items: baseline; }
+.sat-graphic-info .sg-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
+.sat-graphic-info .sg-value { font-size: 15px; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 600; }
 .sat-graphic-info .sg-value.above-hz { color: var(--green); }
 .sat-graphic-info .sg-value.below-hz { color: var(--red); }
 
-.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 0 10px; }
-.detail-row { display: flex; justify-content: space-between; padding: 2px 0; border-bottom: 1px solid rgba(30,42,58,0.5); }
-.detail-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-.detail-value { font-size: 11px; color: var(--text-primary); text-align: right; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 2px 18px; }
+.detail-row { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; border-bottom: 1px solid rgba(30,42,58,0.4); }
+.detail-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
+.detail-value { font-size: 14px; color: var(--text-primary); text-align: right; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 500; }
 
 /* Visibility badges */
-.vis-row { display: flex; gap: 6px; padding: 6px 10px; flex-wrap: wrap; }
+.vis-row { display: flex; gap: 8px; padding: 10px 18px; flex-wrap: wrap; }
 .vis-badge {
-  display: flex; align-items: center; gap: 4px; padding: 3px 8px;
-  border-radius: 3px; font-size: 9px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+  display: flex; align-items: center; gap: 6px; padding: 6px 12px;
+  border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
   border: 1px solid;
 }
 .vis-badge.rf-yes { background: var(--green-dim); color: var(--green); border-color: rgba(0,230,118,0.3); }
 .vis-badge.rf-no { background: var(--red-dim); color: var(--red); border-color: rgba(255,82,82,0.2); }
 .vis-badge.vis-yes { background: var(--gold-dim); color: var(--gold); border-color: rgba(255,213,79,0.3); }
 .vis-badge.vis-no { background: rgba(74,90,110,0.15); color: var(--text-muted); border-color: rgba(74,90,110,0.3); }
-.vis-dot { width: 5px; height: 5px; border-radius: 50%; }
-.vis-badge.rf-yes .vis-dot { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.vis-dot { width: 6px; height: 6px; border-radius: 50%; }
+.vis-badge.rf-yes .vis-dot { background: var(--green); box-shadow: 0 0 8px var(--green); }
 .vis-badge.rf-no .vis-dot { background: var(--red); }
-.vis-badge.vis-yes .vis-dot { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+.vis-badge.vis-yes .vis-dot { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
 .vis-badge.vis-no .vis-dot { background: var(--text-muted); }
 
 /* Frequency & Doppler section */
-.freq-section { padding: 4px 10px 6px; }
-.freq-row { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; }
-.freq-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-.freq-value { font-size: 11px; color: var(--cyan); }
-.freq-doppler { font-size: 10px; color: var(--orange); }
+.freq-section { padding: 8px 18px 10px; border-top: 1px solid var(--border); }
+.freq-section-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 4px; }
+.freq-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
+.freq-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.freq-value { font-size: 13px; color: var(--cyan); font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 600; }
+.freq-doppler { font-size: 11px; color: var(--orange); font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 500; }
 .freq-doppler.positive { color: var(--orange); }
 .freq-doppler.negative { color: var(--accent); }
 
 /* Signal meter */
-.signal-meter { padding: 4px 10px 6px; }
-.signal-meter-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
-.signal-bar-container { display: flex; gap: 2px; height: 12px; align-items: flex-end; }
+.signal-meter { padding: 8px 18px 10px; border-top: 1px solid var(--border); }
+.signal-meter-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 6px; }
+.signal-bar-container { display: flex; gap: 3px; height: 18px; align-items: flex-end; }
 .signal-bar {
-  width: 6px; border-radius: 1px; transition: height 0.3s, background 0.3s;
+  width: 8px; border-radius: 2px; transition: height 0.3s, background 0.3s;
   background: var(--border);
 }
-.signal-bar.active.s1 { background: var(--green); height: 3px; }
-.signal-bar.active.s2 { background: var(--green); height: 4px; }
-.signal-bar.active.s3 { background: var(--green); height: 5px; }
-.signal-bar.active.s4 { background: var(--green); height: 6px; }
-.signal-bar.active.s5 { background: var(--yellow); height: 7px; }
-.signal-bar.active.s6 { background: var(--yellow); height: 8px; }
-.signal-bar.active.s7 { background: var(--orange); height: 9px; }
-.signal-bar.active.s8 { background: var(--orange); height: 10px; }
-.signal-bar.active.s9 { background: var(--red); height: 12px; }
-.signal-bar:not(.active) { height: 3px; }
-.signal-value { font-size: 10px; margin-left: 6px; color: var(--text-secondary); }
+.signal-bar.active.s1 { background: var(--green); height: 4px; }
+.signal-bar.active.s2 { background: var(--green); height: 6px; }
+.signal-bar.active.s3 { background: var(--green); height: 8px; }
+.signal-bar.active.s4 { background: var(--green); height: 10px; }
+.signal-bar.active.s5 { background: var(--yellow); height: 11px; }
+.signal-bar.active.s6 { background: var(--yellow); height: 13px; }
+.signal-bar.active.s7 { background: var(--orange); height: 14px; }
+.signal-bar.active.s8 { background: var(--orange); height: 16px; }
+.signal-bar.active.s9 { background: var(--red); height: 18px; }
+.signal-bar:not(.active) { height: 4px; }
+.signal-value { font-size: 13px; margin-left: 8px; color: var(--text-secondary); font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 700; }
 
 /* Azimuth compass */
-.compass-section { padding: 6px 10px; display: flex; gap: 12px; align-items: center; }
-.compass-container { position: relative; width: 70px; height: 70px; flex-shrink: 0; }
+.compass-section { padding: 10px 18px; display: flex; gap: 16px; align-items: center; border-top: 1px solid var(--border); }
+.compass-section-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 6px; }
+.compass-container { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
 .compass-ring {
-  width: 70px; height: 70px; border-radius: 50%; border: 1px solid var(--border-bright);
+  width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--border-bright);
   position: relative; background: radial-gradient(circle, var(--bg-tertiary) 0%, var(--bg-primary) 100%);
 }
 .compass-cardinal {
-  position: absolute; font-size: 8px; font-weight: 700; color: var(--text-muted);
+  position: absolute; font-size: 9px; font-weight: 800; color: var(--text-muted); letter-spacing: 0.5px;
 }
-.compass-n { top: 1px; left: 50%; transform: translateX(-50%); color: var(--red); }
-.compass-s { bottom: 1px; left: 50%; transform: translateX(-50%); }
-.compass-e { right: 2px; top: 50%; transform: translateY(-50%); }
-.compass-w { left: 2px; top: 50%; transform: translateY(-50%); }
+.compass-n { top: 2px; left: 50%; transform: translateX(-50%); color: var(--red); }
+.compass-s { bottom: 2px; left: 50%; transform: translateX(-50%); }
+.compass-e { right: 3px; top: 50%; transform: translateY(-50%); }
+.compass-w { left: 3px; top: 50%; transform: translateY(-50%); }
 .compass-needle {
-  position: absolute; top: 50%; left: 50%; width: 2px; height: 28px;
+  position: absolute; top: 50%; left: 50%; width: 2px; height: 32px;
   transform-origin: bottom center; border-radius: 1px;
   background: linear-gradient(to top, var(--accent), var(--cyan));
-  box-shadow: 0 0 6px var(--accent);
+  box-shadow: 0 0 8px var(--accent);
   transition: transform 0.5s ease-out;
 }
-.compass-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 6px; height: 6px; border-radius: 50%; background: var(--accent); border: 1px solid #fff; z-index: 1; }
+.compass-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 7px; height: 7px; border-radius: 50%; background: var(--accent); border: 1.5px solid #fff; z-index: 1; }
 .compass-data { flex: 1; }
-.compass-data .cd-row { display: flex; justify-content: space-between; padding: 1px 0; }
-.compass-data .cd-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-.compass-data .cd-value { font-size: 11px; }
+.compass-data .cd-row { display: flex; justify-content: space-between; align-items: baseline; padding: 2px 0; }
+.compass-data .cd-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
+.compass-data .cd-value { font-size: 14px; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 600; }
 
 /* Next pass / AOS-LOS */
-.pass-section { padding: 6px 10px; border-top: 1px solid var(--border); }
-.pass-title { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.pass-section { padding: 10px 18px; border-top: 1px solid var(--border); }
+.pass-title { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 6px; }
 .pass-info { display: flex; gap: 8px; flex-wrap: wrap; }
 .pass-chip {
-  padding: 3px 8px; border-radius: 3px; font-size: 10px;
+  padding: 5px 10px; border-radius: 6px; font-size: 12px;
   background: var(--bg-tertiary); border: 1px solid var(--border);
 }
-.pass-chip .pc-label { color: var(--text-muted); }
-.pass-chip .pc-value { color: var(--accent); }
+.pass-chip .pc-label { color: var(--text-muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+.pass-chip .pc-value { color: var(--accent); font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 600; }
 .pass-chip .pc-value.urgent { color: var(--green); }
-.pass-quality { display: inline-block; padding: 1px 5px; border-radius: 2px; font-size: 8px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-left: 4px; }
+.pass-quality { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-left: 4px; }
 .pass-quality.excellent { background: rgba(0,230,118,0.2); color: var(--green); }
 .pass-quality.good { background: rgba(255,202,40,0.2); color: var(--yellow); }
 .pass-quality.fair { background: rgba(255,145,0,0.2); color: var(--orange); }
 .pass-quality.poor { background: rgba(255,82,82,0.15); color: var(--red); }
 
-.no-selection { color: var(--text-muted); font-size: 11px; padding: 20px 10px; text-align: center; letter-spacing: 0.5px; }
+.no-selection { color: var(--text-muted); font-size: 13px; padding: 30px 18px; text-align: center; letter-spacing: 1px; font-weight: 500; }
 
 /* Map / Cesium container */
 #map-container { flex: 1; position: relative; }
@@ -229,125 +232,126 @@ html, body { height: 100%; font-family: 'SF Mono', 'Fira Code', 'Cascadia Code',
 
 /* Map overlay: grid square label */
 #grid-overlay {
-  position: absolute; top: 8px; left: 50%; transform: translateX(-50%); z-index: 999;
-  background: rgba(10, 14, 20, 0.85); border: 1px solid var(--border);
-  border-radius: 4px; padding: 4px 8px; font-size: 10px; pointer-events: none;
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 999;
+  background: rgba(10, 14, 20, 0.9); border: 1px solid var(--border-bright);
+  border-radius: 8px; padding: 8px 16px; pointer-events: none; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  display: flex; align-items: center; gap: 10px;
 }
-#grid-overlay .grid-label { color: var(--text-muted); font-size: 8px; text-transform: uppercase; letter-spacing: 1px; }
-#grid-overlay .grid-value { color: var(--cyan); font-size: 13px; font-weight: 700; letter-spacing: 1px; }
+#grid-overlay .grid-label { color: var(--text-muted); font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+#grid-overlay .grid-value { color: var(--cyan); font-size: 18px; font-weight: 800; letter-spacing: 2px; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; }
 
 /* Track button */
-.btn-track { background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-muted); border-radius: 3px; padding: 1px 6px; cursor: pointer; font-size: 9px; font-family: inherit; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.15s; }
+.btn-track { background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-muted); border-radius: 5px; padding: 3px 10px; cursor: pointer; font-size: 10px; font-family: inherit; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; font-weight: 700; }
 .btn-track:hover { color: var(--accent); border-color: var(--accent-dim); }
-.btn-track.active { color: var(--cyan); border-color: var(--cyan); background: rgba(0,229,255,0.1); }
+.btn-track.active { color: var(--cyan); border-color: var(--cyan); background: rgba(0,229,255,0.1); box-shadow: 0 0 8px rgba(0,229,255,0.2); }
 
 /* LOS line legend */
 #los-legend {
-  position: absolute; bottom: 8px; right: 8px; z-index: 999;
-  background: rgba(10, 14, 20, 0.85); border: 1px solid var(--border);
-  border-radius: 4px; padding: 4px 8px; font-size: 9px; pointer-events: none; display: none;
+  position: absolute; bottom: 12px; right: 12px; z-index: 999;
+  background: rgba(10, 14, 20, 0.9); border: 1px solid var(--border-bright);
+  border-radius: 6px; padding: 6px 12px; font-size: 10px; pointer-events: none; display: none; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
 }
-#los-legend .los-label { color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+#los-legend .los-label { color: var(--green); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
 
 /* Floating map layer panel */
 #map-layers-panel {
-  position: absolute; top: 8px; right: 8px; z-index: 999;
-  display: flex; flex-direction: column; gap: 4px; align-items: flex-end;
+  position: absolute; top: 12px; right: 12px; z-index: 999;
+  display: flex; flex-direction: column; gap: 6px; align-items: flex-end;
 }
 #map-layers-toggle {
-  background: rgba(10, 14, 20, 0.9); border: 1px solid var(--border);
-  border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 9px;
-  font-family: inherit; color: var(--text-muted); text-transform: uppercase;
-  letter-spacing: 1px; transition: all 0.15s;
+  background: rgba(10, 14, 20, 0.9); border: 1px solid var(--border-bright);
+  border-radius: 8px; padding: 7px 14px; cursor: pointer; font-size: 11px;
+  font-family: inherit; color: var(--text-secondary); text-transform: uppercase;
+  letter-spacing: 1.5px; transition: all 0.2s; font-weight: 700; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
 }
 #map-layers-toggle:hover { color: var(--accent); border-color: var(--accent-dim); }
 #map-layers-toggle.open { color: var(--accent); border-color: var(--accent-dim); background: rgba(10, 14, 20, 0.95); }
 #map-layers-drawer {
-  display: none; background: rgba(10, 14, 20, 0.95); border: 1px solid var(--border);
-  border-radius: 6px; padding: 8px; min-width: 200px;
+  display: none; background: rgba(10, 14, 20, 0.95); border: 1px solid var(--border-bright);
+  border-radius: 10px; padding: 12px; min-width: 220px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
 }
 #map-layers-drawer.open { display: block; }
 .layer-section-title {
-  font-size: 8px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted);
-  margin-top: 6px; margin-bottom: 3px; padding-bottom: 2px; border-bottom: 1px solid var(--border);
+  font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted);
+  margin-top: 10px; margin-bottom: 4px; padding-bottom: 4px; border-bottom: 1px solid var(--border); font-weight: 700;
 }
 .layer-section-title:first-child { margin-top: 0; }
 .layer-btn {
-  display: flex; align-items: center; gap: 6px; width: 100%; padding: 3px 4px;
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 5px 6px;
   background: none; border: none; cursor: pointer; font-family: inherit;
-  font-size: 10px; color: var(--text-secondary); border-radius: 3px; transition: all 0.12s;
+  font-size: 12px; color: var(--text-secondary); border-radius: 5px; transition: all 0.15s; font-weight: 500;
 }
 .layer-btn:hover { background: rgba(77, 166, 255, 0.06); }
-.layer-btn.active { color: var(--accent); }
+.layer-btn.active { color: var(--accent); font-weight: 600; }
 .layer-btn .layer-dot {
-  width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--border-bright);
-  flex-shrink: 0; transition: all 0.12s;
+  width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--border-bright);
+  flex-shrink: 0; transition: all 0.15s;
 }
-.layer-btn.active .layer-dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 4px var(--accent); }
+.layer-btn.active .layer-dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 6px var(--accent); }
 .layer-btn .layer-label { flex: 1; text-align: left; }
-.layer-btn .layer-key { font-size: 8px; color: var(--text-muted); }
+.layer-btn .layer-key { font-size: 9px; color: var(--text-muted); font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 600; background: rgba(255,255,255,0.05); padding: 1px 5px; border-radius: 3px; }
 
 /* Bottom bar */
 #bottom-bar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 4px 12px; background: var(--bg-secondary); border-top: 1px solid var(--border);
-  height: 28px; flex-shrink: 0; z-index: 1000;
+  padding: 0 20px; background: var(--bg-secondary); border-top: 1px solid var(--border);
+  height: 36px; flex-shrink: 0; z-index: 1000;
 }
-#observer-info { display: flex; align-items: center; gap: 8px; }
-#observer-coords { color: var(--text-secondary); }
-#observer-grid { color: var(--cyan); font-weight: 600; }
+#observer-info { display: flex; align-items: center; gap: 10px; }
+#observer-coords { color: var(--text-secondary); font-size: 12px; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 500; }
+#observer-grid { color: var(--cyan); font-weight: 700; font-size: 13px; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; letter-spacing: 1px; }
 .btn-sm {
   background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-muted);
-  border-radius: 3px; padding: 1px 6px; cursor: pointer; font-size: 9px; font-family: inherit;
-  text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.15s;
+  border-radius: 5px; padding: 3px 10px; cursor: pointer; font-size: 10px; font-family: inherit;
+  text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; font-weight: 700;
 }
 .btn-sm:hover { color: var(--accent); border-color: var(--accent-dim); }
-#tracking-stats { color: var(--text-muted); font-size: 10px; display: flex; gap: 12px; }
-#tracking-stats .stat-label { color: var(--text-muted); }
-#tracking-stats .stat-value { color: var(--text-secondary); }
+#tracking-stats { color: var(--text-muted); font-size: 12px; display: flex; gap: 16px; font-weight: 500; }
+#tracking-stats .stat-label { color: var(--text-muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+#tracking-stats .stat-value { color: var(--text-secondary); font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 600; }
 #tracking-stats .stat-value.highlight { color: var(--green); }
 
 /* Modals */
 .modal-overlay {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.7); z-index: 2000; display: flex;
-  align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.75); z-index: 2000; display: flex;
+  align-items: center; justify-content: center; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
 }
 .modal-overlay.hidden { display: none; }
 .modal {
-  background: var(--bg-secondary); border: 1px solid var(--border-bright); border-radius: 8px;
-  padding: 16px; width: 340px; max-width: 90vw;
+  background: var(--bg-secondary); border: 1px solid var(--border-bright); border-radius: 12px;
+  padding: 24px; width: 380px; max-width: 90vw; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
 }
-.modal h3 { font-size: 12px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-.modal label { font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+.modal h3 { font-size: 14px; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; }
+.modal label { font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
 .modal input, .modal select {
-  width: 100%; padding: 5px 8px; background: var(--bg-primary); border: 1px solid var(--border);
-  border-radius: 4px; color: var(--text-primary); font-size: 12px; margin-bottom: 8px; font-family: inherit;
+  width: 100%; padding: 8px 12px; background: var(--bg-primary); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text-primary); font-size: 14px; margin-bottom: 12px; font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
 }
-.modal input:focus, .modal select:focus { outline: none; border-color: var(--accent-dim); }
-.modal-buttons { display: flex; gap: 6px; margin-top: 6px; }
-.modal-buttons button { flex: 1; padding: 5px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; font-family: inherit; text-transform: uppercase; letter-spacing: 0.5px; }
+.modal input:focus, .modal select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(77,166,255,0.15); }
+.modal-buttons { display: flex; gap: 8px; margin-top: 10px; }
+.modal-buttons button { flex: 1; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; font-family: inherit; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; }
 .btn-primary { background: var(--accent); color: #fff; border: none; }
 .btn-primary:hover { filter: brightness(1.15); }
 .btn-cancel { background: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border); }
 .btn-cancel:hover { background: var(--border); }
 
 /* Settings */
-.settings-grid { display: grid; gap: 8px; }
+.settings-grid { display: grid; gap: 10px; }
 .settings-row { display: flex; align-items: center; justify-content: space-between; }
-.settings-row label { font-size: 10px; color: var(--text-secondary); }
-.settings-row input, .settings-row select { width: 100px; margin-bottom: 0; }
+.settings-row label { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+.settings-row input, .settings-row select { width: 110px; margin-bottom: 0; font-size: 13px; }
 
 /* Loading */
 #loading-overlay {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   background: var(--bg-primary); z-index: 3000;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
 }
 #loading-overlay.hidden { display: none; }
-.spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: spin 0.7s linear infinite; }
+.spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-#loading-text { font-size: 11px; color: var(--text-secondary); letter-spacing: 0.5px; }
+#loading-text { font-size: 12px; color: var(--text-secondary); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; }
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -385,7 +389,7 @@ html, body { height: 100%; font-family: 'SF Mono', 'Fira Code', 'Cascadia Code',
     <div id="map-container">
       <div id="cesiumContainer"></div>
       <div id="grid-overlay">
-        <div class="grid-label">Maidenhead</div>
+        <div class="grid-label">Grid Locator</div>
         <div class="grid-value" id="observer-grid-map">--</div>
       </div>
       <div id="los-legend"><span class="los-label">LOS LINE ACTIVE</span></div>
@@ -416,7 +420,7 @@ html, body { height: 100%; font-family: 'SF Mono', 'Fira Code', 'Cascadia Code',
 
   <div id="bottom-bar">
     <div id="observer-info">
-      <span style="color:var(--accent);font-size:9px;text-transform:uppercase;letter-spacing:1px;">QTH:</span>
+      <span style="color:var(--accent);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;">QTH</span>
       <span id="observer-coords">--</span>
       <span id="observer-grid" title="Maidenhead Grid Locator">--</span>
       <button class="btn-sm" id="btn-gps">GPS</button>
@@ -1225,14 +1229,14 @@ async function loadAuroraData(force) {
 // HAM RADIO — MAIDENHEAD GRID SQUARE OVERLAY
 // ============================================================
 function createGridSquareOverlay() {
+  // Use a much higher resolution canvas for crisp, bold labels
   const canvas = document.createElement('canvas');
-  canvas.width = 720;
-  canvas.height = 360;
+  canvas.width = 2160;  // 6px per degree longitude (3x previous)
+  canvas.height = 1080; // 6px per degree latitude
   const ctx = canvas.getContext('2d');
+  const pxPerDegLon = canvas.width / 360;
+  const pxPerDegLat = canvas.height / 180;
 
-  ctx.strokeStyle = 'rgba(0, 229, 255, 0.25)';
-  ctx.lineWidth = 0.5;
-  ctx.font = '7px monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
@@ -1243,25 +1247,32 @@ function createGridSquareOverlay() {
     for (let fj = 0; fj < 18; fj++) {
       const lonDeg = fi * 20 - 180;
       const latDeg = fj * 10 - 90;
-      const x = (lonDeg + 180) * 2;
-      const y = (90 - latDeg - 10) * 2;
-      const w = 20 * 2;
-      const h = 10 * 2;
+      const x = (lonDeg + 180) * pxPerDegLon;
+      const y = (90 - latDeg - 10) * pxPerDegLat;
+      const w = 20 * pxPerDegLon;
+      const h = 10 * pxPerDegLat;
 
-      // Field border
-      ctx.strokeStyle = 'rgba(0, 229, 255, 0.3)';
-      ctx.lineWidth = 1;
+      // Field border — bold, clearly visible
+      ctx.strokeStyle = 'rgba(0, 229, 255, 0.45)';
+      ctx.lineWidth = 2.5;
       ctx.strokeRect(x, y, w, h);
 
-      // Field label (e.g., AA, AB, ..., RR)
+      // Field label — BIG and BOLD (e.g., AA, AB, ..., RR)
       const label = fieldLetters[fi] + fieldLetters[fj];
-      ctx.fillStyle = 'rgba(0, 229, 255, 0.35)';
-      ctx.font = 'bold 9px monospace';
-      ctx.fillText(label, x + w / 2, y + h / 2);
+
+      // Label background for readability
+      ctx.fillStyle = 'rgba(10, 14, 20, 0.5)';
+      const labelW = 38;
+      const labelH = 22;
+      ctx.fillRect(x + w / 2 - labelW / 2, y + h / 2 - labelH / 2, labelW, labelH);
+
+      ctx.fillStyle = 'rgba(0, 229, 255, 0.85)';
+      ctx.font = 'bold 24px monospace';
+      ctx.fillText(label, x + w / 2, y + h / 2 + 1);
 
       // Sub-grid (10 squares per field: 2° lon x 1° lat each)
-      ctx.strokeStyle = 'rgba(0, 229, 255, 0.1)';
-      ctx.lineWidth = 0.3;
+      ctx.strokeStyle = 'rgba(0, 229, 255, 0.12)';
+      ctx.lineWidth = 0.8;
       for (let si = 1; si < 10; si++) {
         const sx = x + si * (w / 10);
         ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx, y + h); ctx.stroke();
@@ -1269,6 +1280,18 @@ function createGridSquareOverlay() {
       for (let sj = 1; sj < 10; sj++) {
         const sy = y + sj * (h / 10);
         ctx.beginPath(); ctx.moveTo(x, sy); ctx.lineTo(x + w, sy); ctx.stroke();
+      }
+
+      // Sub-square number labels (0-9 on edges, smaller but still visible)
+      ctx.fillStyle = 'rgba(0, 229, 255, 0.3)';
+      ctx.font = 'bold 11px monospace';
+      for (let si = 0; si < 10; si++) {
+        const sx = x + si * (w / 10) + (w / 20);
+        ctx.fillText(si.toString(), sx, y + 8);
+      }
+      for (let sj = 0; sj < 10; sj++) {
+        const sy = y + sj * (h / 10) + (h / 20);
+        ctx.fillText(sj.toString(), x + 8, sy);
       }
     }
   }
@@ -1278,7 +1301,7 @@ function createGridSquareOverlay() {
     rectangle: Cesium.Rectangle.fromDegrees(-180, -90, 180, 90),
   });
   const layer = state.viewer.imageryLayers.addImageryProvider(provider);
-  layer.alpha = 0.8;
+  layer.alpha = 0.85;
   state.imageryLayers.gridsquares = layer;
 }
 
@@ -1902,10 +1925,10 @@ function buildSatGraphic(cat, pos, look, sat) {
   const elevCls = look && look.elevation >= 0 ? 'above-hz' : 'below-hz';
 
   return `<div class="sat-graphic">${craftSvg}<div class="sat-graphic-info">
-    <div class="sg-row"><span class="sg-label">ALT</span><span class="sg-value">${altStr}</span></div>
-    <div class="sg-row"><span class="sg-label">RANGE</span><span class="sg-value">${rangeStr}</span></div>
-    <div class="sg-row"><span class="sg-label">SPEED</span><span class="sg-value">${velStr}</span></div>
-    <div class="sg-row"><span class="sg-label">ELEV</span><span class="sg-value ${elevCls}">${elevStr}</span></div>
+    <div class="sg-row"><span class="sg-label">Altitude</span><span class="sg-value">${altStr}</span></div>
+    <div class="sg-row"><span class="sg-label">Range</span><span class="sg-value">${rangeStr}</span></div>
+    <div class="sg-row"><span class="sg-label">Velocity</span><span class="sg-value">${velStr}</span></div>
+    <div class="sg-row"><span class="sg-label">Elevation</span><span class="sg-value ${elevCls}">${elevStr}</span></div>
   </div></div>`;
 }
 
@@ -1925,55 +1948,56 @@ function updateDetailsPanel() {
   h += '<div class="detail-grid">';
   const r = (l, v) => `<div class="detail-row"><span class="detail-label">${l}</span><span class="detail-value">${v}</span></div>`;
   if (pos) {
-    h += r('ALT', `${pos.alt.toFixed(1)} km`);
-    h += r('LAT', `${pos.lat.toFixed(4)}°`);
-    h += r('LON', `${pos.lon.toFixed(4)}°`);
-    h += r('PERIOD', `${getOrbitalPeriod(sat.satrec).toFixed(1)} min`);
-    h += r('GRID', latLonToGrid(pos.lat, pos.lon).toUpperCase());
-    h += r('VELOCITY', `${Math.sqrt(pos.vel.x ** 2 + pos.vel.y ** 2 + pos.vel.z ** 2).toFixed(2)} km/s`);
+    h += r('Altitude', `${pos.alt.toFixed(1)} km`);
+    h += r('Latitude', `${pos.lat.toFixed(4)}°`);
+    h += r('Longitude', `${pos.lon.toFixed(4)}°`);
+    h += r('Period', `${getOrbitalPeriod(sat.satrec).toFixed(1)} min`);
+    h += r('Grid Sq', latLonToGrid(pos.lat, pos.lon).toUpperCase());
+    h += r('Velocity', `${Math.sqrt(pos.vel.x ** 2 + pos.vel.y ** 2 + pos.vel.z ** 2).toFixed(2)} km/s`);
   }
   if (look) {
-    h += r('AZ', `${look.azimuth.toFixed(1)}°`);
-    h += r('EL', `${look.elevation.toFixed(1)}°`);
-    h += r('RANGE', `${look.range.toFixed(0)} km`);
-    h += r('RANGE RATE', `${(sat.rangeRate || 0).toFixed(3)} km/s`);
+    h += r('Azimuth', `${look.azimuth.toFixed(1)}°`);
+    h += r('Elevation', `${look.elevation.toFixed(1)}°`);
+    h += r('Range', `${look.range.toFixed(0)} km`);
+    h += r('Range Rate', `${(sat.rangeRate || 0).toFixed(3)} km/s`);
   }
   if (sat.tleAgeHours != null) {
     const ageStr = sat.tleAgeHours < 24 ? `${sat.tleAgeHours.toFixed(0)}h` : `${(sat.tleAgeHours / 24).toFixed(1)}d`;
     const ageColor = sat.tleAgeHours < 48 ? 'var(--green)' : sat.tleAgeHours < 168 ? 'var(--yellow)' : 'var(--red)';
-    h += `<div class="detail-row"><span class="detail-label">TLE AGE</span><span class="detail-value" style="color:${ageColor}">${ageStr}</span></div>`;
+    h += `<div class="detail-row"><span class="detail-label">TLE Age</span><span class="detail-value" style="color:${ageColor}">${ageStr}</span></div>`;
   }
-  h += r('MODE', cat.mode);
+  h += r('Mode', cat.mode);
   h += '</div>';
 
   h += '<div class="vis-row">';
   h += sat.rfVisible
-    ? '<div class="vis-badge rf-yes"><span class="vis-dot"></span>AOS</div>'
-    : '<div class="vis-badge rf-no"><span class="vis-dot"></span>LOS</div>';
+    ? '<div class="vis-badge rf-yes"><span class="vis-dot"></span>RF In Range</div>'
+    : '<div class="vis-badge rf-no"><span class="vis-dot"></span>RF Below Horizon</div>';
   h += sat.visVisible
-    ? '<div class="vis-badge vis-yes"><span class="vis-dot"></span>OPTICAL</div>'
-    : '<div class="vis-badge vis-no"><span class="vis-dot"></span>NO VIS</div>';
+    ? '<div class="vis-badge vis-yes"><span class="vis-dot"></span>Optically Visible</div>'
+    : '<div class="vis-badge vis-no"><span class="vis-dot"></span>Not Visible</div>';
   h += '</div>';
 
   h += '<div class="freq-section">';
+  h += '<div class="freq-section-label">Doppler-Corrected Frequencies</div>';
   if (cat.downlink) {
     const dShift = computeDoppler(cat.downlink, sat.rangeRate || 0);
     const corrected = cat.downlink + dShift;
     const sign = dShift >= 0 ? '+' : '';
     const cls = dShift >= 0 ? 'positive' : 'negative';
-    h += `<div class="freq-row"><span class="freq-label">DL</span><span class="freq-value">${corrected.toFixed(4)} MHz</span><span class="freq-doppler ${cls}">${sign}${(dShift * 1000).toFixed(1)} Hz</span></div>`;
+    h += `<div class="freq-row"><span class="freq-label">Downlink</span><span class="freq-value">${corrected.toFixed(4)} MHz</span><span class="freq-doppler ${cls}">${sign}${(dShift * 1000).toFixed(1)} Hz</span></div>`;
   }
   if (cat.uplink) {
     const uShift = computeDoppler(cat.uplink, sat.rangeRate || 0);
     const corrected = cat.uplink - uShift;
     const sign = -uShift >= 0 ? '+' : '';
     const cls = -uShift >= 0 ? 'positive' : 'negative';
-    h += `<div class="freq-row"><span class="freq-label">UL</span><span class="freq-value">${corrected.toFixed(4)} MHz</span><span class="freq-doppler ${cls}">${sign}${(-uShift * 1000).toFixed(1)} Hz</span></div>`;
+    h += `<div class="freq-row"><span class="freq-label">Uplink</span><span class="freq-value">${corrected.toFixed(4)} MHz</span><span class="freq-doppler ${cls}">${sign}${(-uShift * 1000).toFixed(1)} Hz</span></div>`;
   }
   h += '</div>';
 
   const sl = sat.signalLevel || 0;
-  h += '<div class="signal-meter"><div class="signal-meter-label">EST. SIGNAL</div><div class="signal-bar-container">';
+  h += '<div class="signal-meter"><div class="signal-meter-label">Estimated Signal Strength</div><div class="signal-bar-container">';
   for (let i = 1; i <= 9; i++) {
     h += `<div class="signal-bar s${i} ${i <= sl ? 'active' : ''}"></div>`;
   }
@@ -1989,15 +2013,15 @@ function updateDetailsPanel() {
         <div class="compass-center"></div>
       </div></div>
       <div class="compass-data">
-        <div class="cd-row"><span class="cd-label">AZ</span><span class="cd-value">${look.azimuth.toFixed(1)}°</span></div>
-        <div class="cd-row"><span class="cd-label">EL</span><span class="cd-value" style="color:${look.elevation >= 0 ? 'var(--green)' : 'var(--red)'}">${look.elevation.toFixed(1)}°</span></div>
-        <div class="cd-row"><span class="cd-label">BEARING</span><span class="cd-value">${azToBearing(look.azimuth)}</span></div>
-        <div class="cd-row"><span class="cd-label">DISTANCE</span><span class="cd-value">${look.range.toFixed(0)} km</span></div>
+        <div class="cd-row"><span class="cd-label">Azimuth</span><span class="cd-value">${look.azimuth.toFixed(1)}°</span></div>
+        <div class="cd-row"><span class="cd-label">Elevation</span><span class="cd-value" style="color:${look.elevation >= 0 ? 'var(--green)' : 'var(--red)'}">${look.elevation.toFixed(1)}°</span></div>
+        <div class="cd-row"><span class="cd-label">Bearing</span><span class="cd-value">${azToBearing(look.azimuth)}</span></div>
+        <div class="cd-row"><span class="cd-label">Slant Range</span><span class="cd-value">${look.range.toFixed(0)} km</span></div>
       </div></div>`;
   }
 
   const pass = state.nextPassCache[state.activeSatId];
-  h += '<div class="pass-section"><div class="pass-title">Next Pass</div><div class="pass-info">';
+  h += '<div class="pass-section"><div class="pass-title">Next Pass Prediction</div><div class="pass-info">';
   if (pass) {
     const tu = pass.start - new Date();
     let ts;
@@ -2005,12 +2029,12 @@ function updateDetailsPanel() {
     else { const hr = Math.floor(tu / 3600000), mn = Math.floor((tu % 3600000) / 60000); ts = hr > 0 ? `${hr}h ${mn}m` : `${mn}m`; }
     const quality = pass.maxEl >= 60 ? 'excellent' : pass.maxEl >= 30 ? 'good' : pass.maxEl >= 15 ? 'fair' : 'poor';
     const qLabel = pass.maxEl >= 60 ? 'S9+' : pass.maxEl >= 30 ? 'FB' : pass.maxEl >= 15 ? 'OK' : 'QRP';
-    h += `<div class="pass-chip"><span class="pc-label">AOS </span><span class="pc-value ${tu <= 300000 ? 'urgent' : ''}">${ts}</span></div>`;
-    h += `<div class="pass-chip"><span class="pc-label">MAX </span><span class="pc-value">${pass.maxEl.toFixed(0)}°</span><span class="pass-quality ${quality}">${qLabel}</span></div>`;
-    h += `<div class="pass-chip"><span class="pc-label">DUR </span><span class="pc-value">${Math.round(pass.duration / 60)}m${Math.round(pass.duration % 60)}s</span></div>`;
-    h += `<div class="pass-chip"><span class="pc-label">AOS@</span><span class="pc-value">${pass.start.toUTCString().slice(17, 25)} UTC</span></div>`;
+    h += `<div class="pass-chip"><span class="pc-label">In </span><span class="pc-value ${tu <= 300000 ? 'urgent' : ''}">${ts}</span></div>`;
+    h += `<div class="pass-chip"><span class="pc-label">Max El </span><span class="pc-value">${pass.maxEl.toFixed(0)}°</span><span class="pass-quality ${quality}">${qLabel}</span></div>`;
+    h += `<div class="pass-chip"><span class="pc-label">Duration </span><span class="pc-value">${Math.round(pass.duration / 60)}m${Math.round(pass.duration % 60)}s</span></div>`;
+    h += `<div class="pass-chip"><span class="pc-label">AOS </span><span class="pc-value">${pass.start.toUTCString().slice(17, 25)} UTC</span></div>`;
   } else {
-    h += '<div class="pass-chip"><span class="pc-label">COMPUTING...</span></div>';
+    h += '<div class="pass-chip"><span class="pc-label">Computing...</span></div>';
   }
   h += '</div></div>';
 
