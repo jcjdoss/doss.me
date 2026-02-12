@@ -398,6 +398,31 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
 #tracking-stats .stat-value { color: var(--text-secondary); font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace; font-weight: 600; }
 #tracking-stats .stat-value.highlight { color: var(--green); }
 
+/* Radio indicator in bottom bar */
+.radio-ind {
+  display: flex; align-items: center; gap: 6px; padding: 3px 10px;
+  background: rgba(0,230,118,0.08); border: 1px solid rgba(0,230,118,0.2);
+  border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+}
+.radio-ind.disconnected { background: rgba(255,82,82,0.08); border-color: rgba(255,82,82,0.2); }
+.radio-ind-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+  box-shadow: 0 0 6px var(--green); animation: pulse-arrow 1.5s ease-in-out infinite;
+}
+.radio-ind.disconnected .radio-ind-dot { background: var(--red); box-shadow: 0 0 6px var(--red); }
+.radio-ind-label { color: var(--green); }
+.radio-ind.disconnected .radio-ind-label { color: var(--red); }
+.radio-ind-freq {
+  color: var(--cyan); font-size: 11px; font-weight: 600;
+}
+.radio-tuned-badge {
+  display: flex; align-items: center; gap: 6px; padding: 6px 12px; margin: 4px 18px 0;
+  background: rgba(0,230,118,0.08); border: 1px solid rgba(0,230,118,0.2);
+  border-radius: 6px; font-size: 10px; font-weight: 700; color: var(--green);
+  letter-spacing: 0.8px; text-transform: uppercase;
+}
+.radio-tuned-badge .radio-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); flex-shrink: 0; }
+
 /* Modals */
 .modal-overlay {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -639,6 +664,11 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
       </div>
       <button class="btn-sm" id="btn-gps">GPS</button>
       <button class="btn-track" id="btn-track">TRACK</button>
+      <div id="radio-indicator" class="radio-ind" style="display:none;">
+        <span class="radio-ind-dot"></span>
+        <span class="radio-ind-label">RADIO</span>
+        <span class="radio-ind-freq mono" id="radio-ind-freq"></span>
+      </div>
     </div>
     <div id="tracking-stats"></div>
   </div>
@@ -690,7 +720,7 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
 </div>
 
 <div class="modal-overlay hidden" id="settings-modal">
-  <div class="modal" style="width:420px;">
+  <div class="modal" style="width:480px;">
     <h3>Settings</h3>
 
     <div class="settings-section-label">Tracking</div>
@@ -724,6 +754,48 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
       <div class="settings-row"><label>Aurora Forecast</label><label class="toggle"><input type="checkbox" id="overlay-aurora"><span class="toggle-slider"></span></label></div>
       <div class="settings-row"><label>Map Labels</label><label class="toggle"><input type="checkbox" id="overlay-labels"><span class="toggle-slider"></span></label></div>
       <div class="settings-row"><label>Nautical Charts</label><label class="toggle"><input type="checkbox" id="overlay-nautical"><span class="toggle-slider"></span></label></div>
+    </div>
+
+    <div class="settings-section-label">Radio Control (CAT)</div>
+    <div class="settings-grid" id="radio-settings">
+      <div class="settings-row">
+        <div class="settings-label-group"><label>Radio Type</label><span class="settings-hint">WebSerial (USB) or rigctld (network)</span></div>
+        <select id="setting-radio-brand">
+          <option value="none">Disabled</option>
+          <option value="kenwood">Kenwood / Elecraft</option>
+          <option value="icom">Icom</option>
+          <option value="yaesu">Yaesu</option>
+          <option value="rigctld">rigctld (Hamlib)</option>
+        </select>
+      </div>
+      <div class="settings-row radio-model-row" style="display:none;">
+        <div class="settings-label-group"><label>Model</label></div>
+        <select id="setting-radio-model"></select>
+      </div>
+      <div class="settings-row radio-serial-row" style="display:none;">
+        <div class="settings-label-group"><label>Baud Rate</label></div>
+        <select id="setting-radio-baud">
+          <option value="4800">4800</option>
+          <option value="9600" selected>9600</option>
+          <option value="19200">19200</option>
+          <option value="38400">38400</option>
+          <option value="115200">115200</option>
+        </select>
+      </div>
+      <div class="settings-row radio-rigctld-row" style="display:none;">
+        <div class="settings-label-group"><label>WebSocket Port</label><span class="settings-hint">Bridge to rigctld TCP daemon</span></div>
+        <div class="settings-input-wrap"><input type="number" id="setting-rigctld-port" value="4533" min="1024" max="65535"></div>
+      </div>
+      <div class="settings-row"><label>Doppler Correction</label><label class="toggle"><input type="checkbox" id="setting-radio-doppler" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-row"><label>Auto-Tune on Select</label><label class="toggle"><input type="checkbox" id="setting-radio-autotune" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-row"><label>Split VFO (Full Duplex)</label><label class="toggle"><input type="checkbox" id="setting-radio-split"><span class="toggle-slider"></span></label></div>
+      <div class="settings-row" style="padding-top:4px;">
+        <button class="btn-sm" id="btn-radio-connect" style="width:100%;padding:8px 16px;font-size:11px;letter-spacing:1.5px;">CONNECT RADIO</button>
+      </div>
+      <div id="radio-status-msg" style="font-size:10px;color:var(--text-muted);text-align:center;padding:0 18px;display:none;"></div>
+      <div id="radio-no-webserial" style="font-size:10px;color:var(--orange);text-align:center;padding:4px 18px;display:none;">
+        WebSerial not available. Use Chrome/Edge 89+ on HTTPS or localhost, or use rigctld.
+      </div>
     </div>
 
     <div class="modal-buttons" style="margin-top:16px;">
@@ -760,6 +832,43 @@ const SATELLITE_CATALOG = [
 ];
 
 const CELESTRAK_GROUPS = ['stations', 'amateur', 'noaa'];
+
+// Radio model database — { name, baud, civAddr (Icom only) }
+const RADIO_MODELS = {
+  kenwood: [
+    { name: 'TS-2000', baud: 9600 },
+    { name: 'TS-590S/SG', baud: 9600 },
+    { name: 'TS-890S', baud: 115200 },
+    { name: 'TS-480', baud: 9600 },
+    { name: 'Elecraft K3/K3S', baud: 38400 },
+    { name: 'Elecraft KX3/KX2', baud: 38400 },
+    { name: 'Flex 6000 Series', baud: 9600 },
+    { name: 'Other (Kenwood-compatible)', baud: 9600 },
+  ],
+  icom: [
+    { name: 'IC-705', baud: 115200, civAddr: 0xA4 },
+    { name: 'IC-7300', baud: 115200, civAddr: 0x94 },
+    { name: 'IC-9700', baud: 115200, civAddr: 0xA2 },
+    { name: 'IC-910H', baud: 19200, civAddr: 0x60 },
+    { name: 'IC-7100', baud: 19200, civAddr: 0x88 },
+    { name: 'IC-7610', baud: 115200, civAddr: 0x98 },
+    { name: 'IC-9100', baud: 19200, civAddr: 0x7C },
+    { name: 'IC-R8600', baud: 115200, civAddr: 0x96 },
+    { name: 'Other Icom', baud: 9600, civAddr: 0x94 },
+  ],
+  yaesu: [
+    { name: 'FT-991A', baud: 38400 },
+    { name: 'FTDX10', baud: 38400 },
+    { name: 'FTDX101D/MP', baud: 38400 },
+    { name: 'FT-710', baud: 38400 },
+    { name: 'FT-817/818', baud: 4800 },
+    { name: 'FT-857D', baud: 4800 },
+    { name: 'FT-897D', baud: 4800 },
+    { name: 'Other Yaesu (new CAT)', baud: 38400 },
+  ],
+  rigctld: [],
+  none: [],
+};
 
 // ============================================================
 // MAIDENHEAD GRID LOCATOR
@@ -1127,6 +1236,351 @@ function estimateSignalLevel(elevation, range, altKm) {
 }
 
 // ============================================================
+// RADIO CAT PROTOCOL DRIVERS
+// ============================================================
+
+// Kenwood / Elecraft ASCII protocol — also used by Flex, many SDRs
+const KenwoodProtocol = {
+  name: 'kenwood',
+  setFreqA(freqHz) { return new TextEncoder().encode('FA' + String(Math.round(freqHz)).padStart(11, '0') + ';'); },
+  setFreqB(freqHz) { return new TextEncoder().encode('FB' + String(Math.round(freqHz)).padStart(11, '0') + ';'); },
+  getFreqA() { return new TextEncoder().encode('FA;'); },
+  setMode(mode) {
+    const m = { 'FM': 4, 'USB': 2, 'LSB': 1, 'CW': 3, 'CW-R': 7, 'AM': 5 }[mode] ?? 4;
+    return new TextEncoder().encode('MD' + m + ';');
+  },
+  parseResponse(text) {
+    if (text.startsWith('FA') && text.endsWith(';')) return { type: 'freqA', value: parseInt(text.slice(2, -1)) };
+    if (text.startsWith('FB') && text.endsWith(';')) return { type: 'freqB', value: parseInt(text.slice(2, -1)) };
+    return null;
+  },
+  delimiter: 0x3B,
+};
+
+// Icom CI-V binary protocol
+const IcomProtocol = {
+  name: 'icom',
+  addresses: {
+    'IC-705': 0xA4, 'IC-7300': 0x94, 'IC-9700': 0xA2,
+    'IC-910H': 0x60, 'IC-7100': 0x88, 'IC-7610': 0x98,
+    'IC-R8600': 0x96, 'IC-9100': 0x7C,
+  },
+  _frame(civAddr, cmd, subCmd, data) {
+    const parts = [0xFE, 0xFE, civAddr, 0xE0, cmd];
+    if (subCmd !== null && subCmd !== undefined) parts.push(subCmd);
+    if (data) parts.push(...data);
+    parts.push(0xFD);
+    return new Uint8Array(parts);
+  },
+  _freqToBCD(freqHz) {
+    const s = String(Math.round(freqHz)).padStart(10, '0');
+    const bcd = [];
+    for (let i = 8; i >= 0; i -= 2) bcd.push((parseInt(s[i]) << 4) | parseInt(s[i + 1]));
+    return bcd;
+  },
+  setFreq(civAddr, freqHz) { return this._frame(civAddr, 0x05, null, this._freqToBCD(freqHz)); },
+  selectVfoA(civAddr) { return this._frame(civAddr, 0x07, 0x00, null); },
+  selectVfoB(civAddr) { return this._frame(civAddr, 0x07, 0x01, null); },
+  setMode(civAddr, mode) {
+    const m = { 'LSB': 0x00, 'USB': 0x01, 'AM': 0x02, 'CW': 0x03, 'FM': 0x05, 'CW-R': 0x07 }[mode] ?? 0x05;
+    return this._frame(civAddr, 0x06, m, [0x01]);
+  },
+  getFreq(civAddr) { return this._frame(civAddr, 0x03, null, null); },
+};
+
+// Yaesu old-style 5-byte protocol — FT-817/818/857/897
+const YaesuOldProtocol = {
+  name: 'yaesu_old',
+  setFreq(freqHz) {
+    const mhz10 = Math.round(freqHz / 10);
+    const s = String(mhz10).padStart(8, '0');
+    const bytes = new Uint8Array(5);
+    for (let i = 0; i < 4; i++) bytes[i] = (parseInt(s[i * 2]) << 4) | parseInt(s[i * 2 + 1]);
+    bytes[4] = 0x01;
+    return bytes;
+  },
+  setMode(mode) {
+    const m = { 'LSB': 0x00, 'USB': 0x01, 'CW': 0x02, 'CW-R': 0x03, 'AM': 0x04, 'FM': 0x08, 'DIG': 0x0A, 'PKT': 0x0C }[mode] ?? 0x08;
+    return new Uint8Array([m, 0x00, 0x00, 0x00, 0x07]);
+  },
+  getFreqMode() { return new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x03]); },
+};
+
+// Yaesu new-style ASCII protocol — FT-991A, FTDX10, FTDX101D, FT-710
+const YaesuNewProtocol = {
+  name: 'yaesu_new',
+  setFreqA(freqHz) { return new TextEncoder().encode('FA' + String(Math.round(freqHz)).padStart(9, '0') + ';'); },
+  setFreqB(freqHz) { return new TextEncoder().encode('FB' + String(Math.round(freqHz)).padStart(9, '0') + ';'); },
+  getFreqA() { return new TextEncoder().encode('FA;'); },
+  setMode(mode) {
+    const m = { 'LSB': 1, 'USB': 2, 'CW': 3, 'FM': 4, 'AM': 5, 'CW-R': 7, 'DATA-USB': 9, 'FM-N': 11 }[mode] ?? 4;
+    return new TextEncoder().encode('MD0' + m + ';');
+  },
+  delimiter: 0x3B,
+};
+
+// rigctld text protocol (over WebSocket)
+const RigctldProtocol = {
+  name: 'rigctld',
+  setFreq(freqHz) { return 'F ' + Math.round(freqHz) + '\n'; },
+  getFreq() { return 'f\n'; },
+  setMode(mode, bandwidth) { return 'M ' + mode + ' ' + (bandwidth || 0) + '\n'; },
+  setVfo(vfo) { return 'V ' + vfo + '\n'; },
+  parseResponse(text) {
+    const lines = text.trim().split('\n');
+    const num = parseInt(lines[0]);
+    if (!isNaN(num) && num > 1000000) return { type: 'freq', value: num };
+    if (lines[0].startsWith('RPRT')) return { type: 'rprt', value: parseInt(lines[0].split(' ')[1]) };
+    return { type: 'raw', value: text };
+  },
+};
+
+// ============================================================
+// RADIO TRANSPORT: WebSerial
+// ============================================================
+const RadioSerial = {
+  async connect() {
+    if (!('serial' in navigator)) throw new Error('WebSerial not supported. Use Chrome/Edge 89+ on HTTPS or localhost.');
+    const port = await navigator.serial.requestPort();
+    await port.open({ baudRate: state.radio.config.baudRate });
+    state.radio.port = port;
+    state.radio.writer = port.writable.getWriter();
+    state.radio.transport = 'serial';
+    state.radio.rxBuffer = new Uint8Array(0);
+    this._readLoop(port);
+    state.radio.connected = true;
+    const brand = state.radio.config.brand;
+    const oldModels = ['FT-817', 'FT-818', 'FT-857', 'FT-897'];
+    state.radio.protocol = brand === 'icom' ? 'icom'
+      : brand === 'yaesu' ? (oldModels.some(m => state.radio.config.model.includes(m)) ? 'yaesu_old' : 'yaesu_new')
+      : 'kenwood';
+    updateRadioStatusUI();
+  },
+  async _readLoop(port) {
+    const reader = port.readable.getReader();
+    state.radio.reader = reader;
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        if (value) {
+          const prev = state.radio.rxBuffer;
+          const buf = new Uint8Array(prev.length + value.length);
+          buf.set(prev); buf.set(value, prev.length);
+          state.radio.rxBuffer = buf;
+        }
+      }
+    } catch (e) { if (state.radio.connected) { console.warn('Serial read error:', e); this.disconnect(); } }
+  },
+  async send(data) {
+    if (!state.radio.writer) return;
+    try { await state.radio.writer.write(data instanceof Uint8Array ? data : new TextEncoder().encode(data)); }
+    catch (e) { console.error('Serial write error:', e); this.disconnect(); }
+  },
+  async disconnect() {
+    state.radio.connected = false;
+    try { if (state.radio.reader) { await state.radio.reader.cancel(); state.radio.reader = null; } } catch(e) {}
+    try { if (state.radio.writer) { state.radio.writer.releaseLock(); state.radio.writer = null; } } catch(e) {}
+    try { if (state.radio.port) { await state.radio.port.close(); state.radio.port = null; } } catch(e) {}
+    state.radio.transport = null;
+    state.radio.protocol = null;
+    updateRadioStatusUI();
+  },
+};
+
+// ============================================================
+// RADIO TRANSPORT: rigctld via WebSocket
+// ============================================================
+const RadioRigctld = {
+  async connect() {
+    const { wsPort, rigctldHost } = state.radio.config;
+    const url = 'ws://' + rigctldHost + ':' + wsPort;
+    return new Promise((resolve, reject) => {
+      const ws = new WebSocket(url);
+      const timeout = setTimeout(() => { ws.close(); reject(new Error('rigctld connection timed out')); }, 5000);
+      ws.onopen = () => {
+        clearTimeout(timeout);
+        state.radio.ws = ws;
+        state.radio.connected = true;
+        state.radio.transport = 'rigctld';
+        state.radio.protocol = 'rigctld';
+        updateRadioStatusUI();
+        ws.send(RigctldProtocol.getFreq());
+        resolve();
+      };
+      ws.onerror = () => { clearTimeout(timeout); reject(new Error('Cannot connect to rigctld WebSocket bridge at ' + url)); };
+      ws.onclose = () => {
+        if (state.radio.connected) {
+          state.radio.connected = false;
+          state.radio.transport = null;
+          state.radio.protocol = null;
+          updateRadioStatusUI();
+        }
+      };
+    });
+  },
+  async send(data) {
+    if (state.radio.ws && state.radio.ws.readyState === WebSocket.OPEN) state.radio.ws.send(data);
+  },
+  async disconnect() {
+    state.radio.connected = false;
+    if (state.radio.ws) { state.radio.ws.close(); state.radio.ws = null; }
+    state.radio.transport = null;
+    state.radio.protocol = null;
+    updateRadioStatusUI();
+  },
+};
+
+// ============================================================
+// RADIO CONTROLLER
+// ============================================================
+const RadioController = {
+  async connect() {
+    try {
+      if (state.radio.config.brand === 'rigctld') await RadioRigctld.connect();
+      else await RadioSerial.connect();
+      this.saveConfig();
+    } catch (e) { throw e; }
+  },
+  async disconnect() {
+    if (state.radio.transport === 'rigctld') await RadioRigctld.disconnect();
+    else await RadioSerial.disconnect();
+  },
+  async _send(data) {
+    if (state.radio.transport === 'rigctld') await RadioRigctld.send(data);
+    else await RadioSerial.send(data);
+  },
+  _delay(ms) { return new Promise(r => setTimeout(r, ms)); },
+
+  async setDownlink(freqHz) {
+    const p = state.radio.protocol;
+    if (p === 'kenwood') await this._send(KenwoodProtocol.setFreqA(freqHz));
+    else if (p === 'icom') {
+      const addr = state.radio.config.civAddress;
+      if (state.radio.config.splitVfo) { await this._send(IcomProtocol.selectVfoA(addr)); await this._delay(30); }
+      await this._send(IcomProtocol.setFreq(addr, freqHz));
+    } else if (p === 'yaesu_old') await this._send(YaesuOldProtocol.setFreq(freqHz));
+    else if (p === 'yaesu_new') await this._send(YaesuNewProtocol.setFreqA(freqHz));
+    else if (p === 'rigctld') {
+      if (state.radio.config.splitVfo) { await this._send(RigctldProtocol.setVfo('VFOA')); await this._delay(20); }
+      await this._send(RigctldProtocol.setFreq(freqHz));
+    }
+  },
+
+  async setUplink(freqHz) {
+    if (!state.radio.config.splitVfo) return;
+    const p = state.radio.protocol;
+    if (p === 'kenwood') await this._send(KenwoodProtocol.setFreqB(freqHz));
+    else if (p === 'icom') {
+      const addr = state.radio.config.civAddress;
+      await this._send(IcomProtocol.selectVfoB(addr)); await this._delay(30);
+      await this._send(IcomProtocol.setFreq(addr, freqHz)); await this._delay(30);
+      await this._send(IcomProtocol.selectVfoA(addr));
+    } else if (p === 'yaesu_new') await this._send(YaesuNewProtocol.setFreqB(freqHz));
+    else if (p === 'rigctld') {
+      await this._send(RigctldProtocol.setVfo('VFOB')); await this._delay(20);
+      await this._send(RigctldProtocol.setFreq(freqHz)); await this._delay(20);
+      await this._send(RigctldProtocol.setVfo('VFOA'));
+    }
+  },
+
+  async setMode(modeStr) {
+    const p = state.radio.protocol;
+    if (p === 'kenwood') await this._send(KenwoodProtocol.setMode(modeStr));
+    else if (p === 'icom') await this._send(IcomProtocol.setMode(state.radio.config.civAddress, modeStr));
+    else if (p === 'yaesu_old') await this._send(YaesuOldProtocol.setMode(modeStr));
+    else if (p === 'yaesu_new') await this._send(YaesuNewProtocol.setMode(modeStr));
+    else if (p === 'rigctld') await this._send(RigctldProtocol.setMode(modeStr, 0));
+  },
+
+  // Main loop hook — throttled Doppler frequency updates
+  async updateDoppler() {
+    if (!state.radio.connected || !state.radio.config.dopplerCorrection) return;
+    if (state.activeSatId == null) return;
+    const now = Date.now();
+    if (now - state.radio.lastTxTime < state.radio.txInterval) return;
+    const sat = state.satellites[state.activeSatId];
+    if (!sat || !sat.catalogEntry) return;
+    const cat = sat.catalogEntry;
+    const rr = sat.rangeRate || 0;
+    if (cat.downlink) {
+      const dShift = computeDoppler(cat.downlink, rr);
+      const correctedDown = Math.round((cat.downlink + dShift) * 1e6 / 10) * 10;
+      if (correctedDown !== state.radio.lastSentDownlink) {
+        state.radio.lastSentDownlink = correctedDown;
+        state.radio.lastTxTime = now;
+        await this.setDownlink(correctedDown);
+      }
+    }
+    if (cat.uplink && state.radio.config.splitVfo) {
+      const uShift = computeDoppler(cat.uplink, rr);
+      const correctedUp = Math.round((cat.uplink - uShift) * 1e6 / 10) * 10;
+      if (correctedUp !== state.radio.lastSentUplink) {
+        state.radio.lastSentUplink = correctedUp;
+        await this._delay(50);
+        await this.setUplink(correctedUp);
+      }
+    }
+  },
+
+  // Called when user selects a different satellite
+  async onSatelliteChange(nid) {
+    if (!state.radio.connected || !state.radio.config.autoTune) return;
+    const sat = state.satellites[nid];
+    if (!sat || !sat.catalogEntry) return;
+    state.radio.lastSentDownlink = 0;
+    state.radio.lastSentUplink = 0;
+    const modeStr = this._satModeToRadioMode(sat.catalogEntry.mode);
+    if (modeStr) await this.setMode(modeStr);
+    await this.updateDoppler();
+  },
+
+  _satModeToRadioMode(satMode) {
+    if (!satMode) return 'FM';
+    const m = satMode.toUpperCase();
+    if (m.includes('FM')) return 'FM';
+    if (m.includes('USB') || m.includes('LINEAR') || m.includes('TRANSP')) return 'USB';
+    if (m.includes('LSB')) return 'LSB';
+    if (m.includes('CW')) return 'CW';
+    return 'FM';
+  },
+
+  saveConfig() {
+    try { localStorage.setItem('sat_tracker_radio', JSON.stringify(state.radio.config)); } catch (e) {}
+  },
+  loadConfig() {
+    try { const s = JSON.parse(localStorage.getItem('sat_tracker_radio')); if (s) Object.assign(state.radio.config, s); } catch (e) {}
+  },
+};
+
+// Radio status UI helpers
+function updateRadioStatusUI() {
+  const el = document.getElementById('radio-indicator');
+  if (!el) return;
+  if (state.radio.connected) {
+    el.style.display = 'flex';
+    el.classList.remove('disconnected');
+    el.querySelector('.radio-ind-label').textContent = state.radio.config.brand === 'rigctld' ? 'RIGCTLD' : (state.radio.config.model || 'RADIO');
+  } else if (state.radio.config.brand !== 'none') {
+    el.style.display = 'flex';
+    el.classList.add('disconnected');
+    el.querySelector('.radio-ind-label').textContent = 'RADIO OFF';
+    document.getElementById('radio-ind-freq').textContent = '';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function updateRadioFreqDisplay() {
+  if (!state.radio.connected) return;
+  const freqEl = document.getElementById('radio-ind-freq');
+  if (!freqEl) return;
+  if (state.radio.lastSentDownlink > 0) {
+    freqEl.textContent = (state.radio.lastSentDownlink / 1e6).toFixed(4) + ' MHz';
+  }
+}
+
+// ============================================================
 // STATE
 // ============================================================
 const state = {
@@ -1149,6 +1603,32 @@ const state = {
   trackingMode: false,
   lastCalcTime: 0, lastTrackTime: 0,
   nextPassCache: {}, animFrameId: null,
+  // Radio CAT control state
+  radio: {
+    connected: false,
+    transport: null,        // 'serial' | 'rigctld' | null
+    protocol: null,         // 'icom' | 'yaesu_old' | 'yaesu_new' | 'kenwood' | null
+    port: null,             // WebSerial port object
+    reader: null,           // ReadableStream reader
+    writer: null,           // WritableStream writer
+    ws: null,               // WebSocket for rigctld
+    config: {
+      brand: 'none',       // 'icom' | 'yaesu' | 'kenwood' | 'rigctld' | 'none'
+      model: '',
+      baudRate: 9600,
+      civAddress: 0x94,     // Icom CI-V address (varies by model)
+      rigctldHost: 'localhost',
+      wsPort: 4533,         // WebSocket bridge port
+      dopplerCorrection: true,
+      autoTune: true,
+      splitVfo: false,      // true for full-duplex sats
+    },
+    lastTxTime: 0,          // throttle: last command send timestamp
+    txInterval: 200,        // min ms between freq commands (5/sec)
+    lastSentDownlink: 0,    // last frequency sent (avoid duplicate cmds)
+    lastSentUplink: 0,
+    rxBuffer: new Uint8Array(0),
+  },
 };
 
 // ============================================================
@@ -2508,6 +2988,7 @@ function selectSat(nid) {
   }
 
   updateDetailsPanel();
+  RadioController.onSatelliteChange(nid);
 }
 
 function toggleSatVis(nid, vis) {
@@ -2868,6 +3349,13 @@ function updateDetailsPanel() {
   }
   h += '</div>';
 
+  // Radio tuning badge
+  if (state.radio.connected && state.radio.config.dopplerCorrection) {
+    h += '<div class="radio-tuned-badge"><span class="radio-dot"></span>';
+    h += 'RADIO TUNED \u2014 ' + (state.radio.config.splitVfo ? 'Split VFO (Full Duplex)' : 'Simplex (RX Only)');
+    h += '</div>';
+  }
+
   const sl = sat.signalLevel || 0;
   h += '<div class="signal-meter"><div class="signal-meter-label">Estimated Signal Strength</div><div class="signal-bar-container">';
   for (let i = 1; i <= 9; i++) {
@@ -3031,6 +3519,8 @@ function animLoop() {
     }
 
     updateDetailsPanel();
+    RadioController.updateDoppler();
+    updateRadioFreqDisplay();
     updateElevBadges();
 
     let above = 0;
@@ -3189,6 +3679,20 @@ function setupEvents() {
     document.getElementById('setting-min-elev').value = state.settings.minElevation;
     document.getElementById('setting-interval').value = state.settings.updateInterval;
     document.getElementById('setting-basemap').value = state.settings.baseMap || 'dark';
+    // Populate radio settings
+    document.getElementById('setting-radio-brand').value = state.radio.config.brand || 'none';
+    document.getElementById('setting-radio-brand').dispatchEvent(new Event('change'));
+    document.getElementById('setting-radio-doppler').checked = state.radio.config.dopplerCorrection !== false;
+    document.getElementById('setting-radio-autotune').checked = state.radio.config.autoTune !== false;
+    document.getElementById('setting-radio-split').checked = !!state.radio.config.splitVfo;
+    if (state.radio.config.brand === 'rigctld') document.getElementById('setting-rigctld-port').value = state.radio.config.wsPort || 4533;
+    const noWS = document.getElementById('radio-no-webserial');
+    if (noWS) noWS.style.display = !('serial' in navigator) ? 'block' : 'none';
+    const rbtn = document.getElementById('btn-radio-connect');
+    if (rbtn) {
+      if (state.radio.connected) { rbtn.textContent = 'DISCONNECT'; rbtn.style.color = 'var(--green)'; }
+      else { rbtn.textContent = 'CONNECT RADIO'; rbtn.style.color = ''; }
+    }
     document.getElementById('settings-modal').classList.remove('hidden');
   });
 
@@ -3210,6 +3714,11 @@ function setupEvents() {
     });
 
     localStorage.setItem('sat_tracker_settings', JSON.stringify(state.settings));
+    // Save radio settings
+    state.radio.config.dopplerCorrection = document.getElementById('setting-radio-doppler').checked;
+    state.radio.config.autoTune = document.getElementById('setting-radio-autotune').checked;
+    state.radio.config.splitVfo = document.getElementById('setting-radio-split').checked;
+    RadioController.saveConfig();
     state.nextPassCache = {};
     document.getElementById('settings-modal').classList.add('hidden');
   });
@@ -3226,6 +3735,75 @@ function setupEvents() {
   document.getElementById('btn-track').addEventListener('click', () => {
     state.trackingMode = !state.trackingMode;
     document.getElementById('btn-track').classList.toggle('active', state.trackingMode);
+  });
+
+  // Radio settings — brand dropdown show/hide
+  document.getElementById('setting-radio-brand').addEventListener('change', () => {
+    const brand = document.getElementById('setting-radio-brand').value;
+    const modelRow = document.querySelector('.radio-model-row');
+    const serialRow = document.querySelector('.radio-serial-row');
+    const rigctldRow = document.querySelector('.radio-rigctld-row');
+    modelRow.style.display = (brand !== 'none' && brand !== 'rigctld') ? 'flex' : 'none';
+    serialRow.style.display = (brand !== 'none' && brand !== 'rigctld') ? 'flex' : 'none';
+    rigctldRow.style.display = (brand === 'rigctld') ? 'flex' : 'none';
+    const modelSelect = document.getElementById('setting-radio-model');
+    modelSelect.innerHTML = '';
+    const models = RADIO_MODELS[brand] || [];
+    models.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.name; opt.textContent = m.name;
+      if (m.baud) opt.dataset.baud = m.baud;
+      if (m.civAddr) opt.dataset.civAddr = '0x' + m.civAddr.toString(16);
+      modelSelect.appendChild(opt);
+    });
+    if (models.length > 0 && models[0].baud) document.getElementById('setting-radio-baud').value = models[0].baud;
+    // Auto-select saved model
+    if (state.radio.config.brand === brand && state.radio.config.model) {
+      modelSelect.value = state.radio.config.model;
+      const sel = modelSelect.options[modelSelect.selectedIndex];
+      if (sel && sel.dataset.baud) document.getElementById('setting-radio-baud').value = sel.dataset.baud;
+    }
+  });
+
+  // Radio model change — update baud rate
+  document.getElementById('setting-radio-model').addEventListener('change', () => {
+    const sel = document.getElementById('setting-radio-model');
+    const opt = sel.options[sel.selectedIndex];
+    if (opt && opt.dataset.baud) document.getElementById('setting-radio-baud').value = opt.dataset.baud;
+    if (opt && opt.dataset.civAddr) state.radio.config.civAddress = parseInt(opt.dataset.civAddr);
+  });
+
+  // Radio connect/disconnect button
+  document.getElementById('btn-radio-connect').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-radio-connect');
+    if (state.radio.connected) {
+      await RadioController.disconnect();
+      btn.textContent = 'CONNECT RADIO'; btn.style.color = '';
+      return;
+    }
+    const brand = document.getElementById('setting-radio-brand').value;
+    if (brand === 'none') return;
+    state.radio.config.brand = brand;
+    state.radio.config.model = document.getElementById('setting-radio-model').value || '';
+    state.radio.config.baudRate = parseInt(document.getElementById('setting-radio-baud').value) || 9600;
+    state.radio.config.dopplerCorrection = document.getElementById('setting-radio-doppler').checked;
+    state.radio.config.autoTune = document.getElementById('setting-radio-autotune').checked;
+    state.radio.config.splitVfo = document.getElementById('setting-radio-split').checked;
+    if (brand === 'rigctld') state.radio.config.wsPort = parseInt(document.getElementById('setting-rigctld-port').value) || 4533;
+    if (brand === 'icom') {
+      const addr = IcomProtocol.addresses[state.radio.config.model];
+      if (addr) state.radio.config.civAddress = addr;
+    }
+    btn.textContent = 'CONNECTING...';
+    try {
+      await RadioController.connect();
+      btn.textContent = 'DISCONNECT'; btn.style.color = 'var(--green)';
+    } catch (e) {
+      btn.textContent = 'CONNECT RADIO'; btn.style.color = '';
+      const msg = document.getElementById('radio-status-msg');
+      msg.textContent = e.message; msg.style.display = 'block'; msg.style.color = 'var(--red)';
+      setTimeout(() => msg.style.display = 'none', 5000);
+    }
   });
 
   // Floating layer panel
@@ -3288,6 +3866,7 @@ function setupEvents() {
 // ============================================================
 async function init() {
   try { const ss = JSON.parse(localStorage.getItem('sat_tracker_settings')); if (ss) Object.assign(state.settings, ss); } catch (e) {}
+  RadioController.loadConfig();
   initMap();
   loadObserverLocation();
   setupEvents();
