@@ -164,6 +164,12 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
 .freq-doppler.positive { color: var(--orange); }
 .freq-doppler.negative { color: var(--accent); }
 
+/* Transponder list */
+.transponder-list { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); }
+.transponder-entry { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; gap: 8px; }
+.xpdr-mode { font-size: 10px; color: var(--text-secondary); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+.xpdr-freq { font-size: 10px; color: var(--text-primary); opacity: 0.8; white-space: nowrap; }
+
 /* Doppler shift gauge */
 .doppler-gauge-wrap { margin-top: 10px; }
 .doppler-gauge-labels { display: flex; justify-content: space-between; font-size: 8px; color: var(--text-muted); letter-spacing: 0.5px; font-family: 'SF Mono', 'Fira Code', monospace; margin-bottom: 3px; opacity: 0.6; }
@@ -285,6 +291,24 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
 /* Map / Cesium container */
 #map-container { flex: 1; position: relative; }
 #cesiumContainer { width: 100%; height: 100%; background: var(--bg-primary); }
+
+/* Frequency scale bar */
+#freq-scale-canvas {
+  position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%);
+  width: 80%; max-width: 900px; height: 72px; z-index: 50; pointer-events: none;
+}
+#freq-scale-band-btns {
+  position: absolute; bottom: 124px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 2px; z-index: 51;
+}
+.freq-band-btn {
+  background: rgba(15,21,32,0.85); border: 1px solid var(--border); color: var(--text-secondary);
+  font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  padding: 3px 12px; cursor: pointer; border-radius: 4px 4px 0 0; transition: all 0.2s;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+.freq-band-btn:hover { color: var(--text-primary); border-color: var(--accent-dim); }
+.freq-band-btn.active { background: rgba(77,166,255,0.12); color: var(--accent); border-color: var(--accent-dim); border-bottom-color: transparent; }
 
 /* Cesium dark-theme overrides */
 .cesium-viewer-bottom { display: none !important; }
@@ -616,6 +640,11 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF P
     </div>
     <div id="map-container">
       <div id="cesiumContainer"></div>
+      <canvas id="freq-scale-canvas"></canvas>
+      <div id="freq-scale-band-btns">
+        <button class="freq-band-btn active" data-band="vhf">2m</button>
+        <button class="freq-band-btn" data-band="uhf">70cm</button>
+      </div>
       <div id="grid-overlay" title="Click to edit your station profile">
         <span class="grid-pin"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></span>
         <div class="grid-info">
@@ -817,21 +846,156 @@ const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
 
 const SATELLITE_CATALOG = [
-  { name: 'ISS (ZARYA)',      noradId: 25544, category: 'Space Stations', uplink: 145.825,  downlink: 437.800,  mode: 'FM Voice/APRS', color: '#4da6ff' },
-  { name: 'ISS (NAUKA)',      noradId: 49044, category: 'Space Stations', uplink: null,      downlink: 437.800,  mode: 'Telemetry',     color: '#80caff' },
-  { name: 'SO-50',            noradId: 27607, category: 'Amateur Radio',  uplink: 145.850,  downlink: 436.795,  mode: 'FM Repeater',   color: '#ff5c8a' },
-  { name: 'AO-91 (FOX-1B)',   noradId: 43017, category: 'Amateur Radio',  uplink: 435.250,  downlink: 145.960,  mode: 'FM Transponder',color: '#56d364' },
-  { name: 'AO-95 (FOX-1Cliff)',noradId: 43770, category: 'Amateur Radio', uplink: 435.300,  downlink: 145.920,  mode: 'FM Transponder',color: '#db61a2' },
-  { name: 'XW-3 (CAS-9)',     noradId: 50466, category: 'Amateur Radio',  uplink: 435.150,  downlink: 145.870,  mode: 'Linear Transp', color: '#f0883e' },
-  { name: 'AO-73 (FUNcube-1)',noradId: 39444, category: 'Amateur Radio',  uplink: 435.150,  downlink: 145.935,  mode: 'Linear/Telem',  color: '#d2a8ff' },
-  { name: 'TEVEL-1',          noradId: 63217, category: 'Amateur Radio',  uplink: 145.970,  downlink: 436.400,  mode: 'FM Transponder', color: '#e3b341' },
-  { name: 'NOAA 15',          noradId: 25338, category: 'Weather/APT',    uplink: null,      downlink: 137.620,  mode: 'APT 2400bps',   color: '#79c0ff' },
-  { name: 'NOAA 18',          noradId: 28654, category: 'Weather/APT',    uplink: null,      downlink: 137.9125, mode: 'APT 2400bps',   color: '#7ee787' },
-  { name: 'NOAA 19',          noradId: 33591, category: 'Weather/APT',    uplink: null,      downlink: 137.100,  mode: 'APT 2400bps',   color: '#ffa657' },
-  { name: 'FOX-1A (AO-85)',   noradId: 40967, category: 'Amateur Radio',  uplink: 435.180,  downlink: 145.980,  mode: 'FM Transponder', color: '#ff6b6b' },
+  // ── Space Stations ───────────────────────────────────────────────────────
+  { name: 'ISS (ZARYA)', noradId: 25544, category: 'Space Stations', color: '#4da6ff',
+    transponders: [
+      { downlinkLow: 145.800, downlinkHigh: 145.800, uplinkLow: 145.990, uplinkHigh: 145.990, mode: 'FM Voice', invert: false, ctcssTone: 67.0, status: 'active' },
+      { downlinkLow: 437.800, downlinkHigh: 437.800, mode: 'APRS Digipeater', invert: false, status: 'active' },
+    ]},
+  { name: 'ISS (NAUKA)', noradId: 49044, category: 'Space Stations', color: '#80caff',
+    transponders: [
+      { downlinkLow: 437.800, downlinkHigh: 437.800, mode: 'Telemetry', status: 'active' },
+    ]},
+  { name: 'CSS (TIANGONG)', noradId: 48274, category: 'Space Stations', color: '#6bb8ff',
+    transponders: [
+      { downlinkLow: 437.550, downlinkHigh: 437.550, mode: 'Telemetry', status: 'active' },
+    ]},
+
+  // ── Amateur Radio — FM Repeaters & Transponders ──────────────────────────
+  { name: 'SO-50 (SaudiSat-1C)', noradId: 27607, category: 'FM Satellites', color: '#ff5c8a',
+    transponders: [
+      { downlinkLow: 436.795, downlinkHigh: 436.795, uplinkLow: 145.850, uplinkHigh: 145.850, mode: 'FM Repeater', invert: false, ctcssTone: 67.0, status: 'active' },
+    ]},
+  { name: 'PO-101 (DIWATA-2B)', noradId: 43678, category: 'FM Satellites', color: '#ff85a1',
+    transponders: [
+      { downlinkLow: 437.500, downlinkHigh: 437.500, uplinkLow: 145.900, uplinkHigh: 145.900, mode: 'FM Repeater', invert: false, ctcssTone: 141.3, status: 'active' },
+    ]},
+  { name: 'AO-91 (FOX-1B)', noradId: 43017, category: 'FM Satellites', color: '#56d364',
+    transponders: [
+      { downlinkLow: 145.960, downlinkHigh: 145.960, uplinkLow: 435.250, uplinkHigh: 435.250, mode: 'FM Transponder', invert: false, ctcssTone: 67.0, status: 'active' },
+    ]},
+  { name: 'AO-95 (FOX-1Cliff)', noradId: 43770, category: 'FM Satellites', color: '#db61a2',
+    transponders: [
+      { downlinkLow: 145.920, downlinkHigh: 145.920, uplinkLow: 435.300, uplinkHigh: 435.300, mode: 'FM Transponder', invert: false, ctcssTone: 67.0, status: 'active' },
+    ]},
+  { name: 'AO-27 (EYESAT-1)', noradId: 22825, category: 'FM Satellites', color: '#ffa0a0',
+    transponders: [
+      { downlinkLow: 436.795, downlinkHigh: 436.795, uplinkLow: 145.850, uplinkHigh: 145.850, mode: 'FM Repeater', invert: false, status: 'semi-operational' },
+    ]},
+  { name: 'MESAT-1 (MO-122)', noradId: 60209, category: 'FM Satellites', color: '#66d9ef',
+    transponders: [
+      { downlinkLow: 435.800, downlinkHigh: 435.800, uplinkLow: 145.980, uplinkHigh: 145.980, mode: 'FM Repeater', invert: false, ctcssTone: 141.3, status: 'inactive' },
+    ]},
+
+  // ── Amateur Radio — Linear Transponders / SSB/CW ─────────────────────────
+  { name: 'AO-7', noradId: 7530, category: 'Linear Transponders', color: '#56d364',
+    transponders: [
+      { downlinkLow: 29.400, downlinkHigh: 29.500, uplinkLow: 145.850, uplinkHigh: 145.950, mode: 'Linear Transponder', invert: true, status: 'semi-operational', bandwidth: 100 },
+      { downlinkLow: 145.925, downlinkHigh: 145.975, uplinkLow: 432.125, uplinkHigh: 432.175, mode: 'Linear Transponder', invert: false, status: 'semi-operational', bandwidth: 50 },
+      { beaconFreq: 29.502, mode: 'CW Beacon', status: 'active' },
+    ]},
+  { name: 'RS-44 (DOSAAF-85)', noradId: 44909, category: 'Linear Transponders', color: '#4dc96b',
+    transponders: [
+      { downlinkLow: 435.610, downlinkHigh: 435.670, uplinkLow: 145.935, uplinkHigh: 145.995, mode: 'Linear Transponder', invert: true, status: 'active', bandwidth: 60 },
+      { beaconFreq: 435.590, mode: 'CW Beacon', status: 'active' },
+    ]},
+  { name: 'FO-29 (JAS-2)', noradId: 24278, category: 'Linear Transponders', color: '#43bf60',
+    transponders: [
+      { downlinkLow: 435.800, downlinkHigh: 435.900, uplinkLow: 145.900, uplinkHigh: 146.000, mode: 'Linear Transponder', invert: false, status: 'active', bandwidth: 100 },
+      { beaconFreq: 435.795, mode: 'CW Beacon', status: 'active' },
+    ]},
+  { name: 'XW-3 (CAS-9)', noradId: 50466, category: 'Linear Transponders', color: '#d05c1a',
+    transponders: [
+      { downlinkLow: 145.855, downlinkHigh: 145.875, uplinkLow: 435.140, uplinkHigh: 435.160, mode: 'Linear Transponder', invert: true, status: 'active', bandwidth: 20 },
+      { beaconFreq: 145.835, mode: 'CW Beacon', status: 'active' },
+    ]},
+  { name: 'AO-73 (FUNcube-1)', noradId: 39444, category: 'Linear Transponders', color: '#d2a8ff',
+    transponders: [
+      { downlinkLow: 145.935, downlinkHigh: 145.970, uplinkLow: 435.130, uplinkHigh: 435.165, mode: 'Linear Transponder', invert: true, status: 'active', bandwidth: 35 },
+      { beaconFreq: 145.935, mode: 'Telemetry', status: 'active' },
+    ]},
+  { name: 'JO-97 (FUNcube-6/JYSAT)', noradId: 43803, category: 'Linear Transponders', color: '#be92eb',
+    transponders: [
+      { downlinkLow: 145.855, downlinkHigh: 145.890, uplinkLow: 435.100, uplinkHigh: 435.135, mode: 'Linear Transponder', invert: true, status: 'active', bandwidth: 35 },
+    ]},
+  { name: 'QO-100 (Es\'hail-2)', noradId: 43700, category: 'Linear Transponders', color: '#ffd700',
+    transponders: [
+      { downlinkLow: 10489.550, downlinkHigh: 10489.800, uplinkLow: 2400.050, uplinkHigh: 2400.300, mode: 'Narrowband Transponder', invert: false, status: 'active', bandwidth: 250 },
+      { downlinkLow: 10491.000, downlinkHigh: 10499.000, uplinkLow: 2401.500, uplinkHigh: 2409.500, mode: 'Wideband Transponder', invert: false, status: 'active', bandwidth: 8000 },
+    ]},
+
+  // ── Weather / APT ────────────────────────────────────────────────────────
+  { name: 'NOAA 15', noradId: 25338, category: 'Weather/Science', color: '#79c0ff',
+    transponders: [
+      { downlinkLow: 137.620, downlinkHigh: 137.620, mode: 'APT 2400bps', status: 'active' },
+    ]},
+  { name: 'NOAA 18', noradId: 28654, category: 'Weather/Science', color: '#7ee787',
+    transponders: [
+      { downlinkLow: 137.9125, downlinkHigh: 137.9125, mode: 'APT 2400bps', status: 'active' },
+    ]},
+  { name: 'NOAA 19', noradId: 33591, category: 'Weather/Science', color: '#ffa657',
+    transponders: [
+      { downlinkLow: 137.100, downlinkHigh: 137.100, mode: 'APT 2400bps', status: 'active' },
+    ]},
+  { name: 'METEOR-M 2-3', noradId: 57166, category: 'Weather/Science', color: '#d4a5ff',
+    transponders: [
+      { downlinkLow: 137.900, downlinkHigh: 137.900, mode: 'LRPT', status: 'active' },
+    ]},
+  { name: 'METEOR-M 2-4', noradId: 59051, category: 'Weather/Science', color: '#c99af5',
+    transponders: [
+      { downlinkLow: 137.100, downlinkHigh: 137.100, mode: 'LRPT', status: 'active' },
+    ]},
 ];
 
-const CELESTRAK_GROUPS = ['stations', 'amateur', 'noaa'];
+// Backward-compatible helpers — old code used cat.downlink / cat.uplink / cat.mode
+function getSatPrimaryDownlink(cat) {
+  if (!cat || !cat.transponders) return null;
+  for (const t of cat.transponders) {
+    if (t.status === 'inactive') continue;
+    if (t.downlinkLow) return t.downlinkLow;
+    if (t.beaconFreq) return t.beaconFreq;
+  }
+  return null;
+}
+function getSatPrimaryUplink(cat) {
+  if (!cat || !cat.transponders) return null;
+  for (const t of cat.transponders) {
+    if (t.status === 'inactive') continue;
+    if (t.uplinkLow) return t.uplinkLow;
+  }
+  return null;
+}
+function getSatPrimaryMode(cat) {
+  if (!cat || !cat.transponders) return null;
+  for (const t of cat.transponders) {
+    if (t.status === 'inactive') continue;
+    if (t.mode) return t.mode;
+  }
+  return null;
+}
+function getSatPrimaryInvert(cat) {
+  if (!cat || !cat.transponders) return false;
+  for (const t of cat.transponders) {
+    if (t.status === 'inactive') continue;
+    if (t.downlinkLow && t.uplinkLow) return !!t.invert;
+  }
+  return false;
+}
+function getSatPrimaryCTCSS(cat) {
+  if (!cat || !cat.transponders) return null;
+  for (const t of cat.transponders) {
+    if (t.status === 'inactive') continue;
+    if (t.ctcssTone) return t.ctcssTone;
+  }
+  return null;
+}
+// Get all active transponders for a satellite
+function getSatActiveTransponders(cat) {
+  if (!cat || !cat.transponders) return [];
+  return cat.transponders.filter(t => t.status !== 'inactive');
+}
+
+const CELESTRAK_GROUPS = ['stations', 'amateur', 'noaa', 'weather', 'science'];
 
 // Radio model database — { name, baud, civAddr (Icom only) }
 const RADIO_MODELS = {
@@ -1503,18 +1667,20 @@ const RadioController = {
     if (!sat || !sat.catalogEntry) return;
     const cat = sat.catalogEntry;
     const rr = sat.rangeRate || 0;
-    if (cat.downlink) {
-      const dShift = computeDoppler(cat.downlink, rr);
-      const correctedDown = Math.round((cat.downlink + dShift) * 1e6 / 10) * 10;
+    const dl = getSatPrimaryDownlink(cat);
+    const ul = getSatPrimaryUplink(cat);
+    if (dl) {
+      const dShift = computeDoppler(dl, rr);
+      const correctedDown = Math.round((dl + dShift) * 1e6 / 10) * 10;
       if (correctedDown !== state.radio.lastSentDownlink) {
         state.radio.lastSentDownlink = correctedDown;
         state.radio.lastTxTime = now;
         await this.setDownlink(correctedDown);
       }
     }
-    if (cat.uplink && state.radio.config.splitVfo) {
-      const uShift = computeDoppler(cat.uplink, rr);
-      const correctedUp = Math.round((cat.uplink - uShift) * 1e6 / 10) * 10;
+    if (ul && state.radio.config.splitVfo) {
+      const uShift = computeDoppler(ul, rr);
+      const correctedUp = Math.round((ul - uShift) * 1e6 / 10) * 10;
       if (correctedUp !== state.radio.lastSentUplink) {
         state.radio.lastSentUplink = correctedUp;
         await this._delay(50);
@@ -1530,7 +1696,7 @@ const RadioController = {
     if (!sat || !sat.catalogEntry) return;
     state.radio.lastSentDownlink = 0;
     state.radio.lastSentUplink = 0;
-    const modeStr = this._satModeToRadioMode(sat.catalogEntry.mode);
+    const modeStr = this._satModeToRadioMode(getSatPrimaryMode(sat.catalogEntry));
     if (modeStr) await this.setMode(modeStr);
     await this.updateDoppler();
   },
@@ -1635,7 +1801,7 @@ const state = {
 // TLE FETCHING
 // ============================================================
 async function fetchTLEData(forceRefresh = false) {
-  const cacheKey = 'sat_tracker_tle_v2';
+  const cacheKey = 'sat_tracker_tle_v3';
   if (!forceRefresh) {
     try {
       const cached = JSON.parse(localStorage.getItem(cacheKey));
@@ -1712,6 +1878,92 @@ function parseTLECache(tleData) {
       console.warn(`TLE parse failed: ${cat.name}:`, e);
     }
   }
+}
+
+// ============================================================
+// SATNOGS TRANSPONDER ENRICHMENT
+// ============================================================
+async function fetchSatNOGSTransmitters() {
+  const cacheKey = 'sat_tracker_satnogs_v1';
+  try {
+    const cached = JSON.parse(localStorage.getItem(cacheKey));
+    if (cached && Date.now() - cached.timestamp < 12 * 3600 * 1000) {
+      console.log('[SatNOGS] Using cached transponder data');
+      mergeSatNOGSData(cached.data);
+      return;
+    }
+  } catch (e) {}
+
+  try {
+    // Fetch only active transmitters for our NORAD IDs
+    const noradIds = new Set(SATELLITE_CATALOG.map(c => c.noradId));
+    const resp = await fetch('https://db.satnogs.org/api/transmitters/?format=json&status=active');
+    if (!resp.ok) { console.warn('[SatNOGS] API returned', resp.status); return; }
+    const allTx = await resp.json();
+
+    // Filter to only our satellites
+    const relevant = allTx.filter(tx => noradIds.has(tx.norad_cat_id));
+    console.log(`[SatNOGS] Fetched ${allTx.length} transmitters, ${relevant.length} relevant to catalog`);
+
+    try { localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: relevant })); } catch (e) {}
+    mergeSatNOGSData(relevant);
+  } catch (e) {
+    console.warn('[SatNOGS] Fetch failed:', e.message);
+  }
+}
+
+function mergeSatNOGSData(satnogsTx) {
+  if (!satnogsTx || !satnogsTx.length) return;
+
+  // Group transmitters by NORAD ID
+  const byNid = {};
+  for (const tx of satnogsTx) {
+    if (!byNid[tx.norad_cat_id]) byNid[tx.norad_cat_id] = [];
+    byNid[tx.norad_cat_id].push(tx);
+  }
+
+  let enriched = 0;
+  for (const cat of SATELLITE_CATALOG) {
+    const txList = byNid[cat.noradId];
+    if (!txList || txList.length === 0) continue;
+
+    // Build SatNOGS transponder entries
+    const satnogsXpdrs = [];
+    for (const tx of txList) {
+      const xpdr = {};
+      // SatNOGS frequencies are in Hz, convert to MHz
+      if (tx.downlink_low) xpdr.downlinkLow = tx.downlink_low / 1e6;
+      if (tx.downlink_high) xpdr.downlinkHigh = tx.downlink_high / 1e6;
+      else if (tx.downlink_low) xpdr.downlinkHigh = tx.downlink_low / 1e6;
+      if (tx.uplink_low) xpdr.uplinkLow = tx.uplink_low / 1e6;
+      if (tx.uplink_high) xpdr.uplinkHigh = tx.uplink_high / 1e6;
+      else if (tx.uplink_low) xpdr.uplinkHigh = tx.uplink_low / 1e6;
+      if (tx.invert) xpdr.invert = true;
+      if (tx.baud) xpdr.baud = tx.baud;
+      xpdr.mode = tx.description || tx.type || 'Unknown';
+      xpdr.status = tx.status === 'active' ? 'active' : 'inactive';
+      xpdr.satnogs = true; // flag origin
+      if (tx.downlink_low || tx.uplink_low) satnogsXpdrs.push(xpdr);
+    }
+
+    if (satnogsXpdrs.length === 0) continue;
+
+    // Merge: if catalog already has manual transponders, add SatNOGS ones that don't duplicate
+    const existing = cat.transponders || [];
+    for (const snx of satnogsXpdrs) {
+      const isDupe = existing.some(ex => {
+        const exDl = ex.downlinkLow || ex.beaconFreq || 0;
+        const snDl = snx.downlinkLow || 0;
+        return Math.abs(exDl - snDl) < 0.005; // within 5 kHz = same transmitter
+      });
+      if (!isDupe) {
+        existing.push(snx);
+        enriched++;
+      }
+    }
+    cat.transponders = existing;
+  }
+  console.log(`[SatNOGS] Enriched catalog with ${enriched} additional transponders`);
 }
 
 // ============================================================
@@ -2678,7 +2930,7 @@ function updateTracks(nid, now) {
     const points = futureTrack.map((pt, i) => {
       const d = new Date(now.getTime() + i * 30 * 1000);
       const rr = getRangeRate(sat.satrec, state.observerGd, d);
-      const freq = sat.catalogEntry.downlink || 437;
+      const freq = getSatPrimaryDownlink(sat.catalogEntry) || 437;
       const shiftHz = computeDoppler(freq, rr) * 1000;
       return { lat: pt[0], lon: pt[1], shiftHz };
     });
@@ -2926,6 +3178,152 @@ function updateObserverDisplay() {
   const shortPlace = placeName ? placeName.split(',').slice(0, 2).join(',').trim() : '';
   if (placeLabel) placeLabel.textContent = shortPlace || `${Math.abs(lat).toFixed(2)}${lat >= 0 ? 'N' : 'S'}, ${Math.abs(lon).toFixed(2)}${lon >= 0 ? 'E' : 'W'} · Click to edit`;
   if (qthHint) qthHint.textContent = shortPlace || 'Click to set your station location';
+}
+
+// ============================================================
+// FREQUENCY SCALE BAR
+// ============================================================
+const FREQ_BANDS = {
+  vhf: { label: '2m Satellite', low: 145.800, high: 146.020, unit: 'MHz' },
+  uhf: { label: '70cm Satellite', low: 435.000, high: 438.000, unit: 'MHz' },
+};
+let freqScaleBand = 'vhf';
+
+function renderFreqScale() {
+  const canvas = document.getElementById('freq-scale-canvas');
+  if (!canvas) return;
+  const container = canvas.parentElement;
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+
+  const band = FREQ_BANDS[freqScaleBand];
+  if (!band) return;
+
+  const pad = 12;
+  const barY = 40;
+  const barH = 8;
+  const barW = w - pad * 2;
+
+  // Background
+  ctx.fillStyle = 'rgba(10,14,20,0.88)';
+  ctx.beginPath();
+  ctx.roundRect(0, 0, w, h, 6);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(30,42,58,0.6)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.roundRect(0.5, 0.5, w - 1, h - 1, 6);
+  ctx.stroke();
+
+  // Band label
+  ctx.fillStyle = 'rgba(122,139,160,0.7)';
+  ctx.font = '9px "SF Mono", monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText(band.label, pad, 14);
+
+  // Frequency bar background
+  ctx.fillStyle = 'rgba(26,33,48,0.9)';
+  ctx.beginPath();
+  ctx.roundRect(pad, barY, barW, barH, 3);
+  ctx.fill();
+
+  // Frequency ticks
+  const range = band.high - band.low;
+  const tickStep = range < 1 ? 0.025 : range < 5 ? 0.5 : 1.0;
+  ctx.fillStyle = 'rgba(122,139,160,0.5)';
+  ctx.strokeStyle = 'rgba(122,139,160,0.3)';
+  ctx.lineWidth = 0.5;
+  ctx.font = '8px "SF Mono", monospace';
+  ctx.textAlign = 'center';
+  for (let f = Math.ceil(band.low / tickStep) * tickStep; f <= band.high; f += tickStep) {
+    const x = pad + ((f - band.low) / range) * barW;
+    ctx.beginPath();
+    ctx.moveTo(x, barY);
+    ctx.lineTo(x, barY + barH + 4);
+    ctx.stroke();
+    ctx.fillText(f.toFixed(3), x, barY + barH + 13);
+  }
+
+  // Collect all visible transponder markers
+  const markers = [];
+  for (const nid of state.visibleSatIds) {
+    const sat = state.satellites[nid];
+    if (!sat || !sat.catalogEntry) continue;
+    const cat = sat.catalogEntry;
+    const rr = sat.rangeRate || 0;
+    const activeXpdrs = getSatActiveTransponders(cat);
+
+    for (const xp of activeXpdrs) {
+      const dlLow = xp.downlinkLow || xp.beaconFreq;
+      const dlHigh = xp.downlinkHigh || dlLow;
+      if (!dlLow) continue;
+
+      const dlLowCorr = dlLow + computeDoppler(dlLow, rr);
+      const dlHighCorr = dlHigh + computeDoppler(dlHigh, rr);
+      if (dlHighCorr < band.low || dlLowCorr > band.high) continue;
+
+      const x1 = pad + Math.max(0, (dlLowCorr - band.low) / range) * barW;
+      const x2 = pad + Math.min(1, (dlHighCorr - band.low) / range) * barW;
+      markers.push({ x1, x2, cat, sat, xp, midX: (x1 + x2) / 2 });
+    }
+  }
+
+  // Draw passband bars first
+  for (const m of markers) {
+    const bw = Math.max(m.x2 - m.x1, 2);
+    const alpha = m.sat.rfVisible ? 0.8 : 0.35;
+    ctx.fillStyle = m.cat.color + (alpha < 1 ? Math.round(alpha * 255).toString(16).padStart(2, '0') : '');
+    ctx.beginPath();
+    ctx.roundRect(m.x1, barY + 1, bw, barH - 2, 1);
+    ctx.fill();
+  }
+
+  // Draw labels with collision avoidance — spread overlapping labels vertically
+  // Deduplicate: one label per satellite (use first transponder in band)
+  const seen = new Set();
+  const labels = [];
+  for (const m of markers) {
+    if (seen.has(m.cat.noradId)) continue;
+    seen.add(m.cat.noradId);
+    const shortName = m.cat.name.length > 14 ? m.cat.name.slice(0, 12) + '..' : m.cat.name;
+    ctx.font = m.sat.rfVisible ? 'bold 8px "SF Mono", monospace' : '8px "SF Mono", monospace';
+    const tw = ctx.measureText(shortName).width;
+    labels.push({ ...m, shortName, tw, lx: m.midX - tw / 2, ly: barY - 4 });
+  }
+
+  // Sort by x position, then push overlapping labels up
+  labels.sort((a, b) => a.lx - b.lx);
+  for (let i = 1; i < labels.length; i++) {
+    for (let j = i - 1; j >= 0; j--) {
+      const overlap = (labels[j].lx + labels[j].tw + 4) - labels[i].lx;
+      if (overlap > 0 && Math.abs(labels[i].ly - labels[j].ly) < 9) {
+        labels[i].ly = labels[j].ly - 9;
+      }
+    }
+  }
+
+  // Render labels and leader lines
+  for (const lb of labels) {
+    // Leader line from bar to label if label was pushed up
+    if (lb.ly < barY - 5) {
+      ctx.strokeStyle = lb.cat.color + '55';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(lb.midX, barY);
+      ctx.lineTo(lb.midX, lb.ly + 3);
+      ctx.stroke();
+    }
+    ctx.fillStyle = lb.cat.color;
+    ctx.font = lb.sat.rfVisible ? 'bold 8px "SF Mono", monospace' : '8px "SF Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(lb.shortName, lb.midX, lb.ly);
+  }
 }
 
 // ============================================================
@@ -3218,7 +3616,13 @@ function updateDetailsPanel() {
     const ageColor = sat.tleAgeHours < 48 ? 'var(--green)' : sat.tleAgeHours < 168 ? 'var(--yellow)' : 'var(--red)';
     h += `<div class="detail-row"><span class="detail-label">TLE Age</span><span class="detail-value" style="color:${ageColor}">${ageStr}</span></div>`;
   }
-  h += r('Mode', cat.mode);
+  const priMode = getSatPrimaryMode(cat);
+  if (priMode) h += r('Mode', priMode);
+  // Show transponder summary
+  const activeXpdr = getSatActiveTransponders(cat);
+  if (activeXpdr.length > 1) h += r('Transponders', `${activeXpdr.length} active`);
+  const ctcss = getSatPrimaryCTCSS(cat);
+  if (ctcss) h += r('CTCSS Tone', `${ctcss} Hz`);
   h += '</div>';
 
   h += '<div class="vis-row">';
@@ -3233,23 +3637,38 @@ function updateDetailsPanel() {
   h += '<div class="freq-section">';
   h += '<div class="freq-section-label">Doppler-Corrected Frequencies</div>';
   const rr = sat.rangeRate || 0;
-  if (cat.downlink) {
-    const dShift = computeDoppler(cat.downlink, rr);
-    const corrected = cat.downlink + dShift;
+  const _dl = getSatPrimaryDownlink(cat);
+  const _ul = getSatPrimaryUplink(cat);
+  if (_dl) {
+    const dShift = computeDoppler(_dl, rr);
+    const corrected = _dl + dShift;
     const sign = dShift >= 0 ? '+' : '';
     const cls = dShift >= 0 ? 'positive' : 'negative';
     h += `<div class="freq-row"><span class="freq-label">Downlink</span><span class="freq-value">${corrected.toFixed(4)} MHz</span><span class="freq-doppler ${cls}">${sign}${(dShift * 1000).toFixed(1)} Hz</span></div>`;
   }
-  if (cat.uplink) {
-    const uShift = computeDoppler(cat.uplink, rr);
-    const corrected = cat.uplink - uShift;
+  if (_ul) {
+    const uShift = computeDoppler(_ul, rr);
+    const corrected = _ul - uShift;
     const sign = -uShift >= 0 ? '+' : '';
     const cls = -uShift >= 0 ? 'positive' : 'negative';
     h += `<div class="freq-row"><span class="freq-label">Uplink</span><span class="freq-value">${corrected.toFixed(4)} MHz</span><span class="freq-doppler ${cls}">${sign}${(-uShift * 1000).toFixed(1)} Hz</span></div>`;
   }
+  // Show all transponders with passband info
+  if (activeXpdr.length > 0) {
+    h += '<div class="transponder-list">';
+    for (const xp of activeXpdr) {
+      if (!xp.downlinkLow && !xp.beaconFreq) continue;
+      const isPassband = xp.downlinkHigh && xp.downlinkHigh !== xp.downlinkLow;
+      const freqStr = xp.beaconFreq ? `${xp.beaconFreq.toFixed(3)}` : isPassband ? `${xp.downlinkLow.toFixed(3)}–${xp.downlinkHigh.toFixed(3)}` : `${xp.downlinkLow.toFixed(3)}`;
+      const bwStr = xp.bandwidth ? ` (${xp.bandwidth}kHz)` : '';
+      const invStr = xp.invert ? ' ↕INV' : '';
+      h += `<div class="transponder-entry"><span class="xpdr-mode">${xp.mode}</span><span class="xpdr-freq mono">${freqStr}${bwStr}${invStr}</span></div>`;
+    }
+    h += '</div>';
+  }
 
   // Doppler shift gauge
-  const shiftHz = cat.downlink ? computeDoppler(cat.downlink, rr) * 1000 : 0;
+  const shiftHz = _dl ? computeDoppler(_dl, rr) * 1000 : 0;
   const maxShift = 10000; // ±10 kHz scale
   const pct = Math.max(-1, Math.min(1, shiftHz / maxShift));
   const approaching = rr < -0.1;
@@ -3270,8 +3689,8 @@ function updateDetailsPanel() {
   // Doppler S-curve for next pass
   const dopplerPasses = state.nextPassCache[state.activeSatId];
   const nextPass = Array.isArray(dopplerPasses) && dopplerPasses.length > 0 ? dopplerPasses[0] : dopplerPasses;
-  if (nextPass && cat.downlink && sat.satrec && state.observerGd) {
-    const curve = computeDopplerCurve(sat.satrec, state.observerGd, nextPass, cat.downlink, 50);
+  if (nextPass && _dl && sat.satrec && state.observerGd) {
+    const curve = computeDopplerCurve(sat.satrec, state.observerGd, nextPass, _dl, 50);
     if (curve.length > 1) {
       const w = 180, ht = 80, pad = 2;
       const shiftVals = curve.map(p => p.shiftHz);
@@ -3522,6 +3941,7 @@ function animLoop() {
     RadioController.updateDoppler();
     updateRadioFreqDisplay();
     updateElevBadges();
+    renderFreqScale();
 
     let above = 0;
     for (const s of Object.values(state.satellites)) if (s.rfVisible) above++;
@@ -3737,6 +4157,16 @@ function setupEvents() {
     document.getElementById('btn-track').classList.toggle('active', state.trackingMode);
   });
 
+  // Frequency scale band buttons
+  document.querySelectorAll('.freq-band-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.freq-band-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      freqScaleBand = btn.dataset.band;
+      renderFreqScale();
+    });
+  });
+
   // Radio settings — brand dropdown show/hide
   document.getElementById('setting-radio-brand').addEventListener('change', () => {
     const brand = document.getElementById('setting-radio-brand').value;
@@ -3882,6 +4312,9 @@ async function init() {
   }
 
   buildSatelliteList();
+
+  // Non-blocking: enrich catalog with SatNOGS transponder data
+  fetchSatNOGSTransmitters().catch(e => console.warn('[SatNOGS] Background fetch error:', e));
 
   // Auto-show ISS
   const iss = 25544;
