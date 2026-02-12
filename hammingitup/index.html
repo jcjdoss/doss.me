@@ -2295,24 +2295,24 @@ function updateDopplerRings(pos) {
 
   const approaching = rr < 0;
   const speed = Math.abs(rr);
-  // Compress rings on approaching side, stretch on receding
-  // This visually demonstrates the Doppler effect
-  const compressFactor = Math.max(0.4, 1.0 - speed * 0.08);
-  const stretchFactor = Math.min(1.8, 1.0 + speed * 0.1);
 
   const rings = [];
   const altM = pos.alt * 1000;
-  const numRings = 4;
+  // Layered filled rings — outer rings first (larger, more transparent),
+  // inner rings on top (smaller, more opaque) to create gradient effect
+  const numRings = 5;
+  const maxRadius = 800000; // 800km outer radius
 
-  for (let i = 1; i <= numRings; i++) {
-    const baseR = 200000 * i; // 200km spacing
-    const radius = approaching
-      ? baseR * compressFactor  // Compressed when approaching
-      : baseR * stretchFactor;  // Stretched when receding
-    const alpha = 0.6 - (i - 1) * 0.12;
+  for (let i = numRings; i >= 1; i--) {
+    const frac = i / numRings;
+    const radius = maxRadius * frac;
+    // Alpha fades out toward edges: inner = vivid, outer = faint
+    const alpha = approaching
+      ? 0.06 + 0.14 * (1 - frac)  // orange layers
+      : 0.05 + 0.12 * (1 - frac); // blue layers
     const col = approaching
-      ? new Cesium.Color(1.0, 0.4, 0.1, alpha)    // vivid orange
-      : new Cesium.Color(0.2, 0.5, 1.0, alpha);    // vivid blue
+      ? new Cesium.Color(1.0, 0.35, 0.05, alpha)
+      : new Cesium.Color(0.15, 0.45, 1.0, alpha);
 
     const ring = viewer.entities.add({
       position: Cesium.Cartesian3.fromDegrees(pos.lon, pos.lat, altM),
@@ -2320,14 +2320,31 @@ function updateDopplerRings(pos) {
         semiMajorAxis: radius,
         semiMinorAxis: radius,
         height: altM,
-        material: Cesium.Color.TRANSPARENT,
-        outline: true,
-        outlineColor: col,
-        outlineWidth: approaching ? 2.5 : 2,
+        material: col,
+        outline: i === numRings, // outline only on outermost ring
+        outlineColor: approaching
+          ? new Cesium.Color(1.0, 0.4, 0.1, 0.35)
+          : new Cesium.Color(0.2, 0.5, 1.0, 0.35),
+        outlineWidth: 1.5,
       },
     });
     rings.push(ring);
   }
+
+  // Center glow — small bright dot right at satellite
+  const glow = viewer.entities.add({
+    position: Cesium.Cartesian3.fromDegrees(pos.lon, pos.lat, altM),
+    ellipse: {
+      semiMajorAxis: 80000,
+      semiMinorAxis: 80000,
+      height: altM,
+      material: approaching
+        ? new Cesium.Color(1.0, 0.5, 0.15, 0.3)
+        : new Cesium.Color(0.3, 0.6, 1.0, 0.3),
+      outline: false,
+    },
+  });
+  rings.push(glow);
 
   state.dopplerRings = rings;
 }
