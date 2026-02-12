@@ -1141,6 +1141,7 @@ const state = {
   entities: {},       // { [nid]: { point, pastTrack, futureTrack } }
   footprintOuter: null,
   footprintInner: null,
+  dopplerRings: null,
   observerEntity: null,
   losEntity: null,
   lastTerminatorTime: 0,
@@ -2113,7 +2114,7 @@ function addSatMarker(nid) {
     },
   });
 
-  state.entities[nid] = { point: pointEntity, pastTrack, futureTrack };
+  state.entities[nid] = { point: pointEntity, pastTrack, futureTrack, dopplerSegments: [] };
 }
 
 function removeSatMarker(nid) {
@@ -2123,6 +2124,7 @@ function removeSatMarker(nid) {
   viewer.entities.remove(ents.point);
   viewer.entities.remove(ents.pastTrack);
   viewer.entities.remove(ents.futureTrack);
+  if (ents.dopplerSegments) ents.dopplerSegments.forEach(s => viewer.entities.remove(s));
   delete state.entities[nid];
 }
 
@@ -2145,10 +2147,30 @@ function updateSatEntityStyle(nid, isActive) {
 // ============================================================
 // CESIUM — GROUND TRACKS (no antimeridian splitting needed!)
 // ============================================================
+function dopplerShiftToColor(shiftHz, maxShift) {
+  // Exaggerate by squaring to make subtle shifts more visible
+  const raw = Math.max(-1, Math.min(1, shiftHz / maxShift));
+  const t = Math.sign(raw) * Math.pow(Math.abs(raw), 0.5);
+  if (t > 0.05) {
+    // Approaching: vivid orange/red
+    const s = Math.min(1, t * 1.5);
+    return new Cesium.Color(1.0, 0.4 * (1 - s) + 0.25 * s, 0.1 * (1 - s), 0.9);
+  } else if (t < -0.05) {
+    // Receding: vivid blue/cyan
+    const s = Math.min(1, Math.abs(t) * 1.5);
+    return new Cesium.Color(0.15 * (1 - s), 0.5 * (1 - s) + 0.3 * s, 1.0, 0.9);
+  } else {
+    // Near zero shift: white
+    return new Cesium.Color(1.0, 1.0, 1.0, 0.8);
+  }
+}
+
 function updateTracks(nid, now) {
   const sat = state.satellites[nid];
   const ents = state.entities[nid];
   if (!sat || !ents) return;
+  const viewer = state.viewer;
+  const isActive = nid === state.activeSatId;
 
   const period = getOrbitalPeriod(sat.satrec);
   const { pastTrack, futureTrack } = computeGroundTrack(sat.satrec, now, period, period * 1.5, 30);
@@ -2156,15 +2178,52 @@ function updateTracks(nid, now) {
   // Convert [lat, lon] arrays to Cesium Cartesian3 — NOTE: lon/lat swap!
   if (pastTrack.length > 1) {
     const pastDegrees = [];
-    for (const pt of pastTrack) { pastDegrees.push(pt[1], pt[0]); } // lon, lat
+    for (const pt of pastTrack) { pastDegrees.push(pt[1], pt[0]); }
     ents.pastTrack.polyline.positions = Cesium.Cartesian3.fromDegreesArray(pastDegrees);
   } else {
     ents.pastTrack.polyline.positions = [];
   }
 
-  if (futureTrack.length > 1) {
+  // Remove old Doppler segments
+  if (ents.dopplerSegments) {
+    ents.dopplerSegments.forEach(s => viewer.entities.remove(s));
+    ents.dopplerSegments = [];
+  }
+
+  if (futureTrack.length > 1 && isActive && state.observerGd) {
+    // Hide the default future track — we'll draw Doppler-colored segments instead
+    ents.futureTrack.polyline.positions = [];
+
+    // Compute Doppler at each future track point
+    const points = futureTrack.map((pt, i) => {
+      const d = new Date(now.getTime() + i * 30 * 1000);
+      const rr = getRangeRate(sat.satrec, state.observerGd, d);
+      const freq = sat.catalogEntry.downlink || 437;
+      const shiftHz = computeDoppler(freq, rr) * 1000;
+      return { lat: pt[0], lon: pt[1], shiftHz };
+    });
+
+    // Find max shift for color scaling
+    const maxShift = Math.max(500, ...points.map(p => Math.abs(p.shiftHz)));
+
+    // Draw colored segments (pairs of adjacent points)
+    for (let i = 0; i < points.length - 1; i++) {
+      const p1 = points[i], p2 = points[i + 1];
+      const avgShift = (p1.shiftHz + p2.shiftHz) / 2;
+      const col = dopplerShiftToColor(avgShift, maxShift);
+      const seg = viewer.entities.add({
+        polyline: {
+          positions: Cesium.Cartesian3.fromDegreesArray([p1.lon, p1.lat, p2.lon, p2.lat]),
+          width: 3.5,
+          material: col,
+          clampToGround: true,
+        },
+      });
+      ents.dopplerSegments.push(seg);
+    }
+  } else if (futureTrack.length > 1) {
     const futureDegrees = [];
-    for (const pt of futureTrack) { futureDegrees.push(pt[1], pt[0]); } // lon, lat
+    for (const pt of futureTrack) { futureDegrees.push(pt[1], pt[0]); }
     ents.futureTrack.polyline.positions = Cesium.Cartesian3.fromDegreesArray(futureDegrees);
   } else {
     ents.futureTrack.polyline.positions = [];
@@ -2215,6 +2274,62 @@ function updateFootprint(pos) {
       outlineWidth: 2,
     },
   });
+}
+
+// ============================================================
+// CESIUM — DOPPLER WAVEFRONT RINGS
+// ============================================================
+function updateDopplerRings(pos) {
+  const viewer = state.viewer;
+  // Remove old rings
+  if (state.dopplerRings) {
+    state.dopplerRings.forEach(r => viewer.entities.remove(r));
+    state.dopplerRings = null;
+  }
+  if (!pos || state.activeSatId == null) return;
+  const sat = state.satellites[state.activeSatId];
+  if (!sat || !state.observerGd) return;
+
+  const rr = sat.rangeRate || 0;
+  if (Math.abs(rr) < 0.01) return;
+
+  const approaching = rr < 0;
+  const speed = Math.abs(rr);
+  // Compress rings on approaching side, stretch on receding
+  // This visually demonstrates the Doppler effect
+  const compressFactor = Math.max(0.4, 1.0 - speed * 0.08);
+  const stretchFactor = Math.min(1.8, 1.0 + speed * 0.1);
+
+  const rings = [];
+  const altM = pos.alt * 1000;
+  const numRings = 4;
+
+  for (let i = 1; i <= numRings; i++) {
+    const baseR = 200000 * i; // 200km spacing
+    const radius = approaching
+      ? baseR * compressFactor  // Compressed when approaching
+      : baseR * stretchFactor;  // Stretched when receding
+    const alpha = 0.6 - (i - 1) * 0.12;
+    const col = approaching
+      ? new Cesium.Color(1.0, 0.4, 0.1, alpha)    // vivid orange
+      : new Cesium.Color(0.2, 0.5, 1.0, alpha);    // vivid blue
+
+    const ring = viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(pos.lon, pos.lat, altM),
+      ellipse: {
+        semiMajorAxis: radius,
+        semiMinorAxis: radius,
+        height: altM,
+        material: Cesium.Color.TRANSPARENT,
+        outline: true,
+        outlineColor: col,
+        outlineWidth: approaching ? 2.5 : 2,
+      },
+    });
+    rings.push(ring);
+  }
+
+  state.dopplerRings = rings;
 }
 
 // ============================================================
@@ -2881,6 +2996,7 @@ function animLoop() {
     if (state.activeSatId != null && state.satellites[state.activeSatId]) {
       const activePos = state.satellites[state.activeSatId].position;
       updateFootprint(activePos);
+      updateDopplerRings(activePos);
       updateLosLine(activePos);
 
       // Camera track mode — follow satellite, looking down at globe
