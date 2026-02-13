@@ -1,1 +1,18 @@
-[{"timestamp":1770998269,"level":14,"vrl":99,"spd":98,"rch":94,"tru":99,"wis":99,"cre":98,"xp":13800}]
+{
+  "timestamp": 1770998269,
+  "level": 14,
+  "stats": {
+    "VRL": 99,
+    "SPD": 98,
+    "RCH": 94,
+    "TRU": 99,
+    "WIS": 99,
+    "CRE": 98
+  },
+  "metrics": {
+    "xp": 13800,
+    "memory_count": 1598,
+    "completed_tasks": 4067,
+    "sessions": 6
+  }
+}
