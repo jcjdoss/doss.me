@@ -162,20 +162,32 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <script>
         // Load stats data
-        const statsData = {"timestamp":1770998269,"level":14,"vrl":99,"spd":98,"rch":94,"tru":99,"wis":99,"cre":98,"xp":13800};
-        const historyData = [{"timestamp":1770998269,"level":14,"vrl":99,"spd":98,"rch":94,"tru":99,"wis":99,"cre":98}];
+        // Fetch stats from JSON
+        fetch('stats.json')
+            .then(response => response.json())
+            .then(statsData => {
+                // Update current stats
+                document.getElementById('level').textContent = statsData.level;
+                
+                const stats = ['vrl', 'spd', 'rch', 'tru', 'wis', 'cre'];
+                stats.forEach(stat => {
+                    const value = statsData.stats[stat.toUpperCase()];
+                    document.getElementById(`${stat}-value`).textContent = value;
+                    setTimeout(() => {
+                        document.getElementById(`${stat}-bar`).style.width = value + '%';
+                    }, 100);
+                });
+                
+                // For now, use single data point for history
+                const historyData = [statsData];
+                renderChart(historyData);
+            })
+            .catch(error => {
+                console.error('Error loading stats:', error);
+                document.body.innerHTML += '<p style="text-align: center; color: #ff006e;">Error loading stats</p>';
+            });
         
-        // Update current stats
-        document.getElementById('level').textContent = statsData.level;
-        
-        const stats = ['vrl', 'spd', 'rch', 'tru', 'wis', 'cre'];
-        stats.forEach(stat => {
-            const value = statsData.stats[stat.toUpperCase()];
-            document.getElementById(`${stat}-value`).textContent = value;
-            setTimeout(() => {
-                document.getElementById(`${stat}-bar`).style.width = value + '%';
-            }, 100);
-        });
+        function renderChart(historyData) {
         
         // Create chart
         const ctx = document.getElementById('statsChart').getContext('2d');
@@ -189,37 +201,37 @@
         const datasets = [
             {
                 label: 'VRL',
-                data: historyData.map(d => d.vrl).reverse(),
+                data: historyData.map(d => d.stats.VRL).reverse(),
                 borderColor: '#ff006e',
                 backgroundColor: 'rgba(255, 0, 110, 0.1)',
             },
             {
                 label: 'SPD',
-                data: historyData.map(d => d.spd).reverse(),
+                data: historyData.map(d => d.stats.SPD).reverse(),
                 borderColor: '#ffbe0b',
                 backgroundColor: 'rgba(255, 190, 11, 0.1)',
             },
             {
                 label: 'RCH',
-                data: historyData.map(d => d.rch).reverse(),
+                data: historyData.map(d => d.stats.RCH).reverse(),
                 borderColor: '#00b4d8',
                 backgroundColor: 'rgba(0, 180, 216, 0.1)',
             },
             {
                 label: 'TRU',
-                data: historyData.map(d => d.tru).reverse(),
+                data: historyData.map(d => d.stats.TRU).reverse(),
                 borderColor: '#06ffa5',
                 backgroundColor: 'rgba(6, 255, 165, 0.1)',
             },
             {
                 label: 'WIS',
-                data: historyData.map(d => d.wis).reverse(),
+                data: historyData.map(d => d.stats.WIS).reverse(),
                 borderColor: '#4361ee',
                 backgroundColor: 'rgba(67, 97, 238, 0.1)',
             },
             {
                 label: 'CRE',
-                data: historyData.map(d => d.cre).reverse(),
+                data: historyData.map(d => d.stats.CRE).reverse(),
                 borderColor: '#8338ec',
                 backgroundColor: 'rgba(131, 56, 236, 0.1)',
             },
@@ -262,6 +274,7 @@
                 }
             }
         });
+        }
     </script>
 </body>
 </html>
